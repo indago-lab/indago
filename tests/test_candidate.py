@@ -1,8 +1,4 @@
-import sys
 
-from exceptiongroup import catch
-
-sys.path.append('..')
 import indago
 import numpy as np
 from copy import copy, deepcopy
