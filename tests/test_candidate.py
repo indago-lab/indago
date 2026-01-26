@@ -3,30 +3,25 @@ import indago
 import numpy as np
 from copy import copy, deepcopy
 
+variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
+             'var2': (indago.VariableType.Real, 0, None),  # Real (continuous) semi-bounded
+             'var3': (indago.VariableType.Real, None, None),  # Real (continuous) unbounded
+             'var4': (indago.VariableType.Discrete, [1.1, 1.2, 1.3, 1.4, 1.5]), # Discrete (float for evaluator, int for optimizer)
+             'var5': (indago.VariableType.Integer, 0, 10),  # Integer (bot for optimizer and evaluator)
+             'var6': (indago.VariableType.Category, ['A', 'B', 'C', 'D', 'E']),  # Category
+             }
+
 def test_initialization():
 
-    variables = {'var1': (indago.VariableType.Real, -100, 100), # Real (continuous) bounded
-                 'var2': (indago.VariableType.Real, 0, None), # Real (continuous) semi-bounded
-                 'var3': (indago.VariableType.Real, None, None), # Real (continuous) unbounded
-                 'var4': (indago.VariableType.Discrete, [1.1, 1.2, 1.3, 1.4, 1.5]), # Discrete (float for evaluator, int for optimizer)
-                 'var5': (indago.VariableType.Integer, 0, 10), # Integer (bot for optimizer and evaluator)
-                 # 'var6': (indago.VariableType.Category, ['a', 'b', 'c', 'd', 'e']),  # Category
-                 }
-
-    candidate: indago.Candidate = indago.Candidate(variables=variables)
+    vars = copy(variables)
+    vars.pop('var6')
+    candidate: indago.Candidate = indago.Candidate(variables=vars)
 
     assert np.all(np.isnan(candidate._X[:4])) and candidate._X[4] == 0
     assert np.all(np.isnan(candidate.X[:4])) and candidate.X[4] == 0.0
 
 def test_list_X_format():
 
-    variables = {'var1': (indago.VariableType.Real, -100, 100), # Real (continuous) bounded
-                 'var2': (indago.VariableType.Real, 0, None), # Real (continuous) semi-bounded
-                 'var3': (indago.VariableType.Real, None, None), # Real (continuous) unbounded
-                 'var4': (indago.VariableType.Discrete, [1.1, 1.2, 1.3, 1.4, 1.5]), # Discrete (float for evaluator, int for optimizer)
-                 'var5': (indago.VariableType.Integer, 0, 10), # Integer (bot for optimizer and evaluator)
-                 'var6': (indago.VariableType.Category, ['a', 'b', 'c', 'd', 'e']),  # Category
-                 }
     candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.List)
 
     print(candidate.X)
@@ -34,16 +29,9 @@ def test_list_X_format():
     assert np.all(np.isnan(candidate._X[:4])) and candidate._X[4] == 0 and candidate.X[5] == 'X'
     assert [type(x) == float for x in candidate._X[:4]] and type(candidate.X[4]) == int and type(candidate.X[5]) == str
 
-def test_X_assing():
+def test_x_assign():
 
-    variables = {'var1': (indago.VariableType.Real, -100, 100), # Real (continuous) bounded
-                 'var2': (indago.VariableType.Real, 0, None), # Real (continuous) semi-bounded
-                 'var3': (indago.VariableType.Real, None, None), # Real (continuous) unbounded
-                 'var4': (indago.VariableType.Discrete, [1.1, 1.2, 1.3, 1.4, 1.5]), # Discrete (float for evaluator, int for optimizer)
-                 'var5': (indago.VariableType.Integer, 0, 10), # Integer (bot for optimizer and evaluator)
-                 'var6': (indago.VariableType.Category, ['a', 'b', 'c', 'd', 'e']),  # Category
-                 }
-    candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.List)
+    candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
 
     candidate.X = [0.11, 0.22, 0.33, 1.5, 7, 'Material A']
     print(candidate.X)
@@ -59,7 +47,9 @@ def test_X_assing():
 
         assert False, f' X[{i}] = {v} should be allowed'
 
+
     try:
+        print(candidate.X)
         candidate.X[0] = 'prvi'
         print(candidate.X)
     except Exception as e:
@@ -67,10 +57,74 @@ def test_X_assing():
     else:
         assert False, f' X[{i}] = {v} should not be allowed'
 
+def test_candidate_copy():
+
+    c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    print(c1.X)
+    print(np.copy(c1.X))
+    c2: indago.Candidate = c1.copy()
+    print(c2.X)
+
+
+def test_adjust():
+
+    c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    assert c1.adjust()
+
+    X = c1.get_x_as_list()
+    X[0] = 1.2345
+    c1.X = X
+    assert not c1.adjust()
+    assert c1.X[0] == X[0]
+
+    X = c1.get_x_as_list()
+    X[0] = -987.654
+    c1.X = X
+    assert c1.adjust()
+    assert not c1.X[0] == X[0]
+
+    X = c1.get_x_as_list()
+    X[1] = -0.3
+    c1.X = X
+    assert c1.adjust()
+    assert not c1.X[1] == X[1]
+
+    X = c1.get_x_as_list()
+    X[2] = 365.25
+    c1.X = X
+    assert not c1.adjust()
+    assert c1.X[1] == X[1]
+
+    X = c1.get_x_as_list()
+    X[3] = 8.2
+    c1.X = X
+    assert c1.adjust()
+    assert not c1.X[3] == X[3]
+
+    X = c1.get_x_as_list()
+    X[4] = 7
+    c1.X = X
+    c1.adjust()
+    assert c1.X[4] == X[4]
+
+    X = c1.get_x_as_list()
+    X[4] = 11
+    c1.X = X
+    assert c1.adjust()
+    assert not c1.X[4] == X[4]
+
+    X = c1.get_x_as_list()
+    X[5] = 'D'
+    c1.X = X
+    assert not c1.adjust()
+    assert c1.X[5] == X[5]
+
+    X = c1.get_x_as_list()
+    X[5] = 'None'
+    c1.X = X
+    assert c1.adjust()
+    assert not c1.X[5] == X[5]
+
 if __name__ == '__main__':
 
-    test_initialization()
-
-    test_list_X_format()
-
-    test_X_assing()
+    test_adjust()

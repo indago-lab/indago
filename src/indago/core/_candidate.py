@@ -24,7 +24,10 @@ import numpy as np
 from typing import TypeAlias
 from numpy.typing import NDArray
 
+from rich.console import Console
+from rich.table import Table
 from enum import Enum
+
 
 class VariableType(Enum):
     """Enum class for variable types."""
@@ -37,19 +40,25 @@ class VariableType(Enum):
     def __str__(self):
         return self.name + ': ' + self.value
 
-X_Type: TypeAlias = tuple[int | float | str]
+
+# Define types
+X_Content_Type: TypeAlias = int | float | str
+X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Content_Type] | NDArray[np.float64]
+X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 
 
 class XFormat(Enum):
     """Enum class for """
 
-    Ndarray = 'ndarray'
+    Tuple = 'tuple'
     List = 'list'
-    # Discrete = 'D'
-    # Category = 'C'
+    Dict = 'dict'
+    Ndarray = 'ndarray'
+    TypeSplit = 'type_split'
 
     def __str__(self):
         return self.name + ': ' + self.value
+
 
 class Candidate:
     """Base class for search agents in all optimization methods.
@@ -74,32 +83,47 @@ class Candidate:
     """
 
     def __init__(self, variables: dict, n_objectives: int = 1, n_constraints: int = 0,
-                 x_format: XFormat = XFormat.Ndarray) -> None:
+                 x_format: XFormat = XFormat.Tuple) -> None:
         """Candidate constructor."""
-        # if optimizer is None:
-        #     return
 
-        X = []
+        X: list[X_Content_Type] = []
+        type_count = {k: 0 for k in VariableType}
         for var_name, (var_type, *var_params) in variables.items():
-            if var_type == VariableType.Real:
-                X.append(np.nan)
-            elif var_type == VariableType.Integer:
-                X.append(0)
-            elif var_type == VariableType.Discrete:
-                X.append(np.nan)
-            elif var_type == VariableType.Category:
-                X.append('X')
-            else:
-                raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
+            match var_type:
+                case VariableType.Real:
+                    X.append(np.nan)
+                case VariableType.Integer:
+                    X.append(0)
+                case VariableType.Discrete:
+                    X.append(np.nan)
+                case VariableType.Category:
+                    X.append('X')
+                case _:
+                    raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
+            type_count[var_type] += 1
 
-        self._X: X_Type = tuple(X)
+        var_float = type_count[VariableType.Real] + type_count[VariableType.Discrete]
+        var_int = type_count[VariableType.Integer]
+        var_str = type_count[VariableType.Category]
+        x_is_homogenous = np.sum(np.array([var_float, var_int, var_str]) > 0) == 1
 
-        if x_format == XFormat.List:
-            self._get_x = self.get_x_as_list
-        elif x_format == XFormat.Ndarray:
-            self._get_x = self.get_x_as_ndarray
-        else:
-            raise NotImplementedError
+        self._X: X_Storage_Type = tuple[X_Content_Type](X)
+        self._variables = variables
+
+        match x_format:
+            case XFormat.Tuple:
+                self._get_x = self.get_x_as_tuple
+            case XFormat.List:
+                self._get_x = self.get_x_as_list
+            case XFormat.Dict:
+                self._get_x = self.get_x_as_dict
+            case XFormat.Ndarray:
+                assert x_is_homogenous, f'Cant use x_format {x_format} for heterogeneous variables'
+                self._get_x = self.get_x_as_ndarray
+            case _:
+                raise NotImplementedError
+
+        self._x_format = x_format
 
         self.O: NDArray[np.float64] = np.full(n_objectives, np.nan)
         self.C: NDArray[np.float64] = np.full(n_constraints, np.nan)
@@ -119,38 +143,109 @@ class Candidate:
         self.unique_str = None
 
     @property
-    def X(self):
+    def X(self) -> X_All_Containers:
         return self._get_x()
 
     @X.setter
-    def X(self, value):
+    def X(self, value: X_All_Containers) -> None:
         self._set_x(value)
 
-    def get_x_as_list(self):
+    def get_x_as_tuple(self) -> tuple[X_Content_Type]:
         return self._X
-    def get_x_as_ndarray(self):
+
+    def get_x_as_list(self) -> list[X_Content_Type]:
+        return list(self._X)
+
+    def get_x_as_dict(self) -> dict[str, X_Content_Type]:
+        X: dict[str, X_Content_Type] = {}
+        for (var_name, var), x in zip(self._variables.items(), self._X):
+            X[var_name] = x
+        return X
+
+    def get_x_as_ndarray(self) -> NDArray[np.float64]:
         return np.asarray(self._X, dtype=np.float64)
-    def get_x_as_xy(self):
-        X = []
-        Y = []
+
+    def get_x_as_xy(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
+        X_float = []
+        X_int = []
+        X_str = []
         for x in self._X:
             if type(x) in [float, np.float64]:
-                X.append(x)
+                X_float.append(x)
             elif type(x) in [int, np.int32]:
-                Y.append(x)
+                X_int.append(x)
+            elif type(x) in [str]:
+                X_str.append(x)
             else:
                 raise NotImplementedError
-        return np.asarray(X, dtype=np.float64), np.asarray(Y, dtype=np.int32)
+        return np.asarray(X_float, dtype=np.float64), np.asarray(X_int, dtype=np.int32), np.asarray(X_str, dtype=np.str_)
 
-    def _set_x(self, values):
+    def _set_x(self, values: X_All_Containers):
+
         X = []
-        if type(values) == list:
-            for i, (x, v) in enumerate(zip(self._X, values)):
+        x_format: type = type(values)
+        if x_format in [list, tuple, np.ndarray]:
+            for i, (v, x) in enumerate(zip(values, self._X)):
+                assert type(x) == type(v), f'X[{i}] value mismatch (replacing {x} of type {type(x)} with {v} of type {type(v)})'
+                X.append(v)
+        elif x_format == dict:
+            for i, ((var_name, v), x) in enumerate(zip(values.items(), self._X)):
                 assert type(x) == type(v), f'X[{i}] value mismatch (replacing {type(x)} with {type(v)})'
                 X.append(v)
-            self._X = tuple(X)
-        elif type(values) == np.ndarray:
+        elif x_format == np.ndarray:
             self._X = values.tolist()
+        else:
+            raise NotImplementedError(f'Unsupported x_format {x_format}')
+        self._X = tuple(X)
+
+
+    def adjust(self) -> bool:
+        X: list[X_Content_Type] = []
+        for (var_name, options), x in zip(self._variables.items(), self._X):
+
+            # Real variable
+            if options[0] == VariableType.Real:
+                _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
+                if options[1] is not None and x < float(options[1]): # lower bound
+                    _x = float(options[1])
+                if options[2] is not None and x > float(options[2]): # upper bound
+                    _x = float(options[2])
+                X.append(_x)
+
+            # Discrete variable
+            if options[0] == VariableType.Discrete:
+                if x in options[1]:
+                    X.append(x)
+                elif np.isnan(x) or np.isinf(x): # nan or inf values
+                    X.append(options[1][0])
+                else:
+                    j = np.argmin(np.abs(np.asarray(options[1]) - _x))
+                    X.append(options[1][j])
+
+            # Integer variable
+            if options[0] == VariableType.Integer:
+                _x = x
+                if x< options[1]:
+                    _x = options[1]
+                elif x > options[2]:
+                    _x = options[2]
+                X.append(_x)
+
+            # Category variable
+            if options[0] == VariableType.Category:
+                if x in options[1]:
+                    X.append(x)
+                else:
+                    X.append(options[1][0])
+
+
+        X = tuple[X_Content_Type](X)
+        changed = not (X == self._X)
+        # print(f'{self._X=}  ==>>  {X=}  {changed=}')
+        if changed:
+            self.X = X
+        return changed
+
 
     def clip(self, optimizer) -> None:
         """Method for clipping (trimming) the design vector (Candidate.X)
@@ -162,7 +257,7 @@ class Candidate:
             Nothing
 
         """
-
+        # TODO this needs to be reimplemented to use Candidate.variables instead of Optimizer
         self.X = np.clip(self.X, optimizer.lb, optimizer.ub)
 
     def copy(self):
@@ -175,24 +270,24 @@ class Candidate:
 
         """
 
-        candidate = Candidate(None)
-        candidate.X = np.copy(self.X)
+        candidate: Candidate = Candidate(self._variables, self.O.size, self.C.size, self._x_format)
+        candidate.X = self.X  #np.copy(self.X)
         candidate.O = np.copy(self.O)
         candidate.C = np.copy(self.C)
         candidate.f = self.f
 
-        # Comparison operators
-        if self.O.size == 1 and self.C.size == 0:
-            candidate._eq_fn = candidate._eq_fast
-            candidate._lt_fn = candidate._lt_fast
-            # self.__gt__ = self._gt_fast
-        else:
-            candidate._eq_fn = candidate._eq_full
-            candidate._lt_fn = candidate._lt_full
-            # self.__gt__ = self._gt_full
+        # # Comparison operators
+        # if self.O.size == 1 and self.C.size == 0:
+        #     candidate._eq_fn = candidate._eq_fast
+        #     candidate._lt_fn = candidate._lt_fast
+        #     # self.__gt__ = self._gt_fast
+        # else:
+        #     candidate._eq_fn = candidate._eq_full
+        #     candidate._lt_fn = candidate._lt_full
+        #     # self.__gt__ = self._gt_full
 
         # if optimizer.forward_unique_str:
-        candidate.unique_str = self.unique_str
+        # candidate.unique_str = self.unique_str
 
         return candidate
 
@@ -218,11 +313,15 @@ class Candidate:
         table.add_column('Property', justify='left', style='magenta')
         table.add_column('Value', justify='left', style='cyan')
 
-        for var, value in vars(self).items():
+        attributes = list(vars(self).items())
+        attributes.append(('X', self.X))
+        print(attributes)
+        for var, value in attributes:
+            print(f'{var}: {value}')
             if not var.startswith('_'):
                 if isinstance(value, (int, float, str, bool)):
                     table.add_row(var, str(value))
-                elif isinstance(value, (list, dict)) and len(value) > 0:
+                elif isinstance(value, (list, tuple, dict)) and len(value) > 0:
                     table.add_row(var, str(value))
                 elif isinstance(value, np.ndarray) and np.size(value) > 0:
                     if isinstance(value[0], (int, float)):
