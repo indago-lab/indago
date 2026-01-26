@@ -54,7 +54,7 @@ class XFormat(Enum):
     List = 'list'
     Dict = 'dict'
     Ndarray = 'ndarray'
-    TypeSplit = 'type_split'
+    Grouped = 'grouped'
 
     def __str__(self):
         return self.name + ': ' + self.value
