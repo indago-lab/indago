@@ -181,7 +181,7 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(X_float, dtype=np.float64), np.asarray(X_int, dtype=np.int32), np.asarray(X_str, dtype=np.str_)
 
-    def _set_x(self, new_values: X_All_Containers):
+    def _set_x(self, new_values: X_All_Containers) -> None:
 
         X = []
         x_format: type = type(new_values)
@@ -225,7 +225,7 @@ class Candidate:
                 elif np.isnan(x) or np.isinf(x): # nan or inf values
                     X.append(var_options[0][0])
                 else:
-                    j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
+                    j = np.argmin(np.abs(np.asarray(var_options[0]) - x))
                     X.append(var_options[0][j])
 
             # Integer variable
@@ -321,9 +321,8 @@ class Candidate:
 
         attributes = list(vars(self).items())
         attributes.append(('X', self.X))
-        print(attributes)
+
         for var, value in attributes:
-            print(f'{var}: {value}')
             if not var.startswith('_'):
                 if isinstance(value, (int, float, str, bool)):
                     table.add_row(var, str(value))
@@ -331,7 +330,7 @@ class Candidate:
                     table.add_row(var, str(value))
                 elif isinstance(value, np.ndarray) and np.size(value) > 0:
                     if isinstance(value[0], (int, float)):
-                        table.add_row(var, np.array_str(value, max_line_width=np.inf))
+                        table.add_row(var, np.array_str(value))
 
         Console().print(table)
         return ''
