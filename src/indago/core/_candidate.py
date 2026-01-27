@@ -21,7 +21,7 @@ Usage: from indago import Candidate
 #     from ._optimizer import Optimizer
 
 import numpy as np
-from typing import TypeAlias
+from typing import TypeAlias, Any
 from numpy.typing import NDArray
 
 from rich.console import Console
@@ -34,8 +34,8 @@ class VariableType(Enum):
 
     Real = 'R'
     Integer = 'I'
-    Discrete = 'D'
-    Category = 'C'
+    RealDiscrete = 'D'
+    Categorical = 'C'
 
     def __str__(self):
         return self.name + ': ' + self.value
@@ -46,6 +46,7 @@ X_Content_Type: TypeAlias = int | float | str
 X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Content_Type] | NDArray[np.float64]
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 
+VariableDictType = dict[str, tuple[VariableType, Any]]
 
 class XFormat(Enum):
     """Enum class for """
@@ -94,17 +95,17 @@ class Candidate:
                     X.append(np.nan)
                 case VariableType.Integer:
                     X.append(0)
-                case VariableType.Discrete:
+                case VariableType.RealDiscrete:
                     X.append(np.nan)
-                case VariableType.Category:
+                case VariableType.Categorical:
                     X.append('X')
                 case _:
                     raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
             type_count[var_type] += 1
 
-        var_float = type_count[VariableType.Real] + type_count[VariableType.Discrete]
+        var_float = type_count[VariableType.Real] + type_count[VariableType.RealDiscrete]
         var_int = type_count[VariableType.Integer]
-        var_str = type_count[VariableType.Category]
+        var_str = type_count[VariableType.Categorical]
         x_is_homogenous = np.sum(np.array([var_float, var_int, var_str]) > 0) == 1
 
         self._X: X_Storage_Type = tuple[X_Content_Type](X)
@@ -180,20 +181,25 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(X_float, dtype=np.float64), np.asarray(X_int, dtype=np.int32), np.asarray(X_str, dtype=np.str_)
 
-    def _set_x(self, values: X_All_Containers):
+    def _set_x(self, new_values: X_All_Containers):
 
         X = []
-        x_format: type = type(values)
+        x_format: type = type(new_values)
         if x_format in [list, tuple, np.ndarray]:
-            for i, (v, x) in enumerate(zip(values, self._X)):
-                assert type(x) == type(v), f'X[{i}] value mismatch (replacing {x} of type {type(x)} with {v} of type {type(v)})'
-                X.append(v)
+            for i, (val, (var_name, (var_type, *_))) in enumerate(zip(new_values, self._variables.items())):
+                if var_type == VariableType.Real or var_type == VariableType.RealDiscrete:
+                    assert isinstance(val, (float, np.floating)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    X.append(float(val))
+                if var_type == VariableType.Integer:
+                    assert isinstance(val, (int, np.integer)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    X.append(int(val))
+                if var_type == VariableType.Categorical:
+                    assert isinstance(val, (str)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    X.append(val)
         elif x_format == dict:
-            for i, ((var_name, v), x) in enumerate(zip(values.items(), self._X)):
+            for i, ((var_name, v), x) in enumerate(zip(new_values.items(), self._X)):
                 assert type(x) == type(v), f'X[{i}] value mismatch (replacing {type(x)} with {type(v)})'
                 X.append(v)
-        elif x_format == np.ndarray:
-            self._X = values.tolist()
         else:
             raise NotImplementedError(f'Unsupported x_format {x_format}')
         self._X = tuple(X)
@@ -201,42 +207,42 @@ class Candidate:
 
     def adjust(self) -> bool:
         X: list[X_Content_Type] = []
-        for (var_name, options), x in zip(self._variables.items(), self._X):
-
+        for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
+            # print(f'{var_name=}  {var_type=}  {var_options=}  {x=}')
             # Real variable
-            if options[0] == VariableType.Real:
+            if var_type == VariableType.Real:
                 _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
-                if options[1] is not None and x < float(options[1]): # lower bound
-                    _x = float(options[1])
-                if options[2] is not None and x > float(options[2]): # upper bound
-                    _x = float(options[2])
+                if var_options[0] is not None and _x < float(var_options[0]): # lower bound
+                    _x = float(var_options[0])
+                if var_options[1] is not None and _x > float(var_options[1]): # upper bound
+                    _x = float(var_options[1])
                 X.append(_x)
 
             # Discrete variable
-            if options[0] == VariableType.Discrete:
-                if x in options[1]:
+            if var_type == VariableType.RealDiscrete:
+                if x in var_options[0]:
                     X.append(x)
                 elif np.isnan(x) or np.isinf(x): # nan or inf values
-                    X.append(options[1][0])
+                    X.append(var_options[0][0])
                 else:
-                    j = np.argmin(np.abs(np.asarray(options[1]) - _x))
-                    X.append(options[1][j])
+                    j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
+                    X.append(var_options[0][j])
 
             # Integer variable
-            if options[0] == VariableType.Integer:
+            if var_type == VariableType.Integer:
                 _x = x
-                if x< options[1]:
-                    _x = options[1]
-                elif x > options[2]:
-                    _x = options[2]
+                if x < var_options[0]:
+                    _x = var_options[0]
+                elif x > var_options[1]:
+                    _x = var_options[1]
                 X.append(_x)
 
             # Category variable
-            if options[0] == VariableType.Category:
-                if x in options[1]:
+            if var_type == VariableType.Categorical:
+                if x in var_options[0]:
                     X.append(x)
                 else:
-                    X.append(options[1][0])
+                    X.append(var_options[0][0])
 
 
         X = tuple[X_Content_Type](X)

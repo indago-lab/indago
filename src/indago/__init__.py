@@ -21,7 +21,7 @@ Usage: import indago
 
 __version__ = '0.5.4'
 
-from indago.core._candidate import Candidate, VariableType, XFormat
+from indago.core._candidate import Candidate, VariableType, XFormat, VariableDictType
 # from indago.core._optimizer import Optimizer
 
 # from indago._utility import *

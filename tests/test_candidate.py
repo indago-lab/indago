@@ -6,9 +6,9 @@ from copy import copy, deepcopy
 variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
              'var2': (indago.VariableType.Real, 0, None),  # Real (continuous) semi-bounded
              'var3': (indago.VariableType.Real, None, None),  # Real (continuous) unbounded
-             'var4': (indago.VariableType.Discrete, [1.1, 1.2, 1.3, 1.4, 1.5]), # Discrete (float for evaluator, int for optimizer)
+             'var4': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
              'var5': (indago.VariableType.Integer, 0, 10),  # Integer (bot for optimizer and evaluator)
-             'var6': (indago.VariableType.Category, ['A', 'B', 'C', 'D', 'E']),  # Category
+             'var6': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
              }
 
 def test_initialization():
