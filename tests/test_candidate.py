@@ -134,6 +134,3 @@ def test_adjust():
     assert not c1.X[5] == X[5]
 
 
-if __name__ == '__main__':
-
-    test_adjust()

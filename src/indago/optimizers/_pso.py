@@ -250,8 +250,7 @@ class PSO(Optimizer):
                     case VariableType.RealDiscrete:
                         v_max.append(0.2 *(np.max(var_options[0]) - np.min(var_options[0])))
                     case VariableType.Categorical:
-                        v_max.append(None)
-                        # TODO
+                        v_max.append(0)
                     case _:
                         raise ValueError(f'Unknown variable type: {var_type}')
             self._v_max = np.asarray(v_max)
@@ -415,16 +414,22 @@ class PSO(Optimizer):
                 for p, particle in enumerate(self._swarm):
                     V = []
                     X:list[X_Content_Type] = []
-                    for i, (v, r1, r2, x, pbx, gbx, (var_name, (var_type, *_var_options))) in enumerate(
+                    for i, (v, r1, r2, x, pbx, gbx, (var_name, (var_type, *var_options))) in enumerate(
                             zip(particle.V,
                                 R1[p, :], R2[p, :],
                                 particle.X,self._pbests[p].X,
                                 self._pbests[self._gbest_idx[p]].X,
                                 self.variables.items())):
-                        V.append(w[p] * v + c1 * r1 * (pbx - x) + c2 * r2 * (gbx - x))
+
+                        if var_type == VariableType.Categorical:
+                            V.append(0)
+                        else:
+                            V.append(w[p] * v + c1 * r1 * (pbx - x) + c2 * r2 * (gbx - x))
                         match var_type:
                             case VariableType.Integer:
                                 X.append(int(round(x + V[i])))
+                            case VariableType.Categorical:
+                                X.append(x if np.random.rand() < self._progress_factor() else np.random.choice(var_options[0]))
                             case _:
                                 X.append(x + V[i])
 
