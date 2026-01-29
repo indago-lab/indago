@@ -49,7 +49,7 @@ X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Co
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 """Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
 
-VariableDictType = dict[str, tuple[VariableType, Any]]
+VariableDictType = dict[str, tuple[VariableType, *tuple[Any, ...]]]
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 class XFormat(Enum):
@@ -139,7 +139,7 @@ class Candidate:
                 self._get_x = self._get_x_as_dict
             case XFormat.Ndarray:
                 assert x_is_homogenous, f'Cant use x_format {x_format} for heterogeneous variables'
-                self._get_x = self.get_x_as_ndarray
+                self._get_x = self._get_x_as_ndarray
             case _:
                 raise NotImplementedError
 
@@ -191,12 +191,15 @@ class Candidate:
                 if var_type == VariableType.Real or var_type == VariableType.RealDiscrete:
                     assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(float(val))
-                if var_type == VariableType.Integer:
+                elif var_type == VariableType.Integer:
                     assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(int(val))
-                if var_type == VariableType.Categorical:
+                elif var_type == VariableType.Categorical:
                     assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(val)
+                else:
+                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+
         elif x_format == dict:
             for i, ((var_name, v), x) in enumerate(zip(design.items(), self._X)):
                 assert type(x) == type(v), f'X[{i}] value mismatch (replacing {type(x)} with {type(v)})'

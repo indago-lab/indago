@@ -6,34 +6,11 @@ from functools import partial
 
 import indago
 from indago.core._optimizer import Optimizer
-
-timeit_runs = 1
-timeit_dims = 20
+from test_utils import *
+timeit_runs = 5
+timeit_dims = 50
 timeit_evals = 1_000
 
-def generate_variables_dict(kind, dims):
-    variables_dict = {}
-    if kind == 'real':
-        for i in range(dims):
-            variables_dict[f'x{i+1}'] = indago.VariableType.Real, -20, 20
-
-    elif kind == 'mixed':
-        for i in range(dims):
-            var_type = np.random.choice(indago.VariableType)
-            match var_type:
-                case indago.VariableType.Real:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Real, -20, 20
-                case indago.VariableType.Integer:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Integer, -20, 20
-                case indago.VariableType.RealDiscrete:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.RealDiscrete, np.linspace(0, 5, 51)
-                case indago.VariableType.Categorical:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Categorical, 'A B C D E F'.split()
-
-    else:
-        raise ValueError(f'Unknown kind {kind}')
-
-    return variables_dict
 
 
 def test_variables_initialization():
@@ -64,24 +41,12 @@ def test_real_rs():
     for i in range(8):
         optimizer.variables['r{i+1}'] = indago.VariableType.Real, 0, 5
     optimizer.evaluator = f
-    optimizer.max_evaluations = 10_000
+    # optimizer.max_evaluations = 10_000
     optimizer.optimize()
     assert optimizer.eval == optimizer.max_evaluations
 
 def test_mixed_rs():
 
-    # def f(x):
-    #     print(f'evaluator: {x=}')
-    #     r1, r2, r3, i1, i2, d1, d2, c = x
-    #
-    #     s = (r1 - 1.0)**2 + (r2 - 2.3)**2 + (r3 - 7.6)**2 + i1 * np.cos(i2 + r1*i1)
-    #     if c == 'A':
-    #         s += np.maximum(i1, i2)
-    #     elif c == 'B':
-    #         s *= i1 * i2
-    #     elif c == 'C':
-    #         s -= np.sqrt(s + i1**2 + i2**2)
-    #     return s
     f = lambda x: 0.0
 
     optimizer = indago.RS()
@@ -95,7 +60,7 @@ def test_mixed_rs():
     optimizer.variables['c'] = indago.VariableType.Categorical, ['A', 'B', 'C']
 
     optimizer.evaluator = f
-    optimizer.max_evaluations = 10_000
+    # optimizer.max_evaluations = 10_000
     optimizer.optimize()
     assert optimizer.eval == optimizer.max_evaluations
 

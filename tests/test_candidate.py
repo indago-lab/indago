@@ -2,18 +2,11 @@
 import indago
 import numpy as np
 from copy import copy, deepcopy
-
-variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
-             'var2': (indago.VariableType.Real, 0, None),  # Real (continuous) semi-bounded
-             'var3': (indago.VariableType.Real, None, None),  # Real (continuous) unbounded
-             'var4': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
-             'var5': (indago.VariableType.Integer, 0, 10),  # Integer (bot for optimizer and evaluator)
-             'var6': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
-             }
+from test_utils import mixed_variables
 
 def test_initialization():
 
-    vars = copy(variables)
+    vars = copy(mixed_variables)
     vars.pop('var6')
     candidate: indago.Candidate = indago.Candidate(variables=vars)
 
@@ -22,7 +15,7 @@ def test_initialization():
 
 def test_list_X_format():
     print()
-    candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.List)
+    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.List)
 
     print(candidate.X)
     print([type(x) for x in candidate.X])
@@ -31,7 +24,7 @@ def test_list_X_format():
 
 def test_x_assign():
     print()
-    candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.Tuple)
 
     candidate.X = [0.11, 0.22, 0.33, 1.5, 7, 'Material A']
     print(candidate.X)
@@ -65,7 +58,7 @@ def test_candidate_copy():
     # c2: indago.Candidate = c1.copy()
     # print(c2.X)
 
-    c1 = indago.Candidate(variables)
+    c1 = indago.Candidate(mixed_variables)
     c1.adjust()
     c1.O = np.array([1.1, 0.01])
     c1.f = 1.11
@@ -83,7 +76,7 @@ def test_candidate_copy():
 
 def test_adjust():
 
-    c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    c1: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.Tuple)
     assert c1.adjust()
 
     X = c1._get_x_as_list()

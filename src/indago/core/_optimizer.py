@@ -45,7 +45,7 @@ from rich.live import Live
 from rich.table import Table
 
 #import indago
-from ._candidate import Candidate, VariableType, X_Content_Type
+from ._candidate import Candidate, VariableType, X_Content_Type, XFormat
 
 class Status(Enum):
     """Enum class for optimization status tracking."""
@@ -230,6 +230,7 @@ class Optimizer:
         self.variables: indago.VariableDictType = {}
         # self.dimensions = None
         self._all_real = False
+        self._x_format = XFormat.Tuple
 
 
         self.evaluator = None
@@ -399,9 +400,10 @@ class Optimizer:
 
         # Initialize lb, ub, and dimensions
         #self._init_bounds()
+        self._init_variables()
 
         assert callable(self.evaluator), \
-            "optimizer.evaluation_function should be callable"
+            "optimizer.evaluator should be callable"
 
         if self.safe_evaluation is None:
             self.safe_evaluation = False
@@ -580,14 +582,18 @@ class Optimizer:
     def _init_variables(self):
 
         self._all_real: bool = all([var_type == VariableType.Real for var_name, (var_type, *_) in self.variables.items()])
-        lb: list[float] = []
-        ub: list[float] = []
+
+        # TODO check types, ordering, etc.
+
         if self._all_real:
-            for var_name, (var_type, *var_options) in self.dimensions.items():
-                lb.append(var_options[0])
-                ub.append(var_options[1])
-        self.lb = np.asarray(lb)
-        self.ub = np.asarray(ub)
+            lb: list[float] = []
+            ub: list[float] = []
+            if self._all_real:
+                for var_name, (var_type, *var_options) in self.variables.items():
+                    lb.append(var_options[0])
+                    ub.append(var_options[1])
+            self.lb = np.asarray(lb)
+            self.ub = np.asarray(ub)
 
 
     def _init_bounds(self) -> None:
