@@ -731,16 +731,14 @@ class Optimizer:
         if self.sampler == 'random':
 
             if self._all_real:
-                if self.sampler == 'random':
-                    for c in candidates:
-                        c.X = np.random.uniform(size=self.dimensions, low=self.lb, high=self.ub)
+                for c in candidates:
+                    c.X = np.random.uniform(size=self.dimensions, low=self.lb, high=self.ub)
 
             else:
 
                 for c in candidates:
                     X: list[X_Content_Type] = list[X_Content_Type]([])
                     for var_name, (var_type, *var_options) in self.variables.items():
-
                         match var_type:
                             case VariableType.Real:
                                 X.append(np.random.uniform(low=var_options[0], high=var_options[1]))
@@ -756,54 +754,34 @@ class Optimizer:
                                 raise ValueError(f'Unknown variable type: {var_type}')
                     c.X = X
 
-                # keys: dict[VariableType, list[str]] = {}
-                # var_index: dict[VariableType, list[str]] = {}
-                #
-                # for var_type in VariableType:
-                #     keys[var_type] = [var_name for var_name, (_var_type, *var_options) in self.variables.items() if _var_type == var_type]
-                #     var_index[var_type] = np.asarray([var_i for var_i, (_var_type, *var_options) in enumerate(self.variables.values()) if _var_type == var_type], dtype=int)
-                #
-                #     match var_type:
-                #         case VariableType.Real:
-                #             lb = [self.variables[k][1] for k in keys[var_type]]
-                #             ub = [self.variables[k][2] for k in keys[var_type]]
-                #
-                #             x_mat = np.random.uniform(size=[len(candidates), len(keys[var_type])], low=lb, high=ub)
-                #
-                #         case VariableType.Integer:
-                #             lb = [self.variables[k][1] for k in keys[var_type]]
-                #             ub = [self.variables[k][2] for k in keys[var_type]]
-                #
-                #             x_mat = np.random.randint(size=[len(candidates), len(keys[var_type])], low=lb, high=ub)
-                #
-                #         case VariableType.RealDiscrete:
-                #             n = [len(self.variables[k][1]) for k in keys[var_type]]
-                #             i = np.random.randint(size=[len(candidates), len(keys[var_type])], low=0, high=n)
-                #
-                #             x_mat = []
-                #             for k, ii in zip(keys[var_type], i):
-                #                 x_mat.append(np.asarray(self.variables[k][1])[np.asarray(ii)])
-                #
-                #         case VariableType.Categorical:
-                #             n = [len(self.variables[k][1]) for k in keys[var_type]]
-                #             i = np.random.randint(size=[len(candidates), len(keys[var_type])], low=0, high=n)
-                #
-                #             x_mat = []
-                #             for k, ii in zip(keys[var_type], i):
-                #                 x_mat.append(np.asarray(self.variables[k][1])[np.asarray(ii)])
-                #
-                #         case _:
-                #             raise ValueError(f'Unknown variable type: {var_type}')
-                #
-                #     for c, x in zip(candidates, x_mat):
-                #         X: list[X_Content_Type] = list(c.X)
-                #         for i, j in enumerate(var_index[var_type]):
-                #             X[j] = x[i]
-                #         c.X = X
-
         if self.sampler in 'halton sobol lhs'.split():
-            for c in candidates:
-                c.X = self.lb + self._sampler_method.random(n=1)[0] * (self.ub - self.lb)
+
+            if self._all_real:
+                for c in candidates:
+                    c.X = self.lb + self._sampler_method.random(n=1)[0] * (self.ub - self.lb)
+
+            else:
+                for c in candidates:
+                    X: list[X_Content_Type] = list[X_Content_Type]([])
+                    R = self._sampler_method.random(n=1)[0]
+                    for (var_name, (var_type, *var_options)), r in zip(self.variables.items(), R):
+                        match var_type:
+                            case VariableType.Real:
+                                X.append(var_options[0] + r * (var_options[1] - var_options[0]))
+                            case VariableType.Integer:
+                                x = var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1.0)
+                                i = int(np.round(x))
+                                X.append(i)
+                            case VariableType.RealDiscrete:
+                                i = int(np.round(r * len(var_options[0]) - 0.5))
+                                X.append(var_options[0][i])
+                            case VariableType.Categorical:
+                                i = int(np.round(r * len(var_options[0]) - 0.5))
+                                X.append(var_options[0][i])
+                            case _:
+                                raise ValueError(f'Unknown variable type: {var_type}')
+                    c.X = X
+
 
     def _evaluate_initial_candidates(self):
         """Private method for evaluating initial candidates. This method populates 
