@@ -24,6 +24,7 @@ import os.path
 
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.ma.core import shape
 from scipy.stats.qmc import Halton, Sobol, LatinHypercube
 from datetime import timedelta, datetime
 import time
@@ -44,7 +45,7 @@ from rich.live import Live
 from rich.table import Table
 
 #import indago
-from ._candidate import Candidate
+from ._candidate import Candidate, VariableType, X_Content_Type
 
 class Status(Enum):
     """Enum class for optimization status tracking."""
@@ -66,7 +67,7 @@ class Optimizer:
     ----------
     dimensions : int
         Number of dimensions of the search space i.e. number of optimization variables.
-    evaluation_function : callable
+    evaluator : callable
         A function (or a callable class) which takes a ndarray as argument and returns fitness value (float), 
         or in case of multi-objective and/or constrained optimization returns a tuple containing objectives' and
         constraints' values. Optionally, it can take a keyword argument **s** (str) in order to handle a unique string
@@ -214,14 +215,24 @@ class Optimizer:
         Optimizer instance
         
     """
+    @property
+    def dimensions(self) -> int:
+        return len(self.variables)
+
+    @dimensions.setter
+    def dimensions(self, value: int):
+        self._dimensions = value
 
     def __init__(self):
         
         self.variant = None
 
         self.variables: indago.VariableDictType = {}
-        self.dimensions = None
-        self.evaluation_function = None
+        # self.dimensions = None
+        self._all_real = False
+
+
+        self.evaluator = None
 
         self.processes = 1
         self._pool = None
@@ -327,9 +338,9 @@ class Optimizer:
 
         try:
             if s is None:
-                return self.evaluation_function(X)
+                return self.evaluator(X)
             else:
-                return self.evaluation_function(X, s)
+                return self.evaluator(X, s)
         except:
             if self.objectives == 1 and self.constraints == 0:
                 return np.nan
@@ -364,7 +375,7 @@ class Optimizer:
         for attr in dir(self):
             if not attr.startswith('_'):
                 assert attr in \
-                    'variant variables dimensions evaluation_function processes \
+                    'variant variables dimensions evaluator evaluation_function processes \
                     objectives objective_weights objective_labels constraints \
                     constraint_labels max_iterations max_evaluations \
                     max_stalled_iterations max_stalled_evaluations target_fitness \
@@ -379,53 +390,17 @@ class Optimizer:
 
         # check if some missing attributes are available in evaluation_function
         for attr in 'dimensions lb ub objective_weights objective_labels constraint_labels'.split(' '):
-            if getattr(self, attr) is None and hasattr(self.evaluation_function, attr):
-                setattr(self, attr, getattr(self.evaluation_function, attr))
-        if self.objectives == 1 and hasattr(self.evaluation_function, 'objectives'):
-            self.objectives = self.evaluation_function.objectives
-        if self.constraints == 0 and hasattr(self.evaluation_function, 'constraints'):
-            self.constraints = self.evaluation_function.constraints
+            if getattr(self, attr) is None and hasattr(self.evaluator, attr):
+                setattr(self, attr, getattr(self.evaluator, attr))
+        if self.objectives == 1 and hasattr(self.evaluator, 'objectives'):
+            self.objectives = self.evaluator.objectives
+        if self.constraints == 0 and hasattr(self.evaluator, 'constraints'):
+            self.constraints = self.evaluator.constraints
 
-        # check for no bounds
-        if self.lb is None:
-            self.lb = -np.inf
-        if self.ub is None:
-            self.ub = np.inf
-        if not np.isfinite(self.lb).all() or not np.isfinite(self.ub).all():
-            assert self.X0 is not None, \
-                "(some of the) bounds are not provided or are given as +/-np.inf or np.nan, optimizer.X0 needed"
-        self.lb = np.nan_to_num(self.lb, nan=-1e100, posinf=1e100, neginf=-1e100).astype(float)
-        self.ub = np.nan_to_num(self.ub, nan=1e100, posinf=1e100, neginf=-1e100).astype(float)
-            
-        # check dimensions or get it from lb/ub
-        if self.dimensions is not None:
-            assert isinstance(self.dimensions, int) and self.dimensions > 0, \
-                "optimizer.dimensions should be positive integer"
-        else:
-            self.dimensions = max(np.size(self.lb), np.size(self.ub))
-            assert self.dimensions > 1, \
-                "optimizer.lb and optimizer.ub both of size 1, missing optimizer.dimensions"
+        # Initialize lb, ub, and dimensions
+        #self._init_bounds()
 
-        # expand scalar lb/ub
-        if np.size(self.lb) == 1:
-            self.lb = np.full(self.dimensions, self.lb)
-        if np.size(self.ub) == 1:
-            self.ub = np.full(self.dimensions, self.ub)
-
-        # in case lb/ub is a list or tuple
-        self.lb = np.array(self.lb)
-        self.ub = np.array(self.ub)
-
-        assert np.size(self.lb) == np.size(self.ub) == self.dimensions, \
-            "optimizer.lb and optimizer.ub should be of equal size or scalar"
-
-        assert (self.lb < self.ub).all(), \
-            "optimizer.lb should be strictly lower than optimizer.ub"
-
-        for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
-            self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
-
-        assert callable(self.evaluation_function), \
+        assert callable(self.evaluator), \
             "optimizer.evaluation_function should be callable"
 
         if self.safe_evaluation is None:
@@ -433,7 +408,7 @@ class Optimizer:
         assert isinstance(self.safe_evaluation, bool), \
             "optimizer.safe_evaluation should be True/False"
         if not self.safe_evaluation:
-            self._evaluation_function_safe = self.evaluation_function
+            self._evaluation_function_safe = self.evaluator
 
         assert isinstance(self.objectives, int) and self.objectives > 0, \
             "optimizer.objectives should be positive integer"
@@ -602,6 +577,60 @@ class Optimizer:
                         }
         self._init_convergence_log()
 
+    def _init_variables(self):
+
+        self._all_real: bool = all([var_type == VariableType.Real for var_name, (var_type, *_) in self.variables.items()])
+        lb: list[float] = []
+        ub: list[float] = []
+        if self._all_real:
+            for var_name, (var_type, *var_options) in self.dimensions.items():
+                lb.append(var_options[0])
+                ub.append(var_options[1])
+        self.lb = np.asarray(lb)
+        self.ub = np.asarray(ub)
+
+
+    def _init_bounds(self) -> None:
+
+        # check for no bounds
+        if self.lb is None:
+            self.lb = -np.inf
+        if self.ub is None:
+            self.ub = np.inf
+        if not np.isfinite(self.lb).all() or not np.isfinite(self.ub).all():
+            assert self.X0 is not None, \
+                "(some of the) bounds are not provided or are given as +/-np.inf or np.nan, optimizer.X0 needed"
+        self.lb = np.nan_to_num(self.lb, nan=-1e100, posinf=1e100, neginf=-1e100).astype(float)
+        self.ub = np.nan_to_num(self.ub, nan=1e100, posinf=1e100, neginf=-1e100).astype(float)
+
+        # check dimensions or get it from lb/ub
+        if self.dimensions is not None:
+            assert isinstance(self.dimensions, int) and self.dimensions > 0, \
+                "optimizer.dimensions should be positive integer"
+        else:
+            self.dimensions = max(np.size(self.lb), np.size(self.ub))
+            assert self.dimensions > 1, \
+                "optimizer.lb and optimizer.ub both of size 1, missing optimizer.dimensions"
+
+        # expand scalar lb/ub
+        if np.size(self.lb) == 1:
+            self.lb = np.full(self.dimensions, self.lb)
+        if np.size(self.ub) == 1:
+            self.ub = np.full(self.dimensions, self.ub)
+
+        # in case lb/ub is a list or tuple
+        self.lb = np.array(self.lb)
+        self.ub = np.array(self.ub)
+
+        assert np.size(self.lb) == np.size(self.ub) == self.dimensions, \
+            "optimizer.lb and optimizer.ub should be of equal size or scalar"
+
+        assert (self.lb < self.ub).all(), \
+            "optimizer.lb should be strictly lower than optimizer.ub"
+
+        for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
+            self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
+
     def _update_progress_bar(self):
         """
         Private function for updating rich progress bar for 'dashboard' monitoring.
@@ -683,8 +712,8 @@ class Optimizer:
                      f'{self.__class__.__name__} optimization running\n',
                      self._progress_bar,
                      report_str)
-        
-    def _initialize_X(self, candidates):
+
+    def _initialize_X(self, candidates: list[Candidate]) -> None:
         """Private method for generating initial positions of given candidates, by using the appropriate method
         (Optimizer.sampler).
 
@@ -698,10 +727,79 @@ class Optimizer:
         None
             Nothing
         """
-        
+
         if self.sampler == 'random':
-            for c in candidates:
-                c.X = np.random.uniform(size=self.dimensions, low=self.lb, high=self.ub)
+
+            if self._all_real:
+                if self.sampler == 'random':
+                    for c in candidates:
+                        c.X = np.random.uniform(size=self.dimensions, low=self.lb, high=self.ub)
+
+            else:
+
+                for c in candidates:
+                    X: list[X_Content_Type] = list[X_Content_Type]([])
+                    for var_name, (var_type, *var_options) in self.variables.items():
+
+                        match var_type:
+                            case VariableType.Real:
+                                X.append(np.random.uniform(low=var_options[0], high=var_options[1]))
+                            case VariableType.Integer:
+                                X.append(np.random.randint(low=var_options[0], high=var_options[1]) + 1)
+                            case VariableType.RealDiscrete:
+                                i = np.random.randint(low=0, high=len(var_options[0]))
+                                X.append(var_options[0][i])
+                            case VariableType.Categorical:
+                                i = np.random.randint(low=0, high=len(var_options[0]))
+                                X.append(var_options[0][i])
+                            case _:
+                                raise ValueError(f'Unknown variable type: {var_type}')
+                    c.X = X
+
+                # keys: dict[VariableType, list[str]] = {}
+                # var_index: dict[VariableType, list[str]] = {}
+                #
+                # for var_type in VariableType:
+                #     keys[var_type] = [var_name for var_name, (_var_type, *var_options) in self.variables.items() if _var_type == var_type]
+                #     var_index[var_type] = np.asarray([var_i for var_i, (_var_type, *var_options) in enumerate(self.variables.values()) if _var_type == var_type], dtype=int)
+                #
+                #     match var_type:
+                #         case VariableType.Real:
+                #             lb = [self.variables[k][1] for k in keys[var_type]]
+                #             ub = [self.variables[k][2] for k in keys[var_type]]
+                #
+                #             x_mat = np.random.uniform(size=[len(candidates), len(keys[var_type])], low=lb, high=ub)
+                #
+                #         case VariableType.Integer:
+                #             lb = [self.variables[k][1] for k in keys[var_type]]
+                #             ub = [self.variables[k][2] for k in keys[var_type]]
+                #
+                #             x_mat = np.random.randint(size=[len(candidates), len(keys[var_type])], low=lb, high=ub)
+                #
+                #         case VariableType.RealDiscrete:
+                #             n = [len(self.variables[k][1]) for k in keys[var_type]]
+                #             i = np.random.randint(size=[len(candidates), len(keys[var_type])], low=0, high=n)
+                #
+                #             x_mat = []
+                #             for k, ii in zip(keys[var_type], i):
+                #                 x_mat.append(np.asarray(self.variables[k][1])[np.asarray(ii)])
+                #
+                #         case VariableType.Categorical:
+                #             n = [len(self.variables[k][1]) for k in keys[var_type]]
+                #             i = np.random.randint(size=[len(candidates), len(keys[var_type])], low=0, high=n)
+                #
+                #             x_mat = []
+                #             for k, ii in zip(keys[var_type], i):
+                #                 x_mat.append(np.asarray(self.variables[k][1])[np.asarray(ii)])
+                #
+                #         case _:
+                #             raise ValueError(f'Unknown variable type: {var_type}')
+                #
+                #     for c, x in zip(candidates, x_mat):
+                #         X: list[X_Content_Type] = list(c.X)
+                #         for i, j in enumerate(var_index[var_type]):
+                #             X[j] = x[i]
+                #         c.X = X
 
         if self.sampler in 'halton sobol lhs'.split():
             for c in candidates:
@@ -1296,9 +1394,9 @@ class Optimizer:
 
                 if self.forward_unique_str:
                     candidates[p].unique_str = self._gen_unique_str()
-                    result = self._evaluation_function_safe(candidates[p].get_x_as_ndarray(), candidates[p].unique_str)
+                    result = self._evaluation_function_safe(candidates[p].get_x_as_tuple(), candidates[p].unique_str)
                 else:
-                    result = self._evaluation_function_safe(candidates[p].get_x_as_ndarray())
+                    result = self._evaluation_function_safe(candidates[p].get_x_as_tuple())
 
                 if self.objectives == 1 and self.constraints == 0:
                     # Fast evaluation
@@ -1311,7 +1409,7 @@ class Optimizer:
                     candidates[p].f = np.dot(candidates[p].O, self.objective_weights)
                     for ic in range(self.constraints):
                         candidates[p].C[ic] = result[self.objectives + ic]
-                
+
                 # if failed evaluation
                 if np.isnan(candidates[p].f):
                     self.eval_fail_count += 1
@@ -1375,7 +1473,7 @@ class Optimizer:
             candidates_best = np.sort(candidates, kind='stable')[0]
             if candidates_best.f == self.best.f:
                 if np.any(candidates_best.X != self.best.X):
-                    self._log(f'Warning: nonunique optimum; multiple best candidates with same fitness but different X: [{", ".join(f"{x:18.12e}" for x in candidates_best.X)}]')
+                    self._log(f'Warning: nonunique optimum; multiple best candidates with same fitness but different X: [{candidates_best.X}]')
             if candidates_best <= self.best:
                 self.best = candidates_best.copy()
 

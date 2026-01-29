@@ -175,7 +175,7 @@ class Candidate:
                 X_float.append(x)
             elif type(x) in [int, np.int32]:
                 X_int.append(x)
-            elif type(x) in [str]:
+            elif type(x) in [str, np.str_]:
                 X_str.append(x)
             else:
                 raise NotImplementedError
@@ -188,13 +188,13 @@ class Candidate:
         if x_format in [list, tuple, np.ndarray]:
             for i, (val, (var_name, (var_type, *_))) in enumerate(zip(new_values, self._variables.items())):
                 if var_type == VariableType.Real or var_type == VariableType.RealDiscrete:
-                    assert isinstance(val, (float, np.floating)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(float(val))
                 if var_type == VariableType.Integer:
-                    assert isinstance(val, (int, np.integer)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(int(val))
                 if var_type == VariableType.Categorical:
-                    assert isinstance(val, (str)), f'Invalid value type for X[{i}] (value={val}, type={type(val)})'
+                    assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(val)
         elif x_format == dict:
             for i, ((var_name, v), x) in enumerate(zip(new_values.items(), self._X)):
