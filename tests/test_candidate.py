@@ -21,7 +21,7 @@ def test_initialization():
     assert np.all(np.isnan(candidate.X[:4])) and candidate.X[4] == 0.0
 
 def test_list_X_format():
-
+    print()
     candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.List)
 
     print(candidate.X)
@@ -30,7 +30,7 @@ def test_list_X_format():
     assert [type(x) == float for x in candidate._X[:4]] and type(candidate.X[4]) == int and type(candidate.X[5]) == str
 
 def test_x_assign():
-
+    print()
     candidate: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
 
     candidate.X = [0.11, 0.22, 0.33, 1.5, 7, 'Material A']
@@ -58,72 +58,88 @@ def test_x_assign():
         assert False, f' X[{i}] = {v} should not be allowed'
 
 def test_candidate_copy():
+    # print()
+    # c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    # print(c1.X)
+    # print(np.copy(c1.X))
+    # c2: indago.Candidate = c1.copy()
+    # print(c2.X)
 
-    c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
-    print(c1.X)
-    print(np.copy(c1.X))
-    c2: indago.Candidate = c1.copy()
-    print(c2.X)
+    c1 = indago.Candidate(variables)
+    c1.adjust()
+    c1.O = np.array([1.1, 0.01])
+    c1.f = 1.11
+    c2 = c1.copy()
+    assert c1.f == c2.f, 'Candidate.copy() does not work. Copy is not the same as original'
+    assert c1 == c2, 'Candidate.copy() does not work. Copy is not the same as original'
+    assert c1.X == c2.X, 'Candidate.copy() does not work. Copy is not the same as original'
 
+    x = c1._get_x_as_list()
+    x[0] = -99.99
+    c1.X = x
+
+    # assert c1 != c2, 'Candidate.copy() does not work. Copy points to original!'
+    assert c1.X != c2.X, 'Candidate.copy() does not work. Copy points to original!'
 
 def test_adjust():
 
     c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
     assert c1.adjust()
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[0] = 1.2345
     c1.X = X
     assert not c1.adjust()
     assert c1.X[0] == X[0]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[0] = -987.654
     c1.X = X
     assert c1.adjust()
     assert not c1.X[0] == X[0]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[1] = -0.3
     c1.X = X
     assert c1.adjust()
     assert not c1.X[1] == X[1]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[2] = 365.25
     c1.X = X
     assert not c1.adjust()
     assert c1.X[1] == X[1]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[3] = 8.2
     c1.X = X
     assert c1.adjust()
     assert not c1.X[3] == X[3]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[4] = 7
     c1.X = X
     c1.adjust()
     assert c1.X[4] == X[4]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[4] = 11
     c1.X = X
     assert c1.adjust()
     assert not c1.X[4] == X[4]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[5] = 'D'
     c1.X = X
     assert not c1.adjust()
     assert c1.X[5] == X[5]
 
-    X = c1.get_x_as_list()
+    X = c1._get_x_as_list()
     X[5] = 'None'
     c1.X = X
     assert c1.adjust()
     assert not c1.X[5] == X[5]
+
 
 if __name__ == '__main__':
 

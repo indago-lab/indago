@@ -15,13 +15,10 @@ License: MIT
 File content: Definition of Candidate classes.
 Usage: from indago import Candidate
 """
-# from __future__ import annotations
-# import typing
-# if typing.TYPE_CHECKING:
-#     from ._optimizer import Optimizer
+from __future__ import annotations # To support using Candidate type annotation inside Candidate class code
+from typing import TypeAlias, Any
 
 import numpy as np
-from typing import TypeAlias, Any
 from numpy.typing import NDArray
 
 from rich.console import Console
@@ -30,7 +27,8 @@ from enum import Enum
 
 
 class VariableType(Enum):
-    """Enum class for variable types."""
+    """Enum class for design variable types. Supported variable types are ``VariableType.Real``,
+    ``VariableType.Integer``, ``VariableType.RealDiscrete``, ``VariableType.Categorical``"""
 
     Real = 'R'
     Integer = 'I'
@@ -38,15 +36,21 @@ class VariableType(Enum):
     Categorical = 'C'
 
     def __str__(self):
-        return self.name + ': ' + self.value
+        """String representation for design variable type"""
+        return self.name
 
 
-# Define types
 X_Content_Type: TypeAlias = int | float | str
+"""Type for possible content of design vector ``X``"""
+
 X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Content_Type] | NDArray[np.float64]
+"""All possible (container) types for the design vector ``X``"""
+
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
+"""Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
 
 VariableDictType = dict[str, tuple[VariableType, Any]]
+"""A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 class XFormat(Enum):
     """Enum class for """
@@ -75,17 +79,32 @@ class Candidate:
         Constraints' values.
     f : float
         Fitness.
-
-    Returns
-    -------
-    Candidate
-        CandidateState instance.
-
+    _variables : VariableDictType
+        A hidden attribute for accessing variables definitions dictionary.
+    _x_format : XFormat:
+        A hidden attribute for attribute X's return value format.
     """
 
-    def __init__(self, variables: dict, n_objectives: int = 1, n_constraints: int = 0,
+    def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
                  x_format: XFormat = XFormat.Tuple) -> None:
-        """Candidate constructor."""
+        """Candidate constructor.
+
+        Parameters
+        ----------
+        variables : VariableDictType
+            A dictionary containing definitions of all design variables.
+        n_objectives : int
+            Number of objectives.
+        n_constraints : int
+            Number of constraints.
+        x_format : XFormat:
+            A format for attribute X's return value.
+
+        Returns
+        -------
+        Candidate
+            CandidateState instance.
+        """
 
         X: list[X_Content_Type] = []
         type_count = {k: 0 for k in VariableType}
@@ -108,23 +127,23 @@ class Candidate:
         var_str = type_count[VariableType.Categorical]
         x_is_homogenous = np.sum(np.array([var_float, var_int, var_str]) > 0) == 1
 
-        self._X: X_Storage_Type = tuple[X_Content_Type](X)
         self._variables = variables
+        self.X: X_Storage_Type = tuple[X_Content_Type](X)
 
         match x_format:
             case XFormat.Tuple:
-                self._get_x = self.get_x_as_tuple
+                self._get_x = self._get_x_as_tuple
             case XFormat.List:
-                self._get_x = self.get_x_as_list
+                self._get_x = self._get_x_as_list
             case XFormat.Dict:
-                self._get_x = self.get_x_as_dict
+                self._get_x = self._get_x_as_dict
             case XFormat.Ndarray:
                 assert x_is_homogenous, f'Cant use x_format {x_format} for heterogeneous variables'
                 self._get_x = self.get_x_as_ndarray
             case _:
                 raise NotImplementedError
 
-        self._x_format = x_format
+        self._x_format: XFormat = x_format
 
         self.O: NDArray[np.float64] = np.full(n_objectives, np.nan)
         self.C: NDArray[np.float64] = np.full(n_constraints, np.nan)
@@ -145,48 +164,30 @@ class Candidate:
 
     @property
     def X(self) -> X_All_Containers:
+        """A property for the design vector X.
+
+        Returns
+        -------
+        X: X_All_Containers
+            A container of all design variables. The type of the container is determined by ``x_format`` argument in
+            the Candidate constructor.
+        """
         return self._get_x()
 
     @X.setter
-    def X(self, value: X_All_Containers) -> None:
-        self._set_x(value)
+    def X(self, design: X_All_Containers) -> None:
+        """Set value for property X.
 
-    def get_x_as_tuple(self) -> tuple[X_Content_Type]:
-        return self._X
-
-    def get_x_as_list(self) -> list[X_Content_Type]:
-        return list(self._X)
-
-    def get_x_as_dict(self) -> dict[str, X_Content_Type]:
-        X: dict[str, X_Content_Type] = {}
-        for (var_name, var), x in zip(self._variables.items(), self._X):
-            X[var_name] = x
-        return X
-
-    def get_x_as_ndarray(self) -> NDArray[np.float64]:
-        return np.asarray(self._X, dtype=np.float64)
-
-    def get_x_as_xy(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
-        X_float = []
-        X_int = []
-        X_str = []
-        for x in self._X:
-            if type(x) in [float, np.float64]:
-                X_float.append(x)
-            elif type(x) in [int, np.int32]:
-                X_int.append(x)
-            elif type(x) in [str, np.str_]:
-                X_str.append(x)
-            else:
-                raise NotImplementedError
-        return np.asarray(X_float, dtype=np.float64), np.asarray(X_int, dtype=np.int32), np.asarray(X_str, dtype=np.str_)
-
-    def _set_x(self, new_values: X_All_Containers) -> None:
+        Parameters
+        ----------
+        design : X_All_Containers
+            The design vector in any of supported formats (list, tuple, dict or numpy.ndarray)
+        """
 
         X = []
-        x_format: type = type(new_values)
+        x_format: type = type(design)
         if x_format in [list, tuple, np.ndarray]:
-            for i, (val, (var_name, (var_type, *_))) in enumerate(zip(new_values, self._variables.items())):
+            for i, (val, (var_name, (var_type, *_))) in enumerate(zip(design, self._variables.items())):
                 if var_type == VariableType.Real or var_type == VariableType.RealDiscrete:
                     assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(float(val))
@@ -197,15 +198,90 @@ class Candidate:
                     assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                     X.append(val)
         elif x_format == dict:
-            for i, ((var_name, v), x) in enumerate(zip(new_values.items(), self._X)):
+            for i, ((var_name, v), x) in enumerate(zip(design.items(), self._X)):
                 assert type(x) == type(v), f'X[{i}] value mismatch (replacing {type(x)} with {type(v)})'
                 X.append(v)
         else:
             raise NotImplementedError(f'Unsupported x_format {x_format}')
         self._X = tuple(X)
 
+    def _get_x_as_tuple(self) -> tuple[X_Content_Type]:
+        """Utility function of getting a design vector X as a tuple.
+
+        Returns
+        -------
+        X: tuple[X_Content_Type]
+            A tuple of all design variables.
+        """
+        return tuple[X_Content_Type](self._X)
+
+    def _get_x_as_list(self) -> list[X_Content_Type]:
+        """Utility function of getting a design vector X as a list.
+
+        Returns
+        -------
+        X: list[X_Content_Type]
+            A list of all design variables.
+        """
+        return list(self._X)
+
+    def _get_x_as_dict(self) -> dict[str, X_Content_Type]:
+        """Utility function of getting a design vector X as a dictionary.
+
+        Returns
+        -------
+        X: dict[str, X_Content_Type]
+            A dictionary of all design variables in a form  ``'var_name': var_value``.
+        """
+        X: dict[str, X_Content_Type] = {}
+        for (var_name, var), x in zip(self._variables.items(), self._X):
+            X[var_name] = x
+        return X
+
+    def _get_x_as_ndarray(self) -> NDArray[np.float64]:
+        """Utility function of getting a design vector X as a numpy.ndarray. It can be used only when all variables
+        are real (``VariableType.Real`` or ``VariableType.RealDiscrete``).
+        TODO this raises an error if called for mixed problems. Decide whether to remove/check/assert.
+
+        Returns
+        -------
+        X: NDArray[np.float64]
+            A list of all design variables.
+        """
+        return np.asarray(self._X, dtype=np.float64)
+
+    def _get_x_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
+        """Utility function of getting a design vector X as a tuple of numpy.ndarrays grouped by type.
+
+        Returns
+        -------
+        X: tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]
+            A tuple of grouped design variables.
+        """
+        design_float = []
+        design_int = []
+        design_str = []
+        for x in self._X:
+            if isinstance(x, (float, np.floating)):
+                design_float.append(x)
+            elif isinstance(x, (int, np.integer)):
+                design_int.append(x)
+            elif isinstance(x, (str, np.str_)):
+                design_str.append(x)
+            else:
+                raise NotImplementedError
+        return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
     def adjust(self) -> bool:
+        """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict
+        provide in the ``Candidate`` constructor.
+
+        Returns
+        -------
+        changed: bool
+            Return whether a design vector X is changed or not, as a ``bool`` value.
+        """
+
         X: list[X_Content_Type] = []
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             # print(f'{var_name=}  {var_type=}  {var_options=}  {x=}')
@@ -244,7 +320,6 @@ class Candidate:
                 else:
                     X.append(var_options[0][0])
 
-
         X = tuple[X_Content_Type](X)
         changed = not (X == self._X)
         # print(f'{self._X=}  ==>>  {X=}  {changed=}')
@@ -266,7 +341,8 @@ class Candidate:
         # TODO this needs to be reimplemented to use Candidate.variables instead of Optimizer
         self.X = np.clip(self.X, optimizer.lb, optimizer.ub)
 
-    def copy(self):
+
+    def copy(self) -> Candidate:
         """Method for creating a copy of the CandidateState.
 
         Returns
@@ -281,28 +357,13 @@ class Candidate:
         candidate.O = np.copy(self.O)
         candidate.C = np.copy(self.C)
         candidate.f = self.f
-
-        # # Comparison operators
-        # if self.O.size == 1 and self.C.size == 0:
-        #     candidate._eq_fn = candidate._eq_fast
-        #     candidate._lt_fn = candidate._lt_fast
-        #     # self.__gt__ = self._gt_fast
-        # else:
-        #     candidate._eq_fn = candidate._eq_full
-        #     candidate._lt_fn = candidate._lt_full
-        #     # self.__gt__ = self._gt_full
-
-        # if optimizer.forward_unique_str:
-        # candidate.unique_str = self.unique_str
+        candidate.unique_str = self.unique_str
 
         return candidate
 
-        # previous solution (much slower)
-        # cP = copy.deepcopy(self)
-        # return cP
-
-    def __str__(self):
+    def __str__(self) -> str:
         """Method for a useful printout of Candidate properties.
+        TODO this needs to return a clean str. Move rich printout to dedicated method e.g. Candidate.rich_print()
 
         Returns
         -------
@@ -335,7 +396,7 @@ class Candidate:
         Console().print(table)
         return ''
 
-    def __eq__(self, other):
+    def __eq__(self, other: Candidate) -> bool:
         """Equality operator wrapper.
 
         Parameters
@@ -353,7 +414,7 @@ class Candidate:
         return self._eq_fn(self, other)
 
     @staticmethod
-    def _eq_fast(a, b):
+    def _eq_fast(a: Candidate, b: Candidate) -> bool:
         """Private method for fast candidate solution equality check.
         Used in single objective, unconstrained optimization.
 
@@ -374,7 +435,7 @@ class Candidate:
         return a.f == b.f
 
     @staticmethod
-    def _eq_full(a, b):
+    def _eq_full(a: Candidate, b: Candidate) -> bool:
         """Private method for full candidate solution equality check.
         Used in multiobjective and/or constrained optimization.
 
@@ -395,7 +456,7 @@ class Candidate:
         # return np.sum(np.abs(a.X - b.X)) + np.sum(np.abs(a.O - b.O)) + np.sum(np.abs(a.C - b.C)) == 0.0
         return (a.X == b.X).all() and (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
 
-    def __ne__(self, other):
+    def __ne__(self, other: Candidate) -> bool:
         """Inequality operator.
 
         Parameters
@@ -412,7 +473,7 @@ class Candidate:
 
         return self.f != other.f
 
-    def __lt__(self, other):
+    def __lt__(self, other: Candidate) -> bool:
         """Less-then operator wrapper.
 
         Parameters
@@ -430,7 +491,7 @@ class Candidate:
         return self._lt_fn(self, other)
 
     @staticmethod
-    def _lt_fast(a, b):
+    def _lt_fast(a: Candidate, b: Candidate) -> bool:
         """Fast less-than operator.
         Used in single objective, unconstrained optimization.
 
@@ -455,7 +516,7 @@ class Candidate:
         return a.f < b.f
 
     @staticmethod
-    def _lt_full(a, b):
+    def _lt_full(a: Candidate, b: Candidate) -> bool:
         """Private method for full less-than check.
         Used in multiobjective and/or constrained optimization.
 
@@ -492,7 +553,7 @@ class Candidate:
             # Better candidate is the one which breaks fewer constraints
             return np.sum(a.C > 0) < np.sum(b.C > 0)
 
-    def __gt__(self, other):
+    def __gt__(self, other: Candidate) -> bool:
         """Greater-then operator wrapper.
 
         Parameters
@@ -509,7 +570,7 @@ class Candidate:
 
         return not (self._lt_fn(self, other) or self._eq_fn(self, other))
 
-    # are these two necessary?
+    # TODO are these two necessary?
     """
     def _gt_fast(self, other):
         return self.f > other.f
@@ -517,7 +578,7 @@ class Candidate:
         return not (self.__eq__(other) or self.__lt__(other))
     """
 
-    def __le__(self, other):
+    def __le__(self, other: Candidate) -> bool:
         """Less-than-or-equal operator wrapper.
 
         Parameters
@@ -534,7 +595,7 @@ class Candidate:
 
         return self._lt_fn(self, other) or self.__eq__(other)
 
-    def __ge__(self, other):
+    def __ge__(self, other: Candidate) -> bool:
         """Greater-than-or-equal operator wrapper.
 
         Parameters
@@ -551,7 +612,7 @@ class Candidate:
 
         return self.__gt__(other) or self.__eq__(other)
 
-    def is_feasible(self):
+    def is_feasible(self) -> bool:
         """
         Determines whether the design vector of a Candidate is a feasible solution. A feasible solution is
         a solution which satisfies all constraints.

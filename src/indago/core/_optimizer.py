@@ -1372,9 +1372,9 @@ class Optimizer:
 
                 if self.forward_unique_str:
                     candidates[p].unique_str = self._gen_unique_str()
-                    result = self._evaluation_function_safe(candidates[p].get_x_as_tuple(), candidates[p].unique_str)
+                    result = self._evaluation_function_safe(candidates[p]._get_x_as_tuple(), candidates[p].unique_str)
                 else:
-                    result = self._evaluation_function_safe(candidates[p].get_x_as_tuple())
+                    result = self._evaluation_function_safe(candidates[p]._get_x_as_tuple())
 
                 if self.objectives == 1 and self.constraints == 0:
                     # Fast evaluation

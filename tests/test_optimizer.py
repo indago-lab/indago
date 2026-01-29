@@ -7,9 +7,9 @@ from functools import partial
 import indago
 from indago.core._optimizer import Optimizer
 
-timeit_runs = 10
-timeit_dims = 100
-timeit_evals = 10_000
+timeit_runs = 1
+timeit_dims = 20
+timeit_evals = 1_000
 
 def generate_variables_dict(kind, dims):
     variables_dict = {}
