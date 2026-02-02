@@ -13,7 +13,6 @@ def test_real_problem():
     optimizer.optimize()
     print(optimizer.best)
 
-
 def test_numeric_problem():
     optimizer = indago.PSO()
 
@@ -22,8 +21,6 @@ def test_numeric_problem():
     # optimizer.monitoring = 'basic'
     optimizer.optimize()
     print(optimizer.best)
-
-
 
 def real_function(x):
     x = np.asarray(x)

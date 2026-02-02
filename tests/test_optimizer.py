@@ -87,7 +87,7 @@ def run_sampler(sampler, variables):
 def test_samplers():
 
     print()
-    print(f'{timeit_dims}-dimenisonal problems, {timeit_evals} evaluations')
+    print(f'{timeit_dims}-dimensional problems, {timeit_evals} evaluations')
     for kind in 'real mixed'.split():
         variables = generate_variables_dict(kind, dims=timeit_dims)
         # print(variables)

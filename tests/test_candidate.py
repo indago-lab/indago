@@ -40,7 +40,6 @@ def test_x_assign():
 
         assert False, f' X[{i}] = {v} should be allowed'
 
-
     try:
         print(candidate.X)
         candidate.X[0] = 'prvi'
