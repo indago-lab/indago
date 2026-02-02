@@ -155,37 +155,46 @@ class PSO(Optimizer):
         else:
             assert False, f'Unknown variant! {self.variant}'
 
-        """ Anakatabatic Inertia a.k.a. Polynomial PFIDI """
         if self.params['inertia'] == 'anakatabatic':
             
             if 'akb_model' in defined_params:
 
-                if self.params['akb_model'] in ['FlyingStork', 'MessyTie', 'TipsySpider', 'RightwardPeaks', 'OrigamiSnake']:  # w-list-based named akb_models
-                    if self.params['akb_model'] == 'FlyingStork':
-                        w_start = [-0.86, 0.24, -1.10, 0.75, 0.72]
-                        w_stop = [-0.81, -0.35, -0.26, 0.64, 0.60]
-                        if self.variant != 'Vanilla':
-                            self._log('Warning: akb_model \'FlyingStork\' was designed for Vanilla PSO')
-                    elif self.params['akb_model'] == 'MessyTie':
-                        w_start = [-0.62, 0.18, 0.65, 0.32, 0.77]
-                        w_stop = [0.36, 0.73, -0.62, 0.40, 1.09]
-                        if self.variant != 'Vanilla':
-                            self._log('Warning: akb_model \'MessyTie\' was designed for Vanilla PSO')
-                    elif self.params['akb_model'] == 'TipsySpider':
-                        w_start = [-0.32, 0.10, -0.81, 1.19, 0.55]
-                        w_stop = [0.34, 0.36, 0.28, 0.75, 0.08]
-                        if self.variant != 'Vanilla':
-                            self._log('Warning: akb_model \'TipsySpider\' was designed for Vanilla PSO')
-                    elif self.params['akb_model'] == 'RightwardPeaks':
-                        w_start = [-1.79, -0.33, 2.00, -0.67, 1.30]
-                        w_stop = [-0.91, -0.88, -0.84, 0.67, -0.36]
-                        if self.variant != 'TVAC':
-                            self._log('Warning: akb_model \'RightwardPeaks\' was designed for TVAC PSO')
-                    elif self.params['akb_model'] == 'OrigamiSnake':
-                        w_start = [-1.36, 2.00, 1.00, -0.60, 1.22]
-                        w_stop = [0.30, 1.03, -0.21, 0.40, 0.06]
-                        if self.variant != 'TVAC':
-                            self._log('Warning: akb_model \'OrigamiSnake\' was designed for TVAC PSO')  # code shared for all w-list-based named akb_models
+                if self.params['akb_model'] in \
+                        ['DoubleSummit', 'FlyingStork', 'MessyTie', 'TipsySpider', 'RightwardPeaks', 'OrigamiSnake']:
+
+                    match self.params['akb_model']:
+                        case 'DoubleSummit':
+                            w_start = [0.41, -0.01, 1.57, -1.5, -0.34]
+                            w_stop = [-0.71, 0.9, 1.71, -0.11, 0.85]
+                            if self.variant != 'Vanilla':
+                                self._log('Warning: akb_model \'DoubleSummit\' was designed for Vanilla PSO')
+                        case 'FlyingStork':
+                            w_start = [-0.86, 0.24, -1.10, 0.75, 0.72]
+                            w_stop = [-0.81, -0.35, -0.26, 0.64, 0.60]
+                            if self.variant != 'Vanilla':
+                                self._log('Warning: akb_model \'FlyingStork\' was designed for Vanilla PSO')
+                        case 'MessyTie':
+                            w_start = [-0.62, 0.18, 0.65, 0.32, 0.77]
+                            w_stop = [0.36, 0.73, -0.62, 0.40, 1.09]
+                            if self.variant != 'Vanilla':
+                                self._log('Warning: akb_model \'MessyTie\' was designed for Vanilla PSO')
+                        case 'TipsySpider':
+                            w_start = [-0.32, 0.10, -0.81, 1.19, 0.55]
+                            w_stop = [0.34, 0.36, 0.28, 0.75, 0.08]
+                            if self.variant != 'Vanilla':
+                                self._log('Warning: akb_model \'TipsySpider\' was designed for Vanilla PSO')
+                        case 'RightwardPeaks':
+                            w_start = [-1.79, -0.33, 2.00, -0.67, 1.30]
+                            w_stop = [-0.91, -0.88, -0.84, 0.67, -0.36]
+                            if self.variant != 'TVAC':
+                                self._log('Warning: akb_model \'RightwardPeaks\' was designed for TVAC PSO')
+                        case 'OrigamiSnake':
+                            w_start = [-1.36, 2.00, 1.00, -0.60, 1.22]
+                            w_stop = [0.30, 1.03, -0.21, 0.40, 0.06]
+                            if self.variant != 'TVAC':
+                                self._log('Warning: akb_model \'OrigamiSnake\' was designed for TVAC PSO')
+
+                    # code shared for all w-list-based named akb_models
                     Th = np.linspace(np.pi/4, 5*np.pi/4, 5)
                     self.params['akb_fun_start'] = \
                                         make_interp_spline(Th, w_start, k=1)
@@ -257,7 +266,9 @@ class PSO(Optimizer):
 
 
         # Generate a swarm
-        self._swarm: list[Particle] = [Particle(self.variables, self.objectives, self.constraints, x_format=self._x_format) for c in range(self.params['swarm_size'])]
+        self._swarm: list[Particle] = \
+            [Particle(self.variables, self.objectives, self.constraints, x_format=self._x_format) \
+             for c in range(self.params['swarm_size'])]
         
         # Prepare arrays
         self._dF = np.full(self.params['swarm_size'], np.nan)
@@ -429,7 +440,8 @@ class PSO(Optimizer):
                             case VariableType.Integer:
                                 X.append(int(round(x + V[i])))
                             case VariableType.Categorical:
-                                X.append(x if np.random.rand() < self._progress_factor() else np.random.choice(var_options[0]))
+                                X.append(x if np.random.rand() < self._progress_factor() \
+                                             else np.random.choice(var_options[0]))
                             case _:
                                 X.append(x + V[i])
 
