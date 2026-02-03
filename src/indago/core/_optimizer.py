@@ -228,7 +228,7 @@ class Optimizer:
         self.variant = None
 
         self.variables: indago.VariableDictType = {}
-        # self.dimensions = None
+        self._dimensions = None
         self._all_real = False
         self._x_format = XFormat.Tuple
 
@@ -399,8 +399,11 @@ class Optimizer:
             self.constraints = self.evaluator.constraints
 
         # Initialize lb, ub, and dimensions
-        #self._init_bounds()
-        self._init_variables()
+        if len(self.variables) > 0:
+            self._init_variables()
+        else:
+            self._init_from_bounds()
+
 
         assert callable(self.evaluator), \
             "optimizer.evaluator should be callable"
@@ -596,7 +599,7 @@ class Optimizer:
             self.ub = np.asarray(ub)
 
 
-    def _init_bounds(self) -> None:
+    def _init_from_bounds(self) -> None:
 
         # check for no bounds
         if self.lb is None:
@@ -610,25 +613,25 @@ class Optimizer:
         self.ub = np.nan_to_num(self.ub, nan=1e100, posinf=1e100, neginf=-1e100).astype(float)
 
         # check dimensions or get it from lb/ub
-        if self.dimensions is not None:
-            assert isinstance(self.dimensions, int) and self.dimensions > 0, \
+        if self._dimensions is not None:
+            assert isinstance(self._dimensions, int) and self.dimensions > 0, \
                 "optimizer.dimensions should be positive integer"
         else:
-            self.dimensions = max(np.size(self.lb), np.size(self.ub))
-            assert self.dimensions > 1, \
+            self._dimensions = max(np.size(self.lb), np.size(self.ub))
+            assert self._dimensions > 1, \
                 "optimizer.lb and optimizer.ub both of size 1, missing optimizer.dimensions"
 
         # expand scalar lb/ub
         if np.size(self.lb) == 1:
-            self.lb = np.full(self.dimensions, self.lb)
+            self.lb = np.full(self._dimensions, self.lb)
         if np.size(self.ub) == 1:
-            self.ub = np.full(self.dimensions, self.ub)
+            self.ub = np.full(self._dimensions, self.ub)
 
         # in case lb/ub is a list or tuple
         self.lb = np.array(self.lb)
         self.ub = np.array(self.ub)
 
-        assert np.size(self.lb) == np.size(self.ub) == self.dimensions, \
+        assert np.size(self.lb) == np.size(self.ub) == self._dimensions, \
             "optimizer.lb and optimizer.ub should be of equal size or scalar"
 
         assert (self.lb < self.ub).all(), \

@@ -96,3 +96,25 @@ def test_samplers():
             run = partial(run_sampler, sampler=sampler, variables=variables)
             t_cpu = timeit.timeit(run, number=timeit_runs)
             print(f'{kind}-variable problem RS with {sampler=}, {t_cpu=}')
+
+
+def test_bounds_api():
+    optimizer = Optimizer()
+    optimizer.lb = np.array([-1, -2, -3])
+    optimizer.ub = np.array([1, 2, 3])
+    optimizer.evaluator = lambda x: 0
+
+    print(f'{optimizer.dimensions=}')
+
+    optimizer._init_optimizer()
+    print(f'{optimizer.dimensions=}')
+    print(optimizer.variables)
+
+    assert optimizer.dimensions == 3, 'Bounds API does not work (dimensions mismatch)'
+    assert optimizer.lb.size == 3, 'Bounds API does not work (dimensions mismatch)'
+    assert optimizer.ub.size == 3, 'Bounds API does not work (dimensions mismatch)'
+    assert len(optimizer.variables) == 3, 'Bounds API does not work (dimensions mismatch)'
+
+
+if __name__ == '__main__':
+    test_bounds_api()
