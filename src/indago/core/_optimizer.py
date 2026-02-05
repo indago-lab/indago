@@ -1526,8 +1526,28 @@ class Optimizer:
 
         # Plot optimization variables
         if ax_x:
+            var_keys = [key for i, key in enumerate(self.variables)]
             for i in range(self.dimensions):
-                X = (self.ub[i] - self.history['X'][:, i]) / (self.ub[i] - self.lb[i])
+                if self._all_real:
+                    X = (self.ub[i] - self.history['X'][:, i]) / (self.ub[i] - self.lb[i])
+                else:
+                    var_name, var_type, *var_options = self.variables[var_keys[i]]
+                    match var_type:
+                        case VariableType.Real:
+                            X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
+                        case VariableType.RealDiscrete:
+                            # TODO implement
+                            X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
+                        case VariableType.Integer:
+                            # TODO implement
+                            X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
+                        case VariableType.Categorical:
+                            # TODO implement
+                            i = var_options[0].index(self.history['X'][:, i])
+                            X = (len(var_options[0]) - i - 1) / (len(var_options[0]) - 1)
+                        case _:
+                            raise ValueError(f'Invalid variable type {var_type}')
+
                 ax_x.plot(E, X, lw=lw, ls='-',
                           label=f'$x_{{{i + 1}}}$' if self.dimensions < 15 else None)
             ax_x.set_ylabel(r'$\mathbf{Optimization~variables}$\n(norm lin scale)')
