@@ -275,7 +275,7 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
-    def set_R(self, R: NDArray[float]) -> None:
+    def _set_X_rel(self, R: NDArray[float]) -> None:
         """Sets the design vector using ndarray of relative values [0, 1]. Correctly sets the values for all variable
         types. Raises an error if relative values are outside of range [0, 1].
 
