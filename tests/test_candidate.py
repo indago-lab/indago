@@ -133,12 +133,48 @@ def test_adjust():
     assert not c1.X[5] == X[5]
 
 def test_set_rel_x():
-
     c = indago.Candidate(mixed_variables)
-    r = np.random.uniform(0, 1, len(c._variables))
+    n = len(c._variables)
+
+    r = np.random.uniform(0, 1, n)
     c.set_R(r)
     print(f'{r=}')
     print(f'{c.X=}')
+
+    lb = []
+    ub = []
+    for var_name, (var_type, *var_options) in mixed_variables.items():
+        match var_type:
+            case indago.VariableType.Real:
+                lb.append(var_options[0])
+                ub.append(var_options[1])
+            case indago.VariableType.RealDiscrete:
+                lb.append(var_options[0][0])
+                ub.append(var_options[0][-1])
+            case indago.VariableType.Integer:
+                lb.append(var_options[0])
+                ub.append(var_options[1])
+            case indago.VariableType.Categorical:
+                lb.append(var_options[0][0])
+                ub.append(var_options[0][-1])
+            case _:
+                raise NotImplementedError
+    lb = tuple(lb)
+    ub = tuple(ub)
+
+    r = np.zeros(n)
+    c.set_R(r)
+    print(f'{r=}')
+    print(f'{c.X=}')
+    print(f'{lb=}')
+    assert c.X == lb, 'Error in relative vale assignment'
+
+    r = np.ones(n)
+    c.set_R(r)
+    print(f'{r=}')
+    print(f'{c.X=}')
+    print(f'{ub=}')
+    assert c.X == ub, 'Error in relative vale assignment'
 
 if __name__ == '__main__':
     test_set_rel_x()
