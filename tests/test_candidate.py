@@ -132,4 +132,13 @@ def test_adjust():
     assert c1.adjust()
     assert not c1.X[5] == X[5]
 
+def test_set_rel_x():
 
+    c = indago.Candidate(mixed_variables)
+    r = np.random.uniform(0, 1, len(c._variables))
+    c.set_R(r)
+    print(f'{r=}')
+    print(f'{c.X=}')
+
+if __name__ == '__main__':
+    test_set_rel_x()

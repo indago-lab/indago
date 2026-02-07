@@ -275,6 +275,35 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
+    def set_R(self, R: np.ndarray) -> None:
+        """Sets the design vector using ndarray of relative values [0, 1]. Correctly sets the values for all variable
+        types. Raises an error if relative values are outside of range [0, 1].
+
+        Parameters
+        -------
+        R: ndarray[float
+            Array of relative values in range [0, 1].
+        """
+        X: list[X_Content_Type] = []
+        for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
+            if r < 0 or r > 1:
+                raise ValueError(f'Relative value {r} is out of [0, 1] range for variable {var_name}')
+            match var_type:
+                case VariableType.Real:
+                    X.append(var_options[0] + r * (var_options[1] - var_options[0]))
+                case VariableType.RealDiscrete:
+                    i = int(round(r * len(var_options[0]) - 0.5))
+                    X.append(var_options[0][i])
+                case VariableType.Integer:
+                    i = int(round(var_options[0] + r * (var_options[1] - var_options[0]) - 0.5))
+                    X.append(i)
+                case VariableType.Categorical:
+                    i = int(round(r * len(var_options[0]) - 0.5))
+                    X.append(var_options[0][i])
+                case _:
+                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+        self.X = X
+        
     def adjust(self) -> bool:
         """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict
         provide in the ``Candidate`` constructor.
