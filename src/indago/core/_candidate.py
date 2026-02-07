@@ -275,7 +275,7 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
-    def set_R(self, R: np.ndarray) -> None:
+    def set_R(self, R: NDArray[float]) -> None:
         """Sets the design vector using ndarray of relative values [0, 1]. Correctly sets the values for all variable
         types. Raises an error if relative values are outside of range [0, 1].
 
@@ -303,7 +303,7 @@ class Candidate:
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         self.X = X
-        
+
     def adjust(self) -> bool:
         """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict
         provide in the ``Candidate`` constructor.
