@@ -39,7 +39,7 @@ def generate_variables_dict(kind, dims):
     return variables_dict
 
 def real_function(x):
-    x = np.asarray(x)
+    # x = np.asarray(x)
     f = np.sum((x - np.arange(x.size)) ** 2)
     # print(f'{x=}, {f=}')
     return f

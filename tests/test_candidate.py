@@ -2,7 +2,7 @@
 import indago
 import numpy as np
 from copy import copy, deepcopy
-from test_utils import mixed_variables
+from test_utils import mixed_variables, real_variables_10D
 
 def test_initialization():
 
@@ -21,6 +21,17 @@ def test_list_X_format():
     print([type(x) for x in candidate.X])
     assert np.all(np.isnan(candidate._X[:4])) and candidate._X[4] == 0 and candidate.X[5] == 'X'
     assert [type(x) == float for x in candidate._X[:4]] and type(candidate.X[4]) == int and type(candidate.X[5]) == str
+
+
+def test_ndarray_X_format():
+    print()
+    candidate: indago.Candidate = indago.Candidate(variables=real_variables_10D, x_format=indago.XFormat.Ndarray)
+
+    print(candidate.X)
+    print(type(candidate.X))
+    print([type(x) for x in candidate.X])
+    # assert np.all(np.isnan(candidate._X[:4])) and candidate._X[4] == 0 and candidate.X[5] == 'X'
+    # assert [type(x) == float for x in candidate._X[:4]] and type(candidate.X[4]) == int and type(candidate.X[5]) == str
 
 def test_x_assign():
     print()
@@ -179,4 +190,4 @@ def test_set_rel_x():
     assert c.X == ub, 'Error in relative vale assignment'
 
 if __name__ == '__main__':
-    test_set_rel_x()
+    test_ndarray_X_format()
