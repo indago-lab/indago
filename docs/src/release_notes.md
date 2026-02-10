@@ -14,9 +14,11 @@ Released on yyyy-mm-dd
 - **New methods: Heap-Based Optimizer (HBO), Controlled Random Search (CRS)**
 - New samplers for generating initial population positions (`Optimizer.sampler`): Sobol (`'sobol'`) and LatinHypercube (`'lhs'`)
 ### Improvements
+- Significant code refactoring, making Indago ready for future extensions
 - **IndagoBench25 results overview and corresponding guidelines added to documentation**
 - Template file for new methods included in the methods library (`_new_method_template.py`)
 - Anakatabatic PSO variants are now using `scipy.interpolate.make_interp_spline` instead of legacy function `interp1d`
+- New anakatabatic model for PSO: `'DoubleSummit'`
 - Literature reference for MSGD provided in documentation
 - LSHADE set as the default DE variant (performs much better than SHADE)
 - `Optimizer.scatter_method` renamed to `Optimizer.sampler` <i class="fa-solid fa-triangle-exclamation"></i>
