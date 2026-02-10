@@ -12,9 +12,7 @@ timeit_dims = 50
 timeit_evals = 1_000
 
 
-
 def test_variables_initialization():
-
     optimizer = Optimizer()
     optimizer.variables['a'] = indago.VariableType.Real, -1, 5
     optimizer.variables['b'] = indago.VariableType.Real, 1, None
@@ -46,7 +44,6 @@ def test_real_rs():
     assert optimizer.eval == optimizer.max_evaluations
 
 def test_mixed_rs():
-
     f = lambda x: 0.0
 
     optimizer = indago.RS()
@@ -72,7 +69,6 @@ def test_timeit_rs():
     print(f'RS with 8D mixed-variable problem, {t_mixed=}')
 
 def run_sampler(sampler, variables):
-
     f = lambda x: 0.0
 
     optimizer = indago.RS()
@@ -85,7 +81,6 @@ def run_sampler(sampler, variables):
     assert optimizer.eval == optimizer.max_evaluations
 
 def test_samplers():
-
     print()
     print(f'{timeit_dims}-dimensional problems, {timeit_evals} evaluations')
     for kind in 'real mixed'.split():
@@ -96,7 +91,6 @@ def test_samplers():
             run = partial(run_sampler, sampler=sampler, variables=variables)
             t_cpu = timeit.timeit(run, number=timeit_runs)
             print(f'{kind}-variable problem RS with {sampler=}, {t_cpu=}')
-
 
 def test_bounds_api():
     optimizer = Optimizer()

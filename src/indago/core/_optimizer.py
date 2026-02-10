@@ -404,6 +404,8 @@ class Optimizer:
         else:
             self._init_from_bounds()
 
+        if self._all_real:
+            self._x_format = XFormat.Ndarray
 
         assert callable(self.evaluator), \
             "optimizer.evaluator should be callable"
@@ -598,7 +600,6 @@ class Optimizer:
             self.lb = np.asarray(lb)
             self.ub = np.asarray(ub)
 
-
     def _init_from_bounds(self) -> None:
 
         # check for no bounds
@@ -614,7 +615,7 @@ class Optimizer:
 
         # check dimensions or get it from lb/ub
         if self._dimensions is not None:
-            assert isinstance(self._dimensions, int) and self.dimensions > 0, \
+            assert isinstance(self._dimensions, int) and self._dimensions > 0, \
                 "optimizer.dimensions should be positive integer"
         else:
             self._dimensions = max(np.size(self.lb), np.size(self.ub))
@@ -636,6 +637,8 @@ class Optimizer:
 
         assert (self.lb < self.ub).all(), \
             "optimizer.lb should be strictly lower than optimizer.ub"
+
+        self._all_real = True
 
         for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
             self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
