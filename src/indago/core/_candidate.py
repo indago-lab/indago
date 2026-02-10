@@ -132,14 +132,14 @@ class Candidate:
 
         match x_format:
             case XFormat.Tuple:
-                self._get_x = self._get_x_as_tuple
+                self._get_x = self._get_X_as_tuple
             case XFormat.List:
-                self._get_x = self._get_x_as_list
+                self._get_x = self._get_X_as_list
             case XFormat.Dict:
-                self._get_x = self._get_x_as_dict
+                self._get_x = self._get_X_as_dict
             case XFormat.Ndarray:
                 assert x_is_homogenous, f'Cant use x_format {x_format} for heterogeneous variables'
-                self._get_x = self._get_x_as_ndarray
+                self._get_x = self._get_X_as_ndarray
             case _:
                 raise NotImplementedError
 
@@ -208,7 +208,7 @@ class Candidate:
             raise NotImplementedError(f'Unsupported x_format {x_format}')
         self._X = tuple(X)
 
-    def _get_x_as_tuple(self) -> tuple[X_Content_Type]:
+    def _get_X_as_tuple(self) -> tuple[X_Content_Type]:
         """Utility function of getting a design vector X as a tuple.
 
         Returns
@@ -218,7 +218,7 @@ class Candidate:
         """
         return tuple[X_Content_Type](self._X)
 
-    def _get_x_as_list(self) -> list[X_Content_Type]:
+    def _get_X_as_list(self) -> list[X_Content_Type]:
         """Utility function of getting a design vector X as a list.
 
         Returns
@@ -228,7 +228,7 @@ class Candidate:
         """
         return list(self._X)
 
-    def _get_x_as_dict(self) -> dict[str, X_Content_Type]:
+    def _get_X_as_dict(self) -> dict[str, X_Content_Type]:
         """Utility function of getting a design vector X as a dictionary.
 
         Returns
@@ -241,7 +241,7 @@ class Candidate:
             X[var_name] = x
         return X
 
-    def _get_x_as_ndarray(self) -> NDArray[np.float64]:
+    def _get_X_as_ndarray(self) -> NDArray[np.float64]:
         """Utility function of getting a design vector X as a numpy.ndarray. It can be used only when all variables
         are real (``VariableType.Real`` or ``VariableType.RealDiscrete``).
         TODO this raises an error if called for mixed problems. Decide whether to remove/check/assert.
@@ -253,7 +253,7 @@ class Candidate:
         """
         return np.asarray(self._X, dtype=np.float64)
 
-    def _get_x_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
+    def _get_X_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
         """Utility function of getting a design vector X as a tuple of numpy.ndarrays grouped by type.
 
         Returns

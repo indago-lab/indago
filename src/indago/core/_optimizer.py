@@ -232,7 +232,6 @@ class Optimizer:
         self._all_real = False
         self._x_format = XFormat.Tuple
 
-
         self.evaluator = None
 
         self.processes = 1
@@ -1384,9 +1383,9 @@ class Optimizer:
 
                 if self.forward_unique_str:
                     candidates[p].unique_str = self._gen_unique_str()
-                    result = self._evaluation_function_safe(candidates[p]._get_x_as_tuple(), candidates[p].unique_str)
+                    result = self._evaluation_function_safe(candidates[p].X, candidates[p].unique_str)
                 else:
-                    result = self._evaluation_function_safe(candidates[p]._get_x_as_tuple())
+                    result = self._evaluation_function_safe(candidates[p].X)
 
                 if self.objectives == 1 and self.constraints == 0:
                     # Fast evaluation

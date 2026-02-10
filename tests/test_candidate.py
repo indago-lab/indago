@@ -66,7 +66,7 @@ def test_candidate_copy():
     assert c1 == c2, 'Candidate.copy() does not work. Copy is not the same as original'
     assert c1.X == c2.X, 'Candidate.copy() does not work. Copy is not the same as original'
 
-    x = c1._get_x_as_list()
+    x = c1._get_X_as_list()
     x[0] = -99.99
     c1.X = x
 
@@ -78,55 +78,55 @@ def test_adjust():
     c1: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.Tuple)
     assert c1.adjust()
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[0] = 1.2345
     c1.X = X
     assert not c1.adjust()
     assert c1.X[0] == X[0]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[0] = -987.654
     c1.X = X
     assert c1.adjust()
     assert not c1.X[0] == X[0]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[1] = -0.3
     c1.X = X
     assert c1.adjust()
     assert not c1.X[1] == X[1]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[2] = 365.25
     c1.X = X
     assert not c1.adjust()
     assert c1.X[1] == X[1]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[3] = 8.2
     c1.X = X
     assert c1.adjust()
     assert not c1.X[3] == X[3]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[4] = 7
     c1.X = X
     c1.adjust()
     assert c1.X[4] == X[4]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[4] = 11
     c1.X = X
     assert c1.adjust()
     assert not c1.X[4] == X[4]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[5] = 'D'
     c1.X = X
     assert not c1.adjust()
     assert c1.X[5] == X[5]
 
-    X = c1._get_x_as_list()
+    X = c1._get_X_as_list()
     X[5] = 'None'
     c1.X = X
     assert c1.adjust()
