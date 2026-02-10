@@ -1,0 +1,254 @@
+
+/* Main content width */
+.wy-nav-content {
+/*     width: 1200px; */
+/*     width: 1200px !important; */
+/*     min-width: 500px !important; */
+    max-width: 1200px;
+    overflow: hidden;
+}
+
+h1 {
+  font-size: 175%;
+/*   color: #707070; */
+}
+h2 {
+  font-size: 130%;
+/*   color: #707070; */
+}
+h3 {
+  font-size: 105%;
+/*   color: #707070; */
+}
+
+.fa-circle-check {
+    /*
+    text-decoration: underline;
+    cursor: help;
+    */
+    position: relative;
+    color: Green;
+}
+.fa-circle-check:hover::after,
+.fa-circle-check:focus::after {
+  content: "Constraints supported";
+  position: absolute;
+  left: 24px;
+  top: 0px;
+  min-width: 100px;
+  border: 1px #aaaaaa solid;
+  border-radius: 2px;
+  background-color: lightgray;
+  padding: 4px;
+/*   color: black; */
+  font-size: 12px;
+  z-index: 1;  
+  font-family: Lato,proxima-nova,Helvetica Neue,Arial,sans-serif;
+  font-weight: 400;
+  color: #404040;
+}
+
+.fa-xmark {
+    /*
+    text-decoration: underline;
+    cursor: help;
+    */
+    position: relative;
+    color: FireBrick;
+}
+.fa-xmark:hover::after,
+.fa-xmark:focus::after {
+  content: "Constraints not supported";
+  position: absolute;
+  left: 24px;
+  top: 0px;
+  min-width: 100px;
+  border: 1px #aaaaaa solid;
+  border-radius: 2px;
+  background-color: lightgray;
+  padding: 4px;
+/*   color: black; */
+  font-size: 12px;
+  z-index: 1;  
+  font-family: Lato,proxima-nova,Helvetica Neue,Arial,sans-serif;
+  font-weight: 400;
+  color: #404040;
+}
+
+.fa-star {
+    /*
+    text-decoration: underline;
+    cursor: help;
+    */
+    position: relative;
+    color: SteelBlue;
+    font-size: 12px;
+}
+.fa-star:hover::after,
+.fa-star:focus::after {
+  content: "Default";
+  position: absolute;
+  left: 24px;
+  top: 0px;
+  min-width: 100px;
+  border: 1px #aaaaaa solid;
+  border-radius: 2px;
+  background-color: lightgray;
+  padding: 4px;
+/*   color: black; */
+  font-size: 12px;
+  z-index: 1;  
+  font-family: Lato,proxima-nova,Helvetica Neue,Arial,sans-serif;
+  font-weight: 400;
+  color: #404040;
+}
+
+
+.fa-triangle-exclamation{
+    /*
+    text-decoration: underline;
+    cursor: help;
+    */
+    position: relative;
+    color: OrangeRed;
+    font-size: 12px;
+}
+.fa-triangle-exclamation
+.fa-triangle-exclamation{
+  content: "Default";
+  position: absolute;
+  left: 24px;
+  top: 0px;
+  min-width: 100px;
+  border: 1px #aaaaaa solid;
+  border-radius: 2px;
+  background-color: lightgray;
+  padding: 4px;
+/*   color: black; */
+  font-size: 12px;
+  z-index: 1;  
+  font-family: Lato,proxima-nova,Helvetica Neue,Arial,sans-serif;
+  font-weight: 400;
+  color: #404040;
+}
+
+
+
+.wy-table-responsive {
+    margin: 4px, 4px;
+    padding: 4px;
+/*     background-color: #08c708; */
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+.wy-table-responsive table {
+/*     table-layout: fixed; */
+    width: 1080px;
+/*     width: 1200px; */
+/*     position: sticky; */
+/*     display: block; */
+/*     overflow-x: auto; */
+/*     overflow-y: hidden; */
+/*     white-space: nowrap; */
+}
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/*
+ * Methods variants table
+ */
+#overview-of-methods-and-their-variants table {
+/*     color: red; */
+}
+/* First column (Method) */
+#overview-of-methods-and-their-variants table td:nth-child(1),
+#overview-of-methods-and-their-variants table th:nth-child(1) {
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+}
+/* Second column (Variant) */
+#overview-of-methods-and-their-variants table td:nth-child(2),
+#overview-of-methods-and-their-variants table th:nth-child(2) {
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
+}
+/* Third column (Constraints) */
+#overview-of-methods-and-their-variants table td:nth-child(3),
+#overview-of-methods-and-their-variants table th:nth-child(3) {
+  width: 110px;
+  min-width: 110px;
+  max-width: 110px;
+  text-align: center;
+}
+/* Forth column (Remarks) */
+#overview-of-methods-and-their-variants table td:nth-child(4),
+#overview-of-methods-and-their-variants table th:nth-child(4) {
+  width: 100%;
+/*   min-width: 50px; */
+/*   max-width: 50px; */
+}
+
+
+
+
+
+/*
+ * Other (methods') tables
+ */
+
+/* First column (Variant) */
+table td:nth-child(1),
+table th:nth-child(1) {
+  width: 125px;
+  min-width: 125px;
+  max-width: 125px;
+}
+/* Second column (Parameter) */
+table td:nth-child(2),
+table th:nth-child(2) {
+  width: 125px;
+  min-width: 125px;
+  max-width: 125px;
+}
+/* Third column (Allowed values) */
+table td:nth-child(3),
+table th:nth-child(3) {
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+}
+/* Forth column (Range) */
+table td:nth-child(4),
+table th:nth-child(4) {
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+}
+/* Fifth column (Default) */
+table td:nth-child(5),
+table th:nth-child(5) {
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+/* Last column (Default) */
+table td:last-child,
+table th:last-child {
+/*   width: 400px; */
+    width:100%;
+}
+
+.rst-content img {
+  max-width: 800px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  /*width: 800px;*/
+}
