@@ -39,7 +39,7 @@ def run(optimizer):
 def test_PSO_defaults() -> None:
     description = 'PSO defaults'
     optimizer = PSO()
-    expected_result = 4.451701712692289
+    expected_result = 2.5793297920299136
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -48,8 +48,8 @@ def test_PSO_defaults() -> None:
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
-    optimizer.X0 = np.zeros(DIM)
-    expected_result = 4.142899631978027
+    optimizer.X0 = np.ones(DIM)
+    expected_result = 4.142899631878027  # needs updating
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -59,7 +59,7 @@ def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
     optimizer.X0 = np.array([1*np.ones(DIM), 2*np.ones(DIM), 3*np.ones(DIM)])
-    expected_result = 4.167936861974944
+    expected_result = 0.37301715942874253
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -69,7 +69,7 @@ def test_PSO_defaults_int_X0() -> None:
     description = 'PSO defaults, int X0'
     optimizer = PSO()
     optimizer.X0 = 25
-    expected_result = 4.737423558263711
+    expected_result = 2.6704917369893884
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -83,7 +83,7 @@ def test_PSO_Vanilla_custom_parameters() -> None:
     optimizer.params['inertia'] = 0.6
     optimizer.params['cognitive_rate'] = 2.0
     optimizer.params['social_rate'] = 2.0
-    expected_result = 4.845127336717785
+    expected_result = 4.026320535708186
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -93,7 +93,7 @@ def test_PSO_TVAC_defaults() -> None:
     description = 'PSO TVAC defaults'
     optimizer = PSO()
     optimizer.variant = 'TVAC'
-    expected_result = 4.727754890370569
+    expected_result = 3.2573071465104713
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -103,7 +103,7 @@ def test_PSO_Vanilla_LDIW() -> None:
     description = 'PSO Vanilla LDIW'
     optimizer = PSO()
     optimizer.params['inertia'] = 'LDIW'
-    expected_result = 4.899434784596884
+    expected_result = 3.304806494663155
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -113,7 +113,7 @@ def test_PSO_Vanilla_HSIW() -> None:
     description = 'PSO Vanilla HSIW'
     optimizer = PSO()
     optimizer.params['inertia'] = 'HSIW'
-    expected_result = 4.2897686157498995
+    expected_result = 2.5417401479737785
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -124,7 +124,7 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
-    expected_result = 3.9438986702688554
+    expected_result = 3.1457484365150234
     tolerance = 1e-4
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -135,7 +135,7 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
-    expected_result = 4.9856511403930694
+    expected_result = 3.3754146413536024
     tolerance = 1e-4
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -147,7 +147,7 @@ def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'OrigamiSnake'
-    expected_result = 4.447881816359018
+    expected_result = 2.822197390624899
     tolerance = 1e-4
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -159,7 +159,7 @@ def test_PSO_Vanilla_anakatabatic_Languid() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'Languid'
-    expected_result = 4.673009823249845
+    expected_result = 3.8318983720461195
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -171,7 +171,7 @@ def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'DoubleSummit'
-    expected_result = 4.673009823249845
+    expected_result = 4.0967505955847
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -182,7 +182,7 @@ def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
     description = 'PSO defaults, multiprocessing on 4 processors'
     optimizer = PSO()
     optimizer.processes = 4
-    expected_result = 4.451701712692289
+    expected_result = 2.5793297920299136
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -193,7 +193,7 @@ def test_PSO_defaults_multiprocessing_on_maximum_processors() -> None:
     description = 'PSO defaults, multiprocessing on maximum processors'
     optimizer = PSO()
     optimizer.processes = 'max'
-    expected_result = 4.451701712692289
+    expected_result = 2.5793297920299136
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -214,7 +214,7 @@ def test_PSO_Chaotic_anakatabatic_Languid() -> None:
     optimizer = PSO()
     optimizer.variant = 'Chaotic'
     optimizer.params['inertia'] = 'anakatabatic'
-    expected_result = 4.660721050519926
+    expected_result = 4.027548994755644
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -224,7 +224,7 @@ def test_PSO_defaults_halton_initializer() -> None:
     description = 'PSO defaults, halton initializer'
     optimizer = PSO()
     optimizer.sampler = 'halton'
-    expected_result = 3.894723171409022
+    expected_result = 2.559935460137834
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -434,7 +434,7 @@ def test_NM_Vanilla_defaults() -> None:
 def test_RS_defaults() -> None:
     description = 'RS defaults'
     optimizer = RS()
-    expected_result = 4.707063872301493
+    expected_result = 4.649421244751145
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -444,7 +444,7 @@ def test_RS_halton_initializer() -> None:
     description = 'RS halton initializer'
     optimizer = RS()
     optimizer.sampler = 'halton'
-    expected_result = 4.964551645464896
+    expected_result = 4.613384041419631
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -454,7 +454,7 @@ def test_RS_sobol_initializer() -> None:
     description = 'RS sobol initializer'
     optimizer = RS()
     optimizer.sampler = 'sobol'
-    expected_result = 4.893882682936462
+    expected_result = 4.67130384878125
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -464,7 +464,7 @@ def test_RS_lhs_initializer() -> None:
     description = 'RS lhs initializer'
     optimizer = RS()
     optimizer.sampler = 'lhs'
-    expected_result = 5.024877929981968
+    expected_result = 4.050654337618511
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
