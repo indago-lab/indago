@@ -23,8 +23,7 @@ def test_numeric_problem():
     print(optimizer.best)
 
 def real_function(x):
-    # x = np.asarray(x)
-    f = np.sum((x - np.arange(x.size)) ** 2)
+    f = np.sum((x - np.arange(len(x))) ** 2)
     # print(f'{x=}, {f=}')
     return f
 
