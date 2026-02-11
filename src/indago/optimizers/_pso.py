@@ -257,7 +257,7 @@ class PSO(Optimizer):
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
                 'optimizer.max_iteration, optimizer.max_evaluations, or optimizer.max_elapsed_time should be provided for this method/variant'
 
-        self._evaluate_initial_candidates(Particle)
+        self._evaluate_initial_candidates()
         
         # Bounds for position and velocity
         if self._all_real:

@@ -794,15 +794,10 @@ class Optimizer:
                     c.X = X
 
 
-    def _evaluate_initial_candidates(self, candidate_type=Candidate):
+    def _evaluate_initial_candidates(self):
         """Private method for evaluating initial candidates. This method populates 
         and evaluates private list of initial candidates (Optimizer._initial_candidates)
         according to provided initial points Optimizer.X0.
-
-        Parameters
-        ----------
-        candidate_type : class
-            Subclass of Candidate class used in the specific optimizer.
 
         Returns
         -------
@@ -820,7 +815,10 @@ class Optimizer:
                 # if 1D convert to 2D
                 if self.X0.ndim == 1:
                     self.X0 = np.array([self.X0])
-                self._initial_candidates = np.array([candidate_type(self.variables) for i in range(self.X0.shape[0])])
+                self._initial_candidates = np.array([Candidate(self.variables,
+                                                               self.objectives,
+                                                               self.constraints,
+                                                               x_format=XFormat.Ndarray) for i in range(self.X0.shape[0])])
                 for i, cs in enumerate(self._initial_candidates):
                     cs.X = self.X0[i, :]
 
@@ -828,7 +826,10 @@ class Optimizer:
                 assert self.X0 > 0, \
                     "optimizer.X0 should be a positive integer"
                 n = self.X0
-                self._initial_candidates = np.array([candidate_type(self.variables) for i in range(n)])
+                self._initial_candidates = np.array([Candidate(self.variables,
+                                                               self.objectives,
+                                                               self.constraints,
+                                                               x_format=XFormat.Ndarray) for i in range(n)])
                 # for cs in self._initial_candidates:
                 #     cs.X = np.random.uniform(self.lb, self.ub, self.dimensions)
                 self._initialize_X(self._initial_candidates)

@@ -49,7 +49,7 @@ def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
     optimizer.X0 = np.ones(DIM)
-    expected_result = 4.142899631878027  # needs updating
+    expected_result = 2.517708163727869
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
