@@ -47,6 +47,20 @@ class Particle(Candidate):
         
         self.V = np.full(len(variables), np.nan)
 
+    def copy(self):
+        """Method for creating a copy of the particle.
+
+        Returns
+        -------
+        Particle
+            Particle instance
+
+        """
+
+        new = super().copy()
+        new.V = np.copy(self.V)
+        return new
+
 
 class PSO(Optimizer):
     """Particle Swarm Optimization method class.
@@ -243,7 +257,7 @@ class PSO(Optimizer):
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
                 'optimizer.max_iteration, optimizer.max_evaluations, or optimizer.max_elapsed_time should be provided for this method/variant'
 
-        self._evaluate_initial_candidates()
+        self._evaluate_initial_candidates(Particle)
         
         # Bounds for position and velocity
         if self._all_real:
@@ -424,7 +438,7 @@ class PSO(Optimizer):
             else:
                 for p, particle in enumerate(self._swarm):
                     V = []
-                    X:list[X_Content_Type] = []
+                    X: list[X_Content_Type] = []
                     for i, (v, r1, r2, x, pbx, gbx, (var_name, (var_type, *var_options))) in enumerate(
                             zip(particle.V,
                                 R1[p, :], R2[p, :],
@@ -482,9 +496,9 @@ class PSO(Optimizer):
                 # reinitialize non-elite candidates
                 sorted_order = np.argsort(self._swarm)
                 elite_swarm_size = max(1, round(self.params['chaotic_elite'] * len(self._swarm)))
-                for p, particle in enumerate(self._swarm[sorted_order]):
+                for p, particle in enumerate([self._swarm[i] for i in sorted_order]):
                     if p >= elite_swarm_size:
-                        particle.X = np.random.uniform(self.lb, self.ub)
+                        self._initialize_X([particle])
                         particle.V = np.random.uniform(-self._v_max, self._v_max)
                 
                 # perform Chaotic Local Search on gbest
@@ -496,7 +510,7 @@ class PSO(Optimizer):
                     gbest_cls.X = self.lb + X_unit * (self.ub - self.lb)
                     self._collective_evaluation([gbest_cls])
                     if gbest_cls < gbest_before_cls: 
-                        self._swarm[sorted_order[0]] = gbest_cls.copy()
+                        self._swarm[sorted_order[0]] = gbest_cls
                         break
         
             if self._finalize_iteration():

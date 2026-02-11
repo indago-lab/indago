@@ -15,6 +15,7 @@ License: MIT
 File content: Definition of Candidate classes.
 Usage: from indago import Candidate
 """
+
 from __future__ import annotations # To support using Candidate type annotation inside Candidate class code
 from typing import TypeAlias, Any
 
@@ -103,7 +104,7 @@ class Candidate:
         Returns
         -------
         Candidate
-            CandidateState instance.
+            Candidate instance.
         """
 
         X: list[X_Content_Type] = []
@@ -375,17 +376,17 @@ class Candidate:
 
 
     def copy(self) -> Candidate:
-        """Method for creating a copy of the CandidateState.
+        """Method for creating a copy of the candidate.
 
         Returns
         -------
         Candidate
-            CandidateState instance
+            Candidate instance
 
         """
 
-        candidate: Candidate = Candidate(self._variables, self.O.size, self.C.size, self._x_format)
-        candidate.X = self.X  #np.copy(self.X)
+        candidate: Candidate = self.__class__(self._variables, self.O.size, self.C.size, self._x_format)
+        candidate.X = self.X
         candidate.O = np.copy(self.O)
         candidate.C = np.copy(self.C)
         candidate.f = self.f
@@ -395,7 +396,7 @@ class Candidate:
 
     def __str__(self) -> str:
         """Method for a useful printout of Candidate properties.
-        TODO this needs to return a clean str. Move rich printout to dedicated method e.g. Candidate.rich_print()
+        TODO this needs to return a clean str. Move rich printout to dedicated method e.g. Candidate.rich_print(), consider __repr__ too
 
         Returns
         -------

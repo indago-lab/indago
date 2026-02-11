@@ -123,9 +123,9 @@ class Optimizer:
         Each method embeds these candidates, fully or partially, in initial population, swarm or starting points. 
         Initial candidates are selected in order of their fitness. 
     _initial_candidates : ndarray
-        Private array of CandidateState instances populated and evaluated according to given Optimizer.X0 parameter.
+        Private array of candidates populated and evaluated according to given Optimizer.X0 parameter.
         The array is adopted in each method for establishing initial population, swarm or starting point.
-    _evaluated_candidates : ndarray of CandidateState
+    _evaluated_candidates : ndarray of Candidate
         Private array used as a buffer of evaluated candidates in current iteration. Enables forwarding a list of all
         evaluated candidates in an interation to be forwarded to post_iteration_processing function even if multiple
         collective evaluations are utilized in a single iteration of a method.
@@ -174,7 +174,7 @@ class Optimizer:
     post_iteration_processing : callable
         Handle for a callable object (e.g. function) that is being evoked after each iteration of the method. The
         function is expected to process following arguments ``it`` (``int``, current iteration), ``candidates`` (an
-        array of CandidateStates evaluated in the current iteration) and ``best`` (best CandidateState found until
+        array of candidates evaluated in the current iteration) and ``best`` (best candidate found until
         current iteration).
     safe_evaluation : bool
         If ``True``, in case of failed evaluations exceptions thrown by the **evaluation_function** 
@@ -278,7 +278,7 @@ class Optimizer:
         self.params = {}
 
         self._initial_candidates = None
-        self._evaluated_candidates = np.array([], dtype=Candidate)
+        self._evaluated_candidates = np.array([])
         self.best = None
         self.it = 0
         self.eval = 0
@@ -794,10 +794,15 @@ class Optimizer:
                     c.X = X
 
 
-    def _evaluate_initial_candidates(self):
+    def _evaluate_initial_candidates(self, candidate_type=Candidate):
         """Private method for evaluating initial candidates. This method populates 
         and evaluates private list of initial candidates (Optimizer._initial_candidates)
         according to provided initial points Optimizer.X0.
+
+        Parameters
+        ----------
+        candidate_type : class
+            Subclass of Candidate class used in the specific optimizer.
 
         Returns
         -------
@@ -815,7 +820,7 @@ class Optimizer:
                 # if 1D convert to 2D
                 if self.X0.ndim == 1:
                     self.X0 = np.array([self.X0])
-                self._initial_candidates = np.array([Candidate(optimizer=self) for i in range(self.X0.shape[0])])
+                self._initial_candidates = np.array([candidate_type(self.variables) for i in range(self.X0.shape[0])])
                 for i, cs in enumerate(self._initial_candidates):
                     cs.X = self.X0[i, :]
 
@@ -823,7 +828,7 @@ class Optimizer:
                 assert self.X0 > 0, \
                     "optimizer.X0 should be a positive integer"
                 n = self.X0
-                self._initial_candidates = np.array([Candidate(optimizer=self) for i in range(n)])
+                self._initial_candidates = np.array([candidate_type(self.variables) for i in range(n)])
                 # for cs in self._initial_candidates:
                 #     cs.X = np.random.uniform(self.lb, self.ub, self.dimensions)
                 self._initialize_X(self._initial_candidates)
@@ -1059,7 +1064,7 @@ class Optimizer:
         resume : bool
             If ``True``, the user is intentionally running the optimizer instance
             which has been run earlier. Otherwise, the optimizer is re-initialized.
-        inject : Candidate or its subclass object
+        inject : Candidate or its subclass
             Candidate solution to be injected into the optimizer population.
         seed : int or None
             Random seed. Provide the same value for reproducing identical 
@@ -1076,7 +1081,7 @@ class Optimizer:
             self.best = None
 
             self._initial_candidates = None
-            self._evaluated_candidates = np.array([], dtype=Candidate)
+            self._evaluated_candidates = np.array([])
 
             self.status = Status.RUNNING
             self._err_msg = None
@@ -1254,7 +1259,7 @@ class Optimizer:
             self.post_iteration_processing(self.it, _candidates, self.best)
 
         # Flushing evaluated candidates
-        self._evaluated_candidates = np.array([], dtype=Candidate)
+        self._evaluated_candidates = np.array([])
 
         # Tracking time
         self.elapsed_time = time.time() - self._clock_start
@@ -1362,7 +1367,7 @@ class Optimizer:
 
         Parameters
         ----------
-        candidates : list of Candidate
+        candidates : list of Candidate or its subclass
             A list of candidates to be evaluated.
             
         Returns
@@ -1452,6 +1457,7 @@ class Optimizer:
 
         # print(f'it {self.it:3d}: ' + ', '.join([f'{c.f:.6e}' for c in candidates]))
         # Expand list of candidates evaluated in current iteration
+        # TODO _evaluated_candidates could maybe be a list (instead of ndarray)?
         self._evaluated_candidates = np.append(self._evaluated_candidates, np.array([c.copy() for c in candidates]))
 
         # Determine new best candidate state

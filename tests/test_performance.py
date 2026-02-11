@@ -203,7 +203,7 @@ def test_PSO_Chaotic_defaults() -> None:
     description = 'PSO Chaotic defaults'
     optimizer = PSO()
     optimizer.variant = 'Chaotic'
-    expected_result = 4.787600353116293
+    expected_result = 4.273075440664452
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
