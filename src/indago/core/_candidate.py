@@ -308,7 +308,7 @@ class Candidate:
                     i = int(round(r * len(var_options[0]) - 0.5))
                     X.append(var_options[0][i])
                 case VariableType.Integer:
-                    i = int(round(var_options[0] + r * (var_options[1] - var_options[0]) - 0.5))
+                    i = int(round(var_options[0] + r * (var_options[1] - var_options[0] + 0.5)))
                     X.append(i)
                 case VariableType.Categorical:
                     i = int(round(r * len(var_options[0]) - 0.5))
@@ -332,11 +332,11 @@ class Candidate:
                 case VariableType.Real:
                     R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
                 case VariableType.RealDiscrete:
-                    R.append(var_options[0].index(x) / (len(var_options[0]) - 1))
+                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
                 case VariableType.Integer:
-                    R.append(x / (len(var_options[0]) - 1))
+                    R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
                 case VariableType.Categorical:
-                    R.append(var_options[0].index(x) / (len(var_options[0]) - 1))
+                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         return np.array(R)

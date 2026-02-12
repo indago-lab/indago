@@ -1,5 +1,6 @@
 import indago
 import numpy as np
+from copy import deepcopy
 
 mixed_variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
              'var2': (indago.VariableType.Real, 0, None),  # Real (continuous) semi-bounded
@@ -8,6 +9,10 @@ mixed_variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (conti
              'var5': (indago.VariableType.Integer, 0, 10),  # Integer (both for optimizer and evaluator)
              'var6': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
                    }
+
+mixed_bounded_variables = deepcopy(mixed_variables)
+mixed_bounded_variables.pop('var2')
+mixed_bounded_variables.pop('var3')
 
 real_variables_10D = {f'x{i}': (indago.VariableType.Real, -100, 100) for i in range (10)}
 

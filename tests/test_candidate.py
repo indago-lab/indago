@@ -2,7 +2,7 @@
 import indago
 import numpy as np
 from copy import copy, deepcopy
-from test_utils import mixed_variables, real_variables_10D
+from test_utils import mixed_variables, mixed_bounded_variables, real_variables_10D
 
 def test_initialization():
 
@@ -144,10 +144,8 @@ def test_adjust():
     assert not c1.X[5] == X[5]
 
 def test_set_rel_x():
-    mixed_variables.pop('var2')
-    mixed_variables.pop('var3')
 
-    c = indago.Candidate(mixed_variables)
+    c = indago.Candidate(mixed_bounded_variables)
     n = len(c._variables)
 
     r = np.random.uniform(0, 1, n)
@@ -157,7 +155,7 @@ def test_set_rel_x():
 
     lb = []
     ub = []
-    for var_name, (var_type, *var_options) in mixed_variables.items():
+    for var_name, (var_type, *var_options) in mixed_bounded_variables.items():
         match var_type:
             case indago.VariableType.Real:
                 lb.append(var_options[0])
@@ -191,20 +189,20 @@ def test_set_rel_x():
     assert c.X == ub, 'Error in relative value assignment'
 
 def test_get_rel_x():
-    mixed_variables.pop('var5')
 
-    c = indago.Candidate(mixed_variables)
+    c = indago.Candidate(mixed_bounded_variables)
     n = len(c._variables)
 
-    # np.random.seed(0)
     r = np.random.uniform(0, 1, n)
+    print(f'{r=}')
     c._set_X_rel(r)
     oldX = c.X
+    print(f'{oldX=}')
 
     r_get = c._get_X_rel()
+    print(f'{r_get=}')
     c._set_X_rel(r_get)
     newX = c.X
-    print(f'{oldX=}')
     print(f'{newX=}')
     assert oldX == newX, 'Error in relative value extraction'
 
