@@ -261,7 +261,12 @@ class PSO(Optimizer):
         
         # Bounds for position and velocity
         if self._all_real:
-            self._v_max = 0.2 * (self.ub - self.lb)
+            # self._v_max = 0.2 * (self.ub - self.lb)
+            dummy = Particle(self.variables, self.objectives, self.constraints, x_format=self._x_format)
+            dummy._set_X_rel(0.2)
+            self._v_max = np.copy(dummy.X)
+            dummy._set_X_rel(0)
+            self._v_max -= np.copy(dummy.X)
         else:
             v_max = []
             for var_name, (var_type, *var_options) in self.variables.items():
@@ -504,10 +509,12 @@ class PSO(Optimizer):
                 # perform Chaotic Local Search on gbest
                 gbest_cls = self.best.copy()
                 gbest_before_cls = self.best.copy()
-                X_unit = (gbest_cls.X - self.lb) / (self.ub - self.lb)
+                # X_unit = (gbest_cls.X - self.lb) / (self.ub - self.lb)
+                X_unit = gbest_cls._get_X_rel()  # instead of the above
                 for _ in range(self.params['max_cls_it']):
                     X_unit = 4 * X_unit * (1 - X_unit)
-                    gbest_cls.X = self.lb + X_unit * (self.ub - self.lb)
+                    # gbest_cls.X = self.lb + X_unit * (self.ub - self.lb)
+                    gbest_cls._set_X_rel(X_unit)  # instead of the above
                     self._collective_evaluation([gbest_cls])
                     if gbest_cls < gbest_before_cls: 
                         self._swarm[sorted_order[0]] = gbest_cls

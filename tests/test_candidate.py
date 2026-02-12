@@ -146,6 +146,7 @@ def test_adjust():
 def test_set_rel_x():
     mixed_variables.pop('var2')
     mixed_variables.pop('var3')
+
     c = indago.Candidate(mixed_variables)
     n = len(c._variables)
 
@@ -187,7 +188,26 @@ def test_set_rel_x():
     print(f'{r=}')
     print(f'{c.X=}')
     print(f'{ub=}')
-    assert c.X == ub, 'Error in relative vale assignment'
+    assert c.X == ub, 'Error in relative value assignment'
+
+def test_get_rel_x():
+    mixed_variables.pop('var5')
+
+    c = indago.Candidate(mixed_variables)
+    n = len(c._variables)
+
+    # np.random.seed(0)
+    r = np.random.uniform(0, 1, n)
+    c._set_X_rel(r)
+    oldX = c.X
+
+    r_get = c._get_X_rel()
+    c._set_X_rel(r_get)
+    newX = c.X
+    print(f'{oldX=}')
+    print(f'{newX=}')
+    assert oldX == newX, 'Error in relative value extraction'
+
 
 if __name__ == '__main__':
     test_ndarray_X_format()

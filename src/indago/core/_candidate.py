@@ -173,6 +173,7 @@ class Candidate:
             A container of all design variables. The type of the container is determined by ``x_format`` argument in
             the Candidate constructor.
         """
+
         return self._get_x()
 
     @X.setter
@@ -217,6 +218,7 @@ class Candidate:
         X: tuple[X_Content_Type]
             A tuple of all design variables.
         """
+
         return tuple[X_Content_Type](self._X)
 
     def _get_X_as_list(self) -> list[X_Content_Type]:
@@ -227,6 +229,7 @@ class Candidate:
         X: list[X_Content_Type]
             A list of all design variables.
         """
+
         return list(self._X)
 
     def _get_X_as_dict(self) -> dict[str, X_Content_Type]:
@@ -237,6 +240,7 @@ class Candidate:
         X: dict[str, X_Content_Type]
             A dictionary of all design variables in a form  ``'var_name': var_value``.
         """
+
         X: dict[str, X_Content_Type] = {}
         for (var_name, var), x in zip(self._variables.items(), self._X):
             X[var_name] = x
@@ -252,6 +256,7 @@ class Candidate:
         X: NDArray[np.float64]
             A list of all design variables.
         """
+
         return np.asarray(self._X, dtype=np.float64)
 
     def _get_X_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
@@ -262,6 +267,7 @@ class Candidate:
         X: tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]
             A tuple of grouped design variables.
         """
+
         design_float = []
         design_int = []
         design_str = []
@@ -276,15 +282,21 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
-    def _set_X_rel(self, R: NDArray[float]) -> None:
-        """Sets the design vector using ndarray of relative values [0, 1]. Correctly sets the values for all variable
-        types. Raises an error if relative values are outside of range [0, 1].
+    def _set_X_rel(self, R: NDArray[float] | float) -> None:
+        """Sets the design vector using ndarray or float of relative values [0, 1]. Correctly sets the values
+        for all variable types. Raises an error if relative values are outside of range [0, 1].
 
         Parameters
         -------
-        R: ndarray[float
+        R: ndarray[float] or float
             Array of relative values in range [0, 1].
         """
+
+        # expand scalar to array
+        R = np.asarray(R, dtype=float)
+        if np.size(R) == 1:
+            R = np.full(len(self._variables), R)
+
         X: list[X_Content_Type] = []
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
             if r < 0 or r > 1:
@@ -303,7 +315,31 @@ class Candidate:
                     X.append(var_options[0][i])
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
-        self.X = X
+        self._X = tuple(X)
+
+    def _get_X_rel(self) -> NDArray[float]:
+        """Gets the relative design vector using ndarray of values [0, 1].
+
+        Returns
+        -------
+        R: ndarray[float]
+            Array of relative values in range [0, 1].
+        """
+
+        R = []
+        for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
+            match var_type:
+                case VariableType.Real:
+                    R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
+                case VariableType.RealDiscrete:
+                    R.append(var_options[0].index(x) / (len(var_options[0]) - 1))
+                case VariableType.Integer:
+                    R.append(x / (len(var_options[0]) - 1))
+                case VariableType.Categorical:
+                    R.append(var_options[0].index(x) / (len(var_options[0]) - 1))
+                case _:
+                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+        return np.array(R)
 
     def adjust(self) -> bool:
         """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict
@@ -318,8 +354,10 @@ class Candidate:
         X: list[X_Content_Type] = []
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             # print(f'{var_name=}  {var_type=}  {var_options=}  {x=}')
+
             # Real variable
             if var_type == VariableType.Real:
+                # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
                 _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
                 if var_options[0] is not None and _x < float(var_options[0]): # lower bound
                     _x = float(var_options[0])
@@ -371,6 +409,7 @@ class Candidate:
             Nothing
 
         """
+
         # TODO this needs to be reimplemented to use Candidate.variables instead of Optimizer
         self.X = np.clip(self.X, optimizer.lb, optimizer.ub)
 
