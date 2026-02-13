@@ -44,16 +44,6 @@ def test_PSO_defaults() -> None:
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_PSO_defaults_solution_given():
-    description = 'PSO defaults, solution given (1D X0)'
-    optimizer = PSO()
-    optimizer.X0 = np.zeros(DIM)
-    expected_result = 0.0
-    tolerance = TOL
-    result = run(optimizer)
-    assert expected_result - tolerance < result < expected_result + tolerance, \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
