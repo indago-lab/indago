@@ -30,7 +30,7 @@ def run(optimizer):
     optimizer.lb = -100
     optimizer.ub = 100
     optimizer.max_evaluations = MAXEVAL
-    return np.log10(optimizer.optimize(seed=0).f)
+    return np.nan_to_num(np.log10(optimizer.optimize(seed=0).f), posinf=1e300, neginf=-1e300)
 
 
 # test functions
@@ -394,8 +394,8 @@ def test_GWO_HSA_defaults():
 def test_MSGD_defaults():
     description = 'MSGD defaults'
     optimizer = MSGD()
-    expected_result = 0  # TODO: -inf in old Indago
-    tolerance = TOL
+    expected_result = -1e300
+    tolerance = 1e290
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
