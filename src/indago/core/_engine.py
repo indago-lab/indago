@@ -73,7 +73,30 @@ class Engine:
         self._all_real: bool = all([var_type == indago.VariableType.Real for var_name, (var_type, *_) \
                                     in self.variables.items()])
 
-        # TODO check types, ordering, etc.
+        # Validation of variable tuples (format)
+        for var_name, (var_type, *var_options) in self.variables.items():
+            print(f'{var_name=}  {var_type=}  {var_options=}')
+            match var_type:
+                case indago.VariableType.Real:
+                    if len(var_options) != 2:
+                        raise ValueError(f'Definition of real variable {var_name} (indago.VariableType.Real, '
+                                         f'{var_options}) needs to be a tuple with exactly three items '
+                                         f'(indago.VariableType.Real, lb, ub)')
+                case indago.VariableType.RealDiscrete:
+                    if len(var_options) != 1:
+                        raise ValueError(f'Definition of real discrete variable {var_name} '
+                                         f'(indago.VariableType.RealDiscrete, {var_options}) needs to be a tuple with '
+                                         f'exactly two items (indago.VariableType.Real, discrete_values)')
+                case indago.VariableType.Integer:
+                    if len(var_options) != 2:
+                        raise ValueError(f'Definition of integer variable {var_name} (indago.VariableType.Integer, '
+                                         f'{var_options}) needs to be a tuple with exactly three items '
+                                         f'(indago.VariableType.Integer, lb, ub)')
+                case indago.VariableType.Categorical:
+                    if len(var_options) != 1:
+                        raise ValueError(f'Definition of categorical variable {var_name} '
+                                         f'(indago.VariableType.Categorical, {var_options}) needs to be a tuple with '
+                                         f'exactly two items (indago.VariableType.Real, str_values)')
 
         if self._all_real:
             lb: list[float] = []
@@ -91,6 +114,16 @@ class Engine:
         else:
             self.lb = None
             self.ub = None
+
+        # TODO check types, ordering, etc.
+        # for var_name, (var_type, *var_options) in self.variables.items():
+        #     match var_type:
+        #         case indago.VariableType.Real:
+        #
+        #             lb, ub = var_options
+        #             assert lb < ub, (f'Lower bound of real variable {var_name} ({lb}) should be strictly lower than '
+        #                              f'upper bound ({ub})')
+
 
     def _init_from_bounds(self) -> None:
         """Private method for validating bounds in real-variable optimization and initializing variables dictionary."""

@@ -1,9 +1,10 @@
+import pytest
 import numpy as np
 
 import indago
 from indago.core._engine import Engine
 from indago.core._optimizer import Optimizer
-
+from test_utils import mixed_variables
 
 def test_optimizer_inheritance():
 
@@ -37,14 +38,23 @@ def test_variables_initialization_unbounded():
     assert np.all(e.ub == [1e100, 1e100, 1e100, 1e100, 1e100, 11.1])
 
     # Mixed design vector
-    for var_type in [indago.VariableType.RealDiscrete, indago.VariableType.Integer, indago.VariableType.Categorical]:
-        e = Engine()
-        e.variables['x1'] = (indago.VariableType.Real, -10.0, 10.0)
-        e.variables['x2'] = (var_type, [0.0, 0.1, 0.2])
-        e._init_variables()
+    e = Engine()
+    e.variables['x1'] = (indago.VariableType.Real, -10.0, 10.0)
+    e.variables['x2'] = (indago.VariableType.RealDiscrete, [0.0, 0.1, 0.2])
+    e._init_variables()
+    assert e.lb is None and e.ub is None
 
-        assert e.lb is None and e.ub is None
+    e = Engine()
+    e.variables['x1'] = (indago.VariableType.Real, -10.0, 10.0)
+    e.variables['x2'] = (indago.VariableType.Integer, 10, 19)
+    e._init_variables()
+    assert e.lb is None and e.ub is None
 
+    e = Engine()
+    e.variables['x1'] = (indago.VariableType.Real, -10.0, 10.0)
+    e.variables['x2'] = (indago.VariableType.Categorical, 'abc'.split())
+    e._init_variables()
+    assert e.lb is None and e.ub is None
 
 def test_bounds_initialization():
 
@@ -85,3 +95,34 @@ def test_bounds_initialization():
 
     for var_name, (var_type, *var_options) in e.variables.items():
         assert var_options[0] == -5.432 and var_options[1] == 6.789
+
+
+def test_variables_validation():
+
+    e = Engine()
+    with pytest.raises(ValueError) as exc:
+        e.variables['a'] = (indago.VariableType.Real, 1)
+        e._init_variables()
+    assert "needs to be a tuple with exactly three items" in str(exc.value)
+
+    e = Engine()
+    with pytest.raises(ValueError) as exc:
+        e.variables['b'] = (indago.VariableType.RealDiscrete, 1.1, 1.2 ,1.3, 1.4)
+        e._init_variables()
+    assert "needs to be a tuple with exactly two items" in str(exc.value)
+
+    e = Engine()
+    with pytest.raises(ValueError) as exc:
+        e.variables['a'] = (indago.VariableType.Integer, 1, 2, 3)
+        e._init_variables()
+    assert "needs to be a tuple with exactly three items" in str(exc.value)
+
+    e = Engine()
+    with pytest.raises(ValueError) as exc:
+        e.variables['b'] = (indago.VariableType.Categorical, 1.1, 1.2 ,1.3, 1.4)
+        e._init_variables()
+    assert "needs to be a tuple with exactly two items" in str(exc.value)
+
+    e = Engine()
+    e.variables = mixed_variables
+    e._init_variables()
