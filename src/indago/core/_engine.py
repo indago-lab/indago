@@ -18,6 +18,7 @@ Usage: from indago.core._engine import Engine
 """
 
 import indago
+from indago.utils._validation import validate_variables
 import numpy as np
 from numpy.typing import NDArray
 
@@ -59,7 +60,7 @@ class Engine:
     def __init__(self):
 
         self.variables: indago.VariableDictType = dict()
-        self.dimensions: int = 0 # Just to remove mypy warning (not having dimensions before initialization)
+        self.dimensions: int = 0 # Just to remove mypy warning (not having dimensions before initialization since it is a property)
         self._dimensions: int | None = None
         self._all_real = False
         self.lb = None
@@ -73,30 +74,10 @@ class Engine:
         self._all_real: bool = all([var_type == indago.VariableType.Real for var_name, (var_type, *_) \
                                     in self.variables.items()])
 
-        # Validation of variable tuples (format)
-        for var_name, (var_type, *var_options) in self.variables.items():
-            print(f'{var_name=}  {var_type=}  {var_options=}')
-            match var_type:
-                case indago.VariableType.Real:
-                    if len(var_options) != 2:
-                        raise ValueError(f'Definition of real variable {var_name} (indago.VariableType.Real, '
-                                         f'{var_options}) needs to be a tuple with exactly three items '
-                                         f'(indago.VariableType.Real, lb, ub)')
-                case indago.VariableType.RealDiscrete:
-                    if len(var_options) != 1:
-                        raise ValueError(f'Definition of real discrete variable {var_name} '
-                                         f'(indago.VariableType.RealDiscrete, {var_options}) needs to be a tuple with '
-                                         f'exactly two items (indago.VariableType.Real, discrete_values)')
-                case indago.VariableType.Integer:
-                    if len(var_options) != 2:
-                        raise ValueError(f'Definition of integer variable {var_name} (indago.VariableType.Integer, '
-                                         f'{var_options}) needs to be a tuple with exactly three items '
-                                         f'(indago.VariableType.Integer, lb, ub)')
-                case indago.VariableType.Categorical:
-                    if len(var_options) != 1:
-                        raise ValueError(f'Definition of categorical variable {var_name} '
-                                         f'(indago.VariableType.Categorical, {var_options}) needs to be a tuple with '
-                                         f'exactly two items (indago.VariableType.Real, str_values)')
+        valid, log = validate_variables(self.variables)
+        for line in log:
+            print(line)
+        if log: raise Exception("Variables validation failed")
 
         if self._all_real:
             lb: list[float] = []
