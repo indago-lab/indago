@@ -37,9 +37,9 @@ X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Co
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 """Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
 
-VariableDictRealType = tuple[VariableType, Real | None, Real | None]
+VariableDictMinMaxType = tuple[VariableType, Real, Real]
 VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
-VariableDictType = dict[str, VariableDictRealType | VariableDictDiscreteType]
+VariableDictType = dict[str, VariableDictMinMaxType | VariableDictDiscreteType]
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 

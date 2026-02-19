@@ -21,7 +21,7 @@ import numpy as np
 import indago
 from numbers import Real
 
-def validate_variables(variables) -> tuple[bool, list[tuple[Exception, str]]]:
+def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[tuple[Exception, str]]]:
 
     validation_log = []
     if not isinstance(variables, dict):
@@ -55,7 +55,7 @@ def validate_variables(variables) -> tuple[bool, list[tuple[Exception, str]]]:
                     if len(var_options) != 1:
                         validation_log.append((ValueError, f'Definition of real discrete variable {var_name} needs to '
                                                            f'be a tuple with exactly two items '
-                                                           f'(indago.VariableType.Real, discrete_values)'))
+                                                           f'(indago.VariableType.RealDiscrete, discrete_values)'))
                     else:
                         discrete_values = var_options[0]
                         if not isinstance(discrete_values, (list, tuple, np.ndarray)):
@@ -69,8 +69,9 @@ def validate_variables(variables) -> tuple[bool, list[tuple[Exception, str]]]:
                                         validation_log.append((ValueError, f'Discrete value {v} for {var_name} should be a real number'))
 
                             if all(isinstance(v, Real) for v in discrete_values):
-                                if discrete_values != sorted(discrete_values):
-                                    validation_log.append((ValueError, f'Discrete values for {var_name} should be sorted'))
+                                discrete_values = np.asarray(discrete_values)
+                                if not np.all(discrete_values[:-1] < discrete_values[1:]):
+                                    validation_log.append((ValueError, f'Discrete values {discrete_values} for {var_name} should be sorted'))
 
                 case indago.VariableType.Integer:
                     if len(var_options) != 2:
@@ -89,7 +90,7 @@ def validate_variables(variables) -> tuple[bool, list[tuple[Exception, str]]]:
                 case indago.VariableType.Categorical:
                     if len(var_options) != 1:
                         validation_log.append((ValueError, f'Definition of categorical variable {var_name} needs to be '
-                                                           f'a tuple with exactly two items (indago.VariableType.Real,'
+                                                           f'a tuple with exactly two items (indago.VariableType.Categorical, '
                                                            f'list_of_string_values)'))
                     else:
                         str_values = var_options[0]

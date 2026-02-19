@@ -77,34 +77,20 @@ class Engine:
         valid, log = validate_variables(self.variables)
         for line in log:
             print(line)
-        if log: raise Exception("Variables validation failed")
+        if log: raise Exception("Variables validation failed\n" + "\n".join(' - ' + v[1] for v in log))
 
         if self._all_real:
             lb: list[float] = []
             ub: list[float] = []
             for var_name, (var_type, *var_options) in self.variables.items():
-                _lb = var_options[0]
-                _ub = var_options[1]
-                if _lb is None or not np.isfinite(_lb): _lb = -1e100
-                if _ub is None or not np.isfinite(_ub): _ub = 1e100
-                lb.append(_lb)
-                ub.append(_ub)
+                lb.append(var_options[0])
+                ub.append(var_options[1])
             self.lb = np.asarray(lb)
             self.ub = np.asarray(ub)
 
         else:
             self.lb = None
             self.ub = None
-
-        # TODO check types, ordering, etc.
-        # for var_name, (var_type, *var_options) in self.variables.items():
-        #     match var_type:
-        #         case indago.VariableType.Real:
-        #
-        #             lb, ub = var_options
-        #             assert lb < ub, (f'Lower bound of real variable {var_name} ({lb}) should be strictly lower than '
-        #                              f'upper bound ({ub})')
-
 
     def _init_from_bounds(self) -> None:
         """Private method for validating bounds in real-variable optimization and initializing variables dictionary."""

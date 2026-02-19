@@ -27,15 +27,12 @@ def test_variables_initialization():
 def test_variables_initialization_unbounded():
     e = Engine()
     e.variables['x1'] = (indago.VariableType.Real, -np.inf, np.inf)
-    e.variables['x2'] = (indago.VariableType.Real, -np.nan, np.nan)
-    e.variables['x3'] = (indago.VariableType.Real, None, None)
-    e.variables['x4'] = (indago.VariableType.Real, np.inf, -np.inf)
-    e.variables['x5'] = (indago.VariableType.Real, -9.9, np.inf)
-    e.variables['x6'] = (indago.VariableType.Real, np.inf, 11.1)
+    e.variables['x2'] = (indago.VariableType.Real, -9.9, np.inf)
+    e.variables['x3'] = (indago.VariableType.Real, -np.inf, 11.1)
     e._init_variables()
 
-    assert np.all(e.lb == [-1e100, -1e100, -1e100, -1e100, -9.9, -1e100])
-    assert np.all(e.ub == [1e100, 1e100, 1e100, 1e100, 1e100, 11.1])
+    assert np.all(e.lb == np.array([-np.inf, -9.9, -np.inf]))
+    assert np.all(e.ub == np.array([np.inf, np.inf, 11.1]))
 
     # Mixed design vector
     e = Engine()
@@ -100,25 +97,25 @@ def test_bounds_initialization():
 def test_variables_validation():
 
     e = Engine()
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(Exception) as exc:
         e.variables['a'] = (indago.VariableType.Real, 1)
         e._init_variables()
-    assert "needs to be a tuple with exactly three items" in str(exc.value)
+    assert "tuple with exactly three items (indago.VariableType.Real, lb, ub)" in str(exc.value)
 
     e = Engine()
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(Exception) as exc:
         e.variables['b'] = (indago.VariableType.RealDiscrete, 1.1, 1.2 ,1.3, 1.4)
         e._init_variables()
-    assert "needs to be a tuple with exactly two items" in str(exc.value)
+    assert "needs to be a tuple with exactly two items (indago.VariableType.RealDiscrete, discrete_values)" in str(exc.value)
 
     e = Engine()
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(Exception) as exc:
         e.variables['a'] = (indago.VariableType.Integer, 1, 2, 3)
         e._init_variables()
-    assert "needs to be a tuple with exactly three items" in str(exc.value)
+    assert "tuple with exactly three items (indago.VariableType.Integer, lb, ub)" in str(exc.value)
 
     e = Engine()
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(Exception) as exc:
         e.variables['b'] = (indago.VariableType.Categorical, 1.1, 1.2 ,1.3, 1.4)
         e._init_variables()
     assert "needs to be a tuple with exactly two items" in str(exc.value)
