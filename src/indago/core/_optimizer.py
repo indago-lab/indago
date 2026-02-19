@@ -45,7 +45,8 @@ from rich.live import Live
 from rich.table import Table
 
 #import indago
-from ._candidate import Candidate, VariableType, X_Content_Type, XFormat
+from ._candidate import Candidate, X_Content_Type
+from ._enums import VariableType, XFormat
 from ._engine import Engine
 
 class Status(Enum):

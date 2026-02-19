@@ -17,30 +17,16 @@ Usage: from indago import Candidate
 """
 
 from __future__ import annotations # To support using Candidate type annotation inside Candidate class code
-from typing import TypeAlias, Any
-from unicodedata import numeric
+from typing import TypeAlias
+from numbers import Real
+
+from ._enums import VariableType, XFormat
 
 import numpy as np
 from numpy.typing import NDArray
 
 from rich.console import Console
 from rich.table import Table
-from enum import Enum
-
-
-class VariableType(Enum):
-    """Enum class for design variable types. Supported variable types are ``VariableType.Real``,
-    ``VariableType.Integer``, ``VariableType.RealDiscrete``, ``VariableType.Categorical``"""
-
-    Real = 'R'
-    Integer = 'I'
-    RealDiscrete = 'D'
-    Categorical = 'C'
-
-    def __str__(self):
-        """String representation for design variable type"""
-        return self.name
-
 
 X_Content_Type: TypeAlias = int | float | str
 """Type for possible content of design vector ``X``"""
@@ -51,23 +37,11 @@ X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Co
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 """Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
 
-from numbers import Real
 VariableDictRealType = tuple[VariableType, Real | None, Real | None]
 VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
 VariableDictType = dict[str, VariableDictRealType | VariableDictDiscreteType]
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
-class XFormat(Enum):
-    """Enum class for """
-
-    Tuple = 'tuple'
-    List = 'list'
-    Dict = 'dict'
-    Ndarray = 'ndarray'
-    Grouped = 'grouped'
-
-    def __str__(self):
-        return self.name + ': ' + self.value
 
 
 class Candidate:
@@ -76,17 +50,17 @@ class Candidate:
 
     Attributes
     ----------
-    X : list[float | int | str]
+    X: list[float | int | str]
         Design vector.
-    O : ndarray
+    O: ndarray
         Objectives' values.
-    C : ndarray
+    C: ndarray
         Constraints' values.
-    f : float
+    f: float
         Fitness.
-    _variables : VariableDictType
+    _variables: VariableDictType
         A hidden attribute for accessing variables definitions dictionary.
-    _x_format : XFormat:
+    _x_format: XFormat:
         A hidden attribute for attribute X's return value format.
     """
 
@@ -96,13 +70,13 @@ class Candidate:
 
         Parameters
         ----------
-        variables : VariableDictType
+        variables: VariableDictType
             A dictionary containing definitions of all design variables.
-        n_objectives : int
+        n_objectives: int
             Number of objectives.
-        n_constraints : int
+        n_constraints: int
             Number of constraints.
-        x_format : XFormat:
+        x_format: XFormat:
             A format for attribute X's return value.
 
         Returns
@@ -182,12 +156,12 @@ class Candidate:
 
     @X.setter
     def X(self, design: X_All_Containers) -> None:
-        """Set value for property X.
+        """Set a value for property X.
 
         Parameters
         ----------
-        design : X_All_Containers
-            The design vector in any of supported formats (list, tuple, dict or numpy.ndarray)
+        design: X_All_Containers
+            The design vector in any of the supported formats (list, tuple, dict, or numpy.ndarray)
         """
 
         X = []

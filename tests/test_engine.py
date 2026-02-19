@@ -32,10 +32,18 @@ def test_variables_initialization_unbounded():
     e.variables['x5'] = (indago.VariableType.Real, -9.9, np.inf)
     e.variables['x6'] = (indago.VariableType.Real, np.inf, 11.1)
     e._init_variables()
-    print(e.lb)
 
     assert np.all(e.lb == [-1e100, -1e100, -1e100, -1e100, -9.9, -1e100])
     assert np.all(e.ub == [1e100, 1e100, 1e100, 1e100, 1e100, 11.1])
+
+    # Mixed design vector
+    for var_type in [indago.VariableType.RealDiscrete, indago.VariableType.Integer, indago.VariableType.Categorical]:
+        e = Engine()
+        e.variables['x1'] = (indago.VariableType.Real, -10.0, 10.0)
+        e.variables['x2'] = (var_type, [0.0, 0.1, 0.2])
+        e._init_variables()
+
+        assert e.lb is None and e.ub is None
 
 
 def test_bounds_initialization():
@@ -44,6 +52,32 @@ def test_bounds_initialization():
     e.lb = -5.432
     e.ub = 6.789
     e.dimensions = 10
+    e._init_from_bounds()
+
+    assert np.all(e.lb == -5.432)
+    assert np.all(e.ub == 6.789)
+
+    for var_name, (var_type, *var_options) in e.variables.items():
+        assert var_options[0] == -5.432 and var_options[1] == 6.789
+
+
+    e = Engine()
+    e.lb = -5.432
+    e.ub = [6.789, 6.789, 6.789]
+    e.dimensions = 3
+    e._init_from_bounds()
+
+    assert np.all(e.lb == -5.432)
+    assert np.all(e.ub == 6.789)
+
+    for var_name, (var_type, *var_options) in e.variables.items():
+        assert var_options[0] == -5.432 and var_options[1] == 6.789
+
+
+    e = Engine()
+    e.lb = [-5.432, -5.432, -5.432]
+    e.ub = 6.789
+    e.dimensions = 3
     e._init_from_bounds()
 
     assert np.all(e.lb == -5.432)

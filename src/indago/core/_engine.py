@@ -19,6 +19,7 @@ Usage: from indago.core._engine import Engine
 
 import indago
 import numpy as np
+from numpy.typing import NDArray
 
 class Engine:
     """Base class for posteriori multi-objective optimization methods.
