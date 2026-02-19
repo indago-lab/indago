@@ -2,7 +2,7 @@ import indago
 import numpy as np
 from copy import deepcopy
 
-mixed_variables = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
+mixed_variables: indago.VariableDictType = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
              'var2': (indago.VariableType.Real, 0, None),  # Real (continuous) semi-bounded
              'var3': (indago.VariableType.Real, None, None),  # Real (continuous) unbounded
              'var4': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)

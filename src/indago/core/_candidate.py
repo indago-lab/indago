@@ -18,6 +18,7 @@ Usage: from indago import Candidate
 
 from __future__ import annotations # To support using Candidate type annotation inside Candidate class code
 from typing import TypeAlias, Any
+from unicodedata import numeric
 
 import numpy as np
 from numpy.typing import NDArray
@@ -50,7 +51,10 @@ X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Co
 X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 """Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
 
-VariableDictType = dict[str, tuple[VariableType, *tuple[Any, ...]]]
+from numbers import Real
+VariableDictRealType = tuple[VariableType, Real | None, Real | None]
+VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
+VariableDictType = dict[str, VariableDictRealType | VariableDictDiscreteType]
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 class XFormat(Enum):

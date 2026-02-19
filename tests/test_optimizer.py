@@ -4,7 +4,6 @@ import numpy as np
 import timeit
 from functools import partial
 
-import indago
 from indago.core._optimizer import Optimizer
 from test_utils import *
 timeit_runs = 5

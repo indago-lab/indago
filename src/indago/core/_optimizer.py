@@ -46,6 +46,7 @@ from rich.table import Table
 
 #import indago
 from ._candidate import Candidate, VariableType, X_Content_Type, XFormat
+from ._engine import Engine
 
 class Status(Enum):
     """Enum class for optimization status tracking."""
@@ -60,13 +61,15 @@ class Status(Enum):
         return self.name + ': ' + self.value
 
 
-class Optimizer:
-    """Base class for all optimization methods.
+class Optimizer(Engine):
+    """Base class for all single-objective or a priori multi-objective optimization methods.
+
+    Note
+    ----
+    The Optimizer inherits Engine class and all its attributes. Please check Engine documentation!
 
     Attributes
     ----------
-    dimensions : int
-        Number of dimensions of the search space i.e. number of optimization variables.
     evaluator : callable
         A function (or a callable class) which takes a ndarray as argument and returns fitness value (float), 
         or in case of multi-objective and/or constrained optimization returns a tuple containing objectives' and
@@ -106,15 +109,7 @@ class Optimizer:
     target_fitness : float
         Target fitness value at which the optimization will be stopped. Default: ``None``.
     max_elapsed_time : float
-        Maximum allowed time (in seconds) to be used in the optimization process. Default: ``None``.       
-    lb : ndarray or list of float or float
-        Lower bounds. If float it will be expanded to ndarray of float of size **dimensions**. If None, defaults to
-        -1e100. Values (or members of ndarray or list) not finite (np.inf, np.nan) default to -1e100. If (all members)
-        not float, Optimizer.X0 must be provided. Default: ``None``.
-    ub : ndarray or list of float or float
-        Upper bounds. If float it will be expanded to ndarray of float of size **dimensions**. If None, defaults to
-        1e100. Values (or members of ndarray or list) not finite (np.inf, np.nan) default to 1e100. If (all members)
-        not float, Optimizer.X0 must be provided. Default: ``None``.
+        Maximum allowed time (in seconds) to be used in the optimization process. Default: ``None``.
     best : Candidate
         The best candidate state insofar encountered in the optimization process.
     X0 : ndarray or int
@@ -215,22 +210,12 @@ class Optimizer:
         Optimizer instance
         
     """
-    @property
-    def dimensions(self) -> int:
-        return len(self.variables)
-
-    @dimensions.setter
-    def dimensions(self, value: int):
-        self._dimensions = value
 
     def __init__(self):
+
+        super().__init__()
         
         self.variant = None
-
-        self.variables: indago.VariableDictType = {}
-        self._dimensions = None
-        self._all_real = False
-        self._x_format = XFormat.Tuple
 
         self.evaluator = None
 
@@ -250,8 +235,6 @@ class Optimizer:
         self.target_fitness = None
         self.max_elapsed_time = None
 
-        self.lb = None
-        self.ub = None
 
         self.X0 = None
         self.sampler = None
@@ -392,6 +375,7 @@ class Optimizer:
         for attr in 'dimensions lb ub objective_weights objective_labels constraint_labels'.split(' '):
             if getattr(self, attr) is None and hasattr(self.evaluator, attr):
                 setattr(self, attr, getattr(self.evaluator, attr))
+
         if self.objectives == 1 and hasattr(self.evaluator, 'objectives'):
             self.objectives = self.evaluator.objectives
         if self.constraints == 0 and hasattr(self.evaluator, 'constraints'):
@@ -399,6 +383,8 @@ class Optimizer:
 
         # Initialize lb, ub, and dimensions
         if len(self.variables) > 0:
+            assert self.lb is None and self.ub is None, \
+                "Setting optimizer.lb and optimizer.ub is not permitted in combination with optimizer.variables"
             self._init_variables()
         else:
             self._init_from_bounds()
@@ -583,64 +569,6 @@ class Optimizer:
                         }
         self._init_convergence_log()
 
-    def _init_variables(self):
-
-        self._all_real: bool = all([var_type == VariableType.Real for var_name, (var_type, *_) in self.variables.items()])
-
-        # TODO check types, ordering, etc.
-
-        if self._all_real:
-            lb: list[float] = []
-            ub: list[float] = []
-            if self._all_real:
-                for var_name, (var_type, *var_options) in self.variables.items():
-                    lb.append(var_options[0])
-                    ub.append(var_options[1])
-            self.lb = np.asarray(lb)
-            self.ub = np.asarray(ub)
-
-    def _init_from_bounds(self) -> None:
-
-        # check for no bounds
-        if self.lb is None:
-            self.lb = -np.inf
-        if self.ub is None:
-            self.ub = np.inf
-        if not np.isfinite(self.lb).all() or not np.isfinite(self.ub).all():
-            assert self.X0 is not None, \
-                "(some of the) bounds are not provided or are given as +/-np.inf or np.nan, optimizer.X0 needed"
-        self.lb = np.nan_to_num(self.lb, nan=-1e100, posinf=1e100, neginf=-1e100).astype(float)
-        self.ub = np.nan_to_num(self.ub, nan=1e100, posinf=1e100, neginf=-1e100).astype(float)
-
-        # check dimensions or get it from lb/ub
-        if self._dimensions is not None:
-            assert isinstance(self._dimensions, int) and self._dimensions > 0, \
-                "optimizer.dimensions should be positive integer"
-        else:
-            self._dimensions = max(np.size(self.lb), np.size(self.ub))
-            assert self._dimensions > 1, \
-                "optimizer.lb and optimizer.ub both of size 1, missing optimizer.dimensions"
-
-        # expand scalar lb/ub
-        if np.size(self.lb) == 1:
-            self.lb = np.full(self._dimensions, self.lb)
-        if np.size(self.ub) == 1:
-            self.ub = np.full(self._dimensions, self.ub)
-
-        # in case lb/ub is a list or tuple
-        self.lb = np.array(self.lb)
-        self.ub = np.array(self.ub)
-
-        assert np.size(self.lb) == np.size(self.ub) == self._dimensions, \
-            "optimizer.lb and optimizer.ub should be of equal size or scalar"
-
-        assert (self.lb < self.ub).all(), \
-            "optimizer.lb should be strictly lower than optimizer.ub"
-
-        self._all_real = True
-
-        for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
-            self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
 
     def _update_progress_bar(self):
         """
