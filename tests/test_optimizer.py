@@ -1,4 +1,3 @@
-from turtledemo.paint import switchupdown
 
 import numpy as np
 import timeit
