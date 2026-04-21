@@ -12,8 +12,9 @@ Released on yyyy-mm-dd
 
 ### New features
 - **Variable types and mixed-variable support**
+- New anakatabatic model for PSO: `'DoubleSummit'`
 ### Improvements
-- **Revamped code structure, ready for future extensions**
+- **Significant code refactoring, making Indago ready for future extensions**
 ### Bug fixes
 
 ***
