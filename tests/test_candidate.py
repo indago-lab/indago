@@ -157,13 +157,13 @@ def test_set_rel_x():
     ub = []
     for var_name, (var_type, *var_options) in mixed_bounded_variables.items():
         match var_type:
-            case indago.VariableType.Real:
+            case indago.VariableType.Real | indago.VariableType.RealPeriodic:
                 lb.append(var_options[0])
                 ub.append(var_options[1])
-            case indago.VariableType.RealDiscrete:
+            case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
                 lb.append(var_options[0][0])
                 ub.append(var_options[0][-1])
-            case indago.VariableType.Integer:
+            case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
                 lb.append(var_options[0])
                 ub.append(var_options[1])
             case indago.VariableType.Categorical:

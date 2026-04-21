@@ -172,4 +172,5 @@ class Engine:
         self._all_real = True
 
         for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
+            # TODO: What about RealPeriodic?
             self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub

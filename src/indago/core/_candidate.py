@@ -40,6 +40,7 @@ X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 VariableDictMinMaxType = tuple[VariableType, Real, Real]
 VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
 VariableDictType = dict[str, VariableDictMinMaxType | VariableDictDiscreteType]
+# TODO: maybe update these to include all possible variable types?
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 
@@ -89,20 +90,19 @@ class Candidate:
         type_count = {k: 0 for k in VariableType}
         for var_name, (var_type, *var_params) in variables.items():
             match var_type:
-                case VariableType.Real:
+                case VariableType.Real | VariableType.RealDiscrete | VariableType.RealPeriodic | VariableType.RealDiscretePeriodic:
                     X.append(np.nan)
-                case VariableType.Integer:
+                case VariableType.Integer | VariableType.IntegerPeriodic:
                     X.append(0)
-                case VariableType.RealDiscrete:
-                    X.append(np.nan)
                 case VariableType.Categorical:
                     X.append('X')
                 case _:
                     raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
             type_count[var_type] += 1
 
-        var_float = type_count[VariableType.Real] + type_count[VariableType.RealDiscrete]
-        var_int = type_count[VariableType.Integer]
+        var_float = type_count[VariableType.Real] + type_count[VariableType.RealDiscrete] \
+                    + type_count[VariableType.RealPeriodic] + type_count[VariableType.RealDiscretePeriodic]
+        var_int = type_count[VariableType.Integer] + type_count[VariableType.IntegerPeriodic]
         var_str = type_count[VariableType.Categorical]
         x_is_homogenous = np.sum(np.array([var_float, var_int, var_str]) > 0) == 1
 
@@ -333,41 +333,71 @@ class Candidate:
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             # print(f'{var_name=}  {var_type=}  {var_options=}  {x=}')
 
-            # Real variable
-            if var_type == VariableType.Real:
-                # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
-                _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
-                if var_options[0] is not None and _x < float(var_options[0]): # lower bound
-                    _x = float(var_options[0])
-                if var_options[1] is not None and _x > float(var_options[1]): # upper bound
-                    _x = float(var_options[1])
-                X.append(_x)
+            match var_type:
 
-            # Discrete variable
-            if var_type == VariableType.RealDiscrete:
-                if x in var_options[0]:
-                    X.append(x)
-                elif np.isnan(x) or np.isinf(x): # nan or inf values
-                    X.append(var_options[0][0])
-                else:
-                    j = np.argmin(np.abs(np.asarray(var_options[0]) - x))
-                    X.append(var_options[0][j])
+                case VariableType.Real:
+                    # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
+                    _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
+                    if var_options[0] is not None and _x < float(var_options[0]): # lower bound
+                        _x = float(var_options[0])
+                    if var_options[1] is not None and _x > float(var_options[1]): # upper bound
+                        _x = float(var_options[1])
+                    X.append(_x)
 
-            # Integer variable
-            if var_type == VariableType.Integer:
-                _x = x
-                if x < var_options[0]:
-                    _x = var_options[0]
-                elif x > var_options[1]:
-                    _x = var_options[1]
-                X.append(_x)
+                case VariableType.RealDiscrete:
+                    if x in var_options[0]:
+                        X.append(x)
+                    elif np.isnan(x) or np.isinf(x): # nan or inf values
+                        X.append(var_options[0][0])
+                    else:
+                        j = np.argmin(np.abs(np.asarray(var_options[0]) - x))
+                        X.append(var_options[0][j])
 
-            # Category variable
-            if var_type == VariableType.Categorical:
-                if x in var_options[0]:
-                    X.append(x)
-                else:
-                    X.append(var_options[0][0])
+                case VariableType.RealPeriodic:
+                    # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
+                    _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
+                    if var_options[0] is not None and _x < float(var_options[0]):  # lower bound
+                        _x = float(var_options[1]) + float(x % (var_options[0] - var_options[1]))
+                    if var_options[1] is not None and _x > float(var_options[1]):  # upper bound
+                        _x = float(var_options[0]) + float(x % (var_options[1] - var_options[0]))
+                    X.append(_x)
+
+                case VariableType.RealDiscretePeriodic:
+                    if x in var_options[0]:
+                        X.append(x)
+                    elif np.isnan(x) or np.isinf(x):  # nan or inf values
+                        X.append(var_options[0][0])
+                    else:
+                        # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
+                        _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
+                        if _x < var_options[0][0]:  # lower bound
+                            _x = float(var_options[0][-1]) + float(x % (var_options[0][0] - var_options[0][-1]))
+                        if _x > var_options[0][-1]:  # upper bound
+                            _x = float(var_options[0]) + float(x % (var_options[0][-1] - var_options[0][0]))
+                        j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
+                        X.append(var_options[0][j])
+
+                case VariableType.Integer:
+                    _x = x
+                    if x < var_options[0]:
+                        _x = var_options[0]
+                    elif x > var_options[1]:
+                        _x = var_options[1]
+                    X.append(_x)
+
+                case VariableType.IntegerPeriodic:
+                    _x = x
+                    if x < var_options[0]:
+                        _x = var_options[1] + int(round(x % (var_options[0] - var_options[1])))
+                    elif x > var_options[1]:
+                        _x = var_options[0] + int(round(x % (var_options[1] - var_options[0])))
+                    X.append(_x)
+
+                case VariableType.Categorical:
+                    if x in var_options[0]:
+                        X.append(x)
+                    else:
+                        X.append(var_options[0][0])
 
         X = tuple[X_Content_Type](X)
         changed = not (X == self._X)

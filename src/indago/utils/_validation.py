@@ -33,10 +33,10 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                 (TypeError, f'Variable type {var_type} for variable {var_name} is not an indago.VariableType'))
 
             match var_type:
-                case indago.VariableType.Real:
+                case indago.VariableType.Real | indago.VariableType.RealPeriodic:
                     if len(var_options) != 2:
                         validation_log.append((ValueError, f'Definition of real variable {var_name} needs to be a tuple '
-                                                           f'with exactly three items (indago.VariableType.Real, lb, ub)'))
+                                                           f'with exactly three items (indago.VariableType.Real | indago.VariableType.RealPeriodic, lb, ub)'))
                     else:
                         lb, ub = var_options
                         if not isinstance(lb, Real): validation_log.append((TypeError, f'Unsupported lb type ({type(lb)}) for {var_name}'))
@@ -51,11 +51,11 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                                 validation_log.append((ValueError, f'Lower bound of real variable {var_name} ({lb}) should '
                                                                    f'be strictly lower than upper bound ({ub})'))
 
-                case indago.VariableType.RealDiscrete:
+                case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
                     if len(var_options) != 1:
                         validation_log.append((ValueError, f'Definition of real discrete variable {var_name} needs to '
                                                            f'be a tuple with exactly two items '
-                                                           f'(indago.VariableType.RealDiscrete, discrete_values)'))
+                                                           f'(indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic, list_of_discrete_values)'))
                     else:
                         discrete_values = var_options[0]
                         if not isinstance(discrete_values, (list, tuple, np.ndarray)):
@@ -73,10 +73,10 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                                 if not np.all(discrete_values[:-1] < discrete_values[1:]):
                                     validation_log.append((ValueError, f'Discrete values {discrete_values} for {var_name} should be sorted'))
 
-                case indago.VariableType.Integer:
+                case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
                     if len(var_options) != 2:
                         validation_log.append((ValueError, f'Definition of integer variable {var_name} needs to be a tuple '
-                                                           f'with exactly three items (indago.VariableType.Integer, lb, ub)'))
+                                                           f'with exactly three items (indago.VariableType.Integer | indago.VariableType.IntegerPeriodic, lb, ub)'))
                     else:
                         lb, ub = var_options
                         if not isinstance(lb, (int, np.integer)): validation_log.append((TypeError, f'Unsupported lb type ({type(lb)}) for {var_name}'))

@@ -271,11 +271,11 @@ class PSO(Optimizer):
             v_max = []
             for var_name, (var_type, *var_options) in self.variables.items():
                 match var_type:
-                    case VariableType.Real:
+                    case VariableType.Real | VariableType.RealPeriodic:
                         v_max.append(0.2 * (var_options[1] - var_options[0]))
-                    case VariableType.Integer:
+                    case VariableType.Integer | VariableType.IntegerPeriodic:
                         v_max.append(0.2 * (var_options[1] - var_options[0]))
-                    case VariableType.RealDiscrete:
+                    case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
                         v_max.append(0.2 *(np.max(var_options[0]) - np.min(var_options[0])))
                     case VariableType.Categorical:
                         v_max.append(0)

@@ -643,21 +643,17 @@ class Optimizer(Engine):
                     X: list[X_Content_Type] = list[X_Content_Type]([])
                     for var_name, (var_type, *var_options) in self.variables.items():
                         match var_type:
-                            case VariableType.Real:
+                            case VariableType.Real | VariableType.RealPeriodic:
                                 X.append(np.random.uniform(low=var_options[0], high=var_options[1]))
-                            case VariableType.Integer:
+                            case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic | VariableType.Categorical:
+                                X.append(np.random.choice(var_options[0]))
+                            case VariableType.Integer | VariableType.IntegerPeriodic:
                                 X.append(np.random.randint(low=var_options[0], high=var_options[1]) + 1)
-                            case VariableType.RealDiscrete:
-                                i = np.random.randint(low=0, high=len(var_options[0]))
-                                X.append(var_options[0][i])
-                            case VariableType.Categorical:
-                                i = np.random.randint(low=0, high=len(var_options[0]))
-                                X.append(var_options[0][i])
                             case _:
                                 raise ValueError(f'Unknown variable type: {var_type}')
                     c.X = X
 
-        if self.sampler in 'halton sobol lhs'.split():
+        elif self.sampler in 'halton sobol lhs'.split():
 
             if self._all_real:
                 for c in candidates:
@@ -669,16 +665,13 @@ class Optimizer(Engine):
                     R = self._sampler_method.random(n=1)[0]
                     for (var_name, (var_type, *var_options)), r in zip(self.variables.items(), R):
                         match var_type:
-                            case VariableType.Real:
+                            case VariableType.Real | VariableType.RealPeriodic:
                                 X.append(var_options[0] + r * (var_options[1] - var_options[0]))
-                            case VariableType.Integer:
+                            case VariableType.Integer | VariableType.IntegerPeriodic:
                                 x = var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1.0)
                                 i = int(np.round(x))
                                 X.append(i)
-                            case VariableType.RealDiscrete:
-                                i = int(np.round(r * len(var_options[0]) - 0.5))
-                                X.append(var_options[0][i])
-                            case VariableType.Categorical:
+                            case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic | VariableType.Categorical:
                                 i = int(np.round(r * len(var_options[0]) - 0.5))
                                 X.append(var_options[0][i])
                             case _:
@@ -1434,12 +1427,12 @@ class Optimizer(Engine):
                 else:
                     var_name, var_type, *var_options = self.variables[var_keys[i]]
                     match var_type:
-                        case VariableType.Real:
+                        case VariableType.Real | VariableType.RealPeriodic:
                             X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
-                        case VariableType.RealDiscrete:
+                        case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
                             # TODO implement
                             X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
-                        case VariableType.Integer:
+                        case VariableType.Integer | VariableType.IntegerPeriodic:
                             # TODO implement
                             X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
                         case VariableType.Categorical:

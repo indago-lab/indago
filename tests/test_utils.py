@@ -29,11 +29,11 @@ def generate_variables_dict(kind, dims):
                 while var_type == indago.VariableType.Categorical:
                     var_type = np.random.choice(indago.VariableType)
             match var_type:
-                case indago.VariableType.Real:
+                case indago.VariableType.Real | indago.VariableType.RealPeriodic:
                     variables_dict[f'x{i+1}'] = indago.VariableType.Real, -20, 20
-                case indago.VariableType.Integer:
+                case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
                     variables_dict[f'x{i+1}'] = indago.VariableType.Integer, -20, 20
-                case indago.VariableType.RealDiscrete:
+                case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
                     variables_dict[f'x{i+1}'] = indago.VariableType.RealDiscrete, np.linspace(0, 5, 51)
                 case indago.VariableType.Categorical:
                     variables_dict[f'x{i+1}'] = indago.VariableType.Categorical, 'A B C D E F'.split()

@@ -20,11 +20,15 @@ from enum import Enum
 
 class VariableType(Enum):
     """Enum class for design variable types. Supported variable types are ``VariableType.Real``,
-    ``VariableType.Integer``, ``VariableType.RealDiscrete``, ``VariableType.Categorical``."""
+    ``VariableType.RealDiscrete``, ``VariableType.RealPeriodic``, ``VariableType.RealDiscretePeriodic``,
+    ``VariableType.Integer``, ``VariableType.IntegerDiscrete``, ``VariableType.Categorical``."""
 
     Real = 'R'
+    RealDiscrete = 'RD'
+    RealPeriodic = 'RP'
+    RealDiscretePeriodic = 'RDP'
     Integer = 'I'
-    RealDiscrete = 'D'
+    IntegerPeriodic = 'IP'
     Categorical = 'C'
 
     def __str__(self):

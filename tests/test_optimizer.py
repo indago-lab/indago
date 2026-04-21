@@ -76,6 +76,7 @@ def run_sampler(sampler, variables):
     optimizer.max_evaluations = timeit_evals
     optimizer.sampler = sampler
     optimizer.optimize()
+    # print(f'{sampler=}, {optimizer.dimensions=}')
     assert optimizer.eval == optimizer.max_evaluations
 
 def test_samplers():
