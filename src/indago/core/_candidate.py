@@ -226,9 +226,10 @@ class Candidate:
         return X
 
     def _get_X_as_ndarray(self) -> NDArray[np.float64]:
-        """Utility function of getting a design vector X as a numpy.ndarray. It can be used only when all variables
-        are real (``VariableType.Real`` or ``VariableType.RealDiscrete``).
-        TODO this raises an error if called for mixed problems. Decide whether to remove/check/assert.
+        """Utility function for getting a design vector X as a numpy.ndarray. It can be used only when all variables
+        are real (``VariableType.Real``, ``VariableType.RealDiscrete``, ``VariableType.RealPeriodic``,
+        or ``VariableType.RealDiscretePeriodic``).
+        TODO: this raises an error if called for mixed problems. Decide whether to remove/check/assert.
 
         Returns
         -------
@@ -281,12 +282,12 @@ class Candidate:
             if r < 0 or r > 1:
                 raise ValueError(f'Relative value {r} is out of [0, 1] range for variable {var_name}')
             match var_type:
-                case VariableType.Real:
+                case VariableType.Real | VariableType.RealPeriodic:
                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
-                case VariableType.RealDiscrete:
+                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
                     i = int(round(r * len(var_options[0]) - 0.5))
                     X.append(var_options[0][i])
-                case VariableType.Integer:
+                case VariableType.Integer | VariableType.IntegerPeriodic:
                     i = int(round(var_options[0] + r * (var_options[1] - var_options[0] + 0.5)))
                     X.append(i)
                 case VariableType.Categorical:
@@ -308,11 +309,11 @@ class Candidate:
         R = []
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             match var_type:
-                case VariableType.Real:
+                case VariableType.Real | VariableType.RealPeriodic:
                     R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
-                case VariableType.RealDiscrete:
+                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
                     R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
-                case VariableType.Integer:
+                case VariableType.Integer | VariableType.IntegerPeriodic:
                     R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
                 case VariableType.Categorical:
                     R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))

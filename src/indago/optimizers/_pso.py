@@ -455,6 +455,7 @@ class PSO(Optimizer):
                             V.append(0)
                         else:
                             V.append(w[p] * v + c1 * r1 * (pbx - x) + c2 * r2 * (gbx - x))
+
                         match var_type:
                             case VariableType.Integer | VariableType.IntegerPeriodic:
                                 X.append(int(round(x + V[i])))
