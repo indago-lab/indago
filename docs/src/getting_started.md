@@ -39,7 +39,7 @@ optimizer.lb = -10  # lower bound, here given as scalar (equal for all variables
 optimizer.ub = 10 + np.arange(8)  # upper bounds, here given as np.array (one bound value per each of the 8 variables)
 
 # Set evaluation function
-optimizer.evaluation_function = goalfun  
+optimizer.evaluator = goalfun  
 
 # Objectives and constraints settings
 optimizer.objectives = 1  # number of objectives (optional parameter, default objectives=1), this is obj in evaluation function
@@ -102,7 +102,7 @@ Then, we must provide a goal function which needs to be minimized, say:
 ```python
 def goalfun(x):	# must take 1d np.array
     return np.sum(x**2)  # must return scalar number
-pso.evaluation_function = goalfun
+pso.evaluator = goalfun
 ```
 Now we can define optimizer inputs:
 ```python
@@ -612,7 +612,7 @@ optimizer.optimize()
 
 ## Failing evaluation function
 
-Sometimes, for whatever reason, goal function (i.e. `optimizer.evaluation_function`) may fail to compute. Indago features a built-in (semi-experimental) scheme for handling such cases, which are identified by evaluation function returning `np.nan`. You can control this scheme by setting the `optimizer.eval_fail_behavior` to one of the following:
+Sometimes, for whatever reason, goal function (i.e. `optimizer.evaluator`) may fail to compute. Indago features a built-in (semi-experimental) scheme for handling such cases, which are identified by evaluation function returning `np.nan`. You can control this scheme by setting the `optimizer.eval_fail_behavior` to one of the following:
 
 - `'abort'` - optimization is stopped at the first event of evaluation function returning `np.nan` (default)
 - `'ignore'` - optimizer will ignore any `np.nan` values returned by the evaluation function (note that Vanilla FWA does not support this)
@@ -625,7 +625,7 @@ optimizer.eval_retry_recede = 0.05  # at each retry move the unevaluated design 
 ```
 Note that setting `optimizer.eval_retry_recede = 0` yields pure evaluation retries without design vector modification, which might be useful for randomly failing fitness functions.
 
-Failed evaluations are detected by `optimizer.evaluation_function` returning `np.nan`. Thus the function should be prepared in such a way so that it returns `np.nan` if it fails to compute. However, if you want Indago to handle this for you, you can enable
+Failed evaluations are detected by `optimizer.evaluator` returning `np.nan`. Thus the function should be prepared in such a way so that it returns `np.nan` if it fails to compute. However, if you want Indago to handle this for you, you can enable
 ```python
 optimizer.safe_evaluation = True  # default safe_evaluation=False
 ```

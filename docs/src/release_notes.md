@@ -15,6 +15,7 @@ Released on yyyy-mm-dd
 - New anakatabatic model for PSO: `'DoubleSummit'`
 ### Improvements
 - **Significant code refactoring, making Indago ready for future extensions**
+- `Optimizer.evaluation_function` renamed to `Optimizer.evaluator` <i class="fa-solid fa-triangle-exclamation"></i>
 ### Bug fixes
 
 ***
