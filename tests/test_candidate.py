@@ -206,6 +206,23 @@ def test_get_rel_x():
     print(f'{newX=}')
     assert oldX == newX, 'Error in relative value extraction'
 
+def test_periodic_1():
+
+    variables = {'r': (indago.VariableType.Real, -100, 100),
+                 'phi': (indago.VariableType.RealPeriodic, 0, 1),}
+    c = indago.Candidate(variables)
+
+    c.X = [9.99, 0.9]
+    c.adjust()
+    assert np.isclose(c.X[1], 0.9), 'Adjust for periodic variable does not work'
+
+    c.X = [9.99, 1.2]
+    c.adjust()
+    assert np.isclose(c.X[1], 0.2), 'Adjust for periodic variable does not work'
+
+    c.X = [9.99, -0.05]
+    c.adjust()
+    assert np.isclose(c.X[1], 0.95), 'Adjust for periodic variable does not work'
 
 if __name__ == '__main__':
     test_ndarray_X_format()
