@@ -26,5 +26,5 @@ def test_periodic():
         optimizer.evaluator = goalfun
         optimizer.max_evaluations = 100
         optimizer.optimize(seed=0)
-        print(f'{vars['var0'][0]} solution: {optimizer.best.f}')
+        print(f"{vars['var0'][0]} solution: {optimizer.best.f}")
         assert optimizer.eval == 100
