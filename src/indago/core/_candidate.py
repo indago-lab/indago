@@ -40,7 +40,7 @@ X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 VariableDictMinMaxType = tuple[VariableType, Real, Real]
 VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
 VariableDictType = dict[str, VariableDictMinMaxType | VariableDictDiscreteType]
-# TODO: maybe update these to include all possible variable types?
+# TODO: maybe update these to include Periodic types?
 """A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
 
 
@@ -168,17 +168,18 @@ class Candidate:
         x_format: type = type(design)
         if x_format in [list, tuple, np.ndarray]:
             for i, (val, (var_name, (var_type, *_))) in enumerate(zip(design, self._variables.items())):
-                if var_type == VariableType.Real or var_type == VariableType.RealDiscrete:
-                    assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                    X.append(float(val))
-                elif var_type == VariableType.Integer:
-                    assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                    X.append(int(val))
-                elif var_type == VariableType.Categorical:
-                    assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                    X.append(val)
-                else:
-                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+                match var_type:
+                    case VariableType.Real | VariableType.RealDiscrete | VariableType.RealPeriodic | VariableType.RealDiscretePeriodic:
+                        assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                        X.append(float(val))
+                    case VariableType.Integer | VariableType.IntegerPeriodic:
+                        assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                        X.append(int(val))
+                    case VariableType.Categorical:
+                        assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                        X.append(val)
+                    case _:
+                        raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
 
         elif x_format == dict:
             for i, ((var_name, v), x) in enumerate(zip(design.items(), self._X)):
@@ -373,7 +374,7 @@ class Candidate:
                         if _x < var_options[0][0]:  # lower bound
                             _x = float(var_options[0][-1]) + float(x % (var_options[0][0] - var_options[0][-1]))
                         if _x > var_options[0][-1]:  # upper bound
-                            _x = float(var_options[0]) + float(x % (var_options[0][-1] - var_options[0][0]))
+                            _x = float(var_options[0][0]) + float(x % (var_options[0][-1] - var_options[0][0]))
                         j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
                         X.append(var_options[0][j])
 

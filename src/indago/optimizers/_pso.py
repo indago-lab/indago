@@ -456,7 +456,7 @@ class PSO(Optimizer):
                         else:
                             V.append(w[p] * v + c1 * r1 * (pbx - x) + c2 * r2 * (gbx - x))
                         match var_type:
-                            case VariableType.Integer:
+                            case VariableType.Integer | VariableType.IntegerPeriodic:
                                 X.append(int(round(x + V[i])))
                             case VariableType.Categorical:
                                 X.append(x if np.random.rand() < self._progress_factor() \
