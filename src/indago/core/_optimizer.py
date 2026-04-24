@@ -1425,7 +1425,7 @@ class Optimizer(Engine):
                 if self._all_real:
                     X = (self.ub[i] - self.history['X'][:, i]) / (self.ub[i] - self.lb[i])
                 else:
-                    var_name, var_type, *var_options = self.variables[var_keys[i]]
+                    var_type, *var_options = self.variables[var_keys[i]]
                     match var_type:
                         case VariableType.Real | VariableType.RealPeriodic:
                             X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
