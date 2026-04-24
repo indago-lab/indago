@@ -638,10 +638,13 @@ Some intermediate optimization results are stored in `optimizer.history` dict, w
 
 Also, a utility function is available for visualizing optimization convergence, which produces convergence plots for all defined objectives and constraints:
 ```python
-optimizer.plot_history()
+fig, axes = optimizer.plot_history()
+fig.show()
 ```
 
 ![Optimization convergence plot](images/plot_history.png)
+
+Optionally, you can provide a filename for saving the plot and a title for the plot: `optimizer.plot_history(filename='convergence.png', title='Convergence plot')`.
 
 ## References
 
