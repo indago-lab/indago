@@ -444,17 +444,18 @@ class PSO(Optimizer):
                 for p, particle in enumerate(self._swarm):
                     V = []
                     X: list[X_Content_Type] = []
-                    for i, (v, r1, r2, x, pbx, gbx, (var_name, (var_type, *var_options))) in enumerate(
+                    for i, (v, r1, r2, x, pb_minus_p_x, gb_minus_p_x, (var_name, (var_type, *var_options))) in enumerate(
                             zip(particle.V,
                                 R1[p, :], R2[p, :],
-                                particle.X,self._pbests[p].X,
-                                self._pbests[self._gbest_idx[p]].X,
+                                particle.X,
+                                self._pbests[p] - particle,
+                                self._pbests[self._gbest_idx[p]] - particle,
                                 self.variables.items())):
 
                         if var_type == VariableType.Categorical:
                             V.append(0)
                         else:
-                            V.append(w[p] * v + c1 * r1 * (pbx - x) + c2 * r2 * (gbx - x))
+                            V.append(w[p] * v + c1 * r1 * pb_minus_p_x + c2 * r2 * gb_minus_p_x)
 
                         match var_type:
                             case VariableType.Integer | VariableType.IntegerPeriodic:

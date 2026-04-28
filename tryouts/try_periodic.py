@@ -35,5 +35,8 @@ for vars in [real, real_periodic, real_discrete_periodic, integer_periodic]:
             res.append(optimizer.best.f)
             # print(f"{vars['var0'][0]} solution #{i+1}: {optimizer.best.f}")
 
+            # fig, axes = optimizer.plot_history()
+            # fig.show()
+
         print(f"*** {opt_class.__name__} {vars['var0'][0]} median solution: {np.median(res)}")
 

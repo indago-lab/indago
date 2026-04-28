@@ -694,6 +694,55 @@ class Candidate:
 
         return self.__gt__(other) or self.__eq__(other)
 
+    def __sub__(self, other):
+
+        all_real = True
+        for var_type in self._variables.values():
+            if var_type[0] != VariableType.Real:
+                all_real = False
+                break
+        if all_real:
+            return self.X - other.X
+
+        deltaX = []
+        for i, (var_type, *var_options) in enumerate(self._variables.values()):
+
+            x = other.X[i]
+            x_alt = np.inf
+            selfx = self.X[i]
+            match var_type:
+
+                case VariableType.RealPeriodic:
+                    if x < float((var_options[1] - var_options[0])/2):  # from left half to far right
+                        x_alt = x + (var_options[1] - var_options[0])
+                    else:  # from right half to far left
+                        x_alt = x - (var_options[1] - var_options[0])
+
+                case VariableType.IntegerPeriodic:
+                    x_med = np.median([_ for _ in range(var_options[0], var_options[1] + 1)])
+                    if x < x_med:  # from left half to far right
+                        x_alt = x + (var_options[1] - var_options[0])
+                    else:  # from right half to far left
+                        x_alt = x - (var_options[1] - var_options[0])
+
+                case VariableType.RealDiscretePeriodic:  # TODO: maybe this should be index-based, not value-based?
+                    x_med = np.median(var_options[0])
+                    if x < x_med:  # from left half to far right
+                        x_alt = x + (var_options[0][-1] - var_options[0][0])
+                    else:  # from right half to far left
+                        x_alt = x - (var_options[0][-1] - var_options[0][0])
+
+                case VariableType.Categorical:
+                    deltaX.append(None)
+                    continue
+
+            if abs(selfx - x) < abs(selfx - x_alt):
+                deltaX.append(selfx - x)
+            else:
+                deltaX.append(selfx - x_alt)
+
+        return np.array(deltaX)
+
     def is_feasible(self) -> bool:
         """
         Determines whether the design vector of a Candidate is a feasible solution. A feasible solution is
