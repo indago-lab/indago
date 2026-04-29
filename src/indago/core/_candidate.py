@@ -399,11 +399,10 @@ class Candidate:
                     if x in var_options[0]:
                         X.append(x)
                     else:
-                        X.append(var_options[0][0])
+                        X.append(np.random.choice(var_options[0]))
 
         X = tuple[X_Content_Type](X)
         changed = not (X == self._X)
-        # print(f'{self._X=}  ==>>  {X=}  {changed=}')
         if changed:
             self.X = X
         return changed
@@ -694,7 +693,19 @@ class Candidate:
 
         return self.__gt__(other) or self.__eq__(other)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Candidate) -> NDArray[float]:
+        """Computes the distance (vector difference) between the positions (X) of two candidates.
+
+        Parameters
+        ----------
+        other : Candidate
+            Candidate object with which the subtraction (self.X - other.X) is performed.
+
+        Returns
+        -------
+        distance : ndarray
+            Computed distance vector.
+        """
 
         all_real = True
         for var_type in self._variables.values():
@@ -733,7 +744,7 @@ class Candidate:
                         x_alt = x - (var_options[0][-1] - var_options[0][0])
 
                 case VariableType.Categorical:
-                    deltaX.append(None)
+                    deltaX.append(np.nan)  # np.nan is good because it survives NumPy operations
                     continue
 
             if abs(selfx - x) < abs(selfx - x_alt):
