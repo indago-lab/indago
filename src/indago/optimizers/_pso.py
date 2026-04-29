@@ -276,13 +276,12 @@ class PSO(Optimizer):
                     case VariableType.Integer | VariableType.IntegerPeriodic:
                         v_max.append(0.2 * (var_options[1] - var_options[0]))
                     case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                        v_max.append(0.2 *(np.max(var_options[0]) - np.min(var_options[0])))
+                        v_max.append(0.2 * (np.max(var_options[0]) - np.min(var_options[0])))
                     case VariableType.Categorical:
                         v_max.append(0)
                     case _:
                         raise ValueError(f'Unknown variable type: {var_type}')
             self._v_max = np.asarray(v_max)
-
 
         # Generate a swarm
         self._swarm: list[Particle] = \

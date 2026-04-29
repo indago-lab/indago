@@ -26,7 +26,7 @@ from indago.core._candidate import Candidate, VariableType, XFormat, VariableDic
 
 # from indago._utility import *
 # from indago._utility import _round_smooth
-#
+
 from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO
 # from indago._fwa import FWA
@@ -36,7 +36,7 @@ from indago.optimizers._pso import PSO
 # from indago._efo import EFO
 # from indago._mrfo import MRFO
 # from indago._abc import ABC
-# from indago._nm import NM
+from indago.optimizers._nm import NM
 # from indago._msgd import MSGD
 # from indago._gwo import GWO
 # from indago._hbo import HBO

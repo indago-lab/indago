@@ -8,7 +8,7 @@ real_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealPe
 real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscretePeriodic, [float(_) for _ in range(0, 361)]) for i in range (0, 10)}
 integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, 10)}
 
-optimizers = [indago.PSO]
+optimizers = [indago.PSO, indago.NM]
 
 def goalfun(x):
     x = np.asarray(x)

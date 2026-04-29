@@ -12,7 +12,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, RS #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, NM, GWO, HBO, CRS, EEEO
+from indago import PSO, RS, NM #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, HBO, CRS, EEEO
 
 
 def F(x):
@@ -399,7 +399,7 @@ def test_MSGD_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
@@ -418,7 +418,6 @@ def test_NM_Vanilla_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
 
 def test_RS_defaults():
     description = 'RS defaults'
@@ -458,7 +457,6 @@ def test_RS_lhs_initializer():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
 """
 def test_HBO_defaults():
     description = 'HBO defaults'
@@ -572,8 +570,8 @@ if __name__ == '__main__':
     # test_GWO_defaults()
     # test_GWO_HSA_defaults()
     # test_MSGD_defaults()
-    # test_NM_defaults()
-    # test_NM_Vanilla_defaults()
+    test_NM_defaults()
+    test_NM_Vanilla_defaults()
     test_RS_defaults()
     test_RS_halton_initializer()
     test_RS_sobol_initializer()
