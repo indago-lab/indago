@@ -1,7 +1,8 @@
 import indago
 import numpy as np
+from indago.core._optimizer import Optimizer
 
-mixed_variables: indago.VariableDictType = {  # Real (continuous) unbounded
+mixed_variables: indago.VariableDictType = {
              'var1': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
              'var2': (indago.VariableType.Integer, 0, 4),  # Integer (both for optimizer and evaluator)
              'var3': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
@@ -12,17 +13,31 @@ mixed_variables: indago.VariableDictType = {  # Real (continuous) unbounded
              'var8': (indago.VariableType.IntegerPeriodic, 0, 2),
              'var9': (indago.VariableType.IntegerPeriodic, 0, 3),
              'var10': (indago.VariableType.IntegerPeriodic, 0, 4),
+             'var11': (indago.VariableType.Real, -10, 5),
+             'var12': (indago.VariableType.RealPeriodic, -24, 24),
                    }
 
 def try_uniformity():
-    c = indago.Candidate(mixed_variables)
+    optimizer = Optimizer()
+    optimizer.variables = mixed_variables
+    optimizer.evaluator = lambda x: x
+    optimizer.sampler = 'random'
+    optimizer._init_optimizer()
 
     XX = []
     RR = []
     n_samples = 100_000
-    for i in range(n_samples):
-        r = np.random.uniform(0, 1, len(c._variables))
-        c._R = r
+
+    candidates = [indago.Candidate(variables=mixed_variables) for _ in range(n_samples)]
+    optimizer._initialize_X(candidates)
+
+    # for i, c in enumerate(candidates):
+    #     print(f'{c}')
+
+    # c = indago.Candidate(mixed_variables)
+    for i, c in enumerate(candidates):
+        # r = np.random.uniform(0, 1, len(c._variables))
+        # c._R = r
         XX.append(c.X)
 
         c._X = c._X
@@ -31,9 +46,10 @@ def try_uniformity():
 
     print(f'{len(XX)=}')
 
-    for i_var, var in enumerate(mixed_variables):
+    for i_var, (var_name, (var_type, *var_options)) in enumerate(mixed_variables.items()):
 
-        if var not in [indago.VariableType.Real, indago.VariableType.RealPeriodic]:
+        print(f'{var_name=} {var_type} {var_options}')
+        if var_type not in [indago.VariableType.Real, indago.VariableType.RealPeriodic]:
             # print(XX)
             x = np.asarray([sample[i_var] for sample in XX])
             r = np.asarray([sample[i_var] for sample in RR])
@@ -44,19 +60,33 @@ def try_uniformity():
 
             cnt_sammples_x = {}
             cnt_sammples_r = {}
-            # if unique.size < 10:
+            # if unique_x.size > 20:
+            #     continue
             for u in unique_x:
                 cnt_sammples_x[u] = np.sum(np.asarray(x) == u) / n_samples
             for u in unique_r:
                 cnt_sammples_r[u] = np.sum(np.asarray(r) == u) / n_samples
 
-                # cnt_sammples[var] /= n_samples
+            print(f'unique:  {len(cnt_sammples_x)}   {len(cnt_sammples_r)}')
 
-        print(f'{var=} {mixed_variables[var][0]} {len(cnt_sammples_x)} {len(cnt_sammples_r)}')
-        for k, v in cnt_sammples_x.items():
-            print(f' x={k} share: {float(v)}')
-        for k, v in cnt_sammples_r.items():
-            print(f' r={k} share: {float(v)}')
+            eps = 0.01
+            for k, v in cnt_sammples_x.items():
+                print(f' x={k} share: {float(v)}')
+                assert np.abs(v - 1/unique_x.size) < eps, 'Nonuniform distribution detected!'
+            for k, v in cnt_sammples_r.items():
+                print(f' r={k} share: {float(v)}')
+                assert np.abs(v - 1/unique_r.size) < eps, 'Nonuniform distribution detected!'
+
+        else:
+            lb, ub = var_options
+            x = np.asarray([sample[i_var] for sample in XX])
+            cnt, bins = np.histogram(x, bins=np.linspace(lb, ub, 10))
+            cnt = np.asarray(cnt)
+            cnt = cnt / np.sum(cnt)
+            print(cnt)
+            assert np.max(np.abs(cnt - 1/9)) < eps, 'Nonuniform distribution detected!'
+
+
         # print(RR[-3:])
         print()
 
