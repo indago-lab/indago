@@ -262,7 +262,34 @@ class Candidate:
                 raise NotImplementedError
         return np.asarray(design_float, dtype=np.float64), np.asarray(design_int, dtype=np.int32), np.asarray(design_str, dtype=np.str_)
 
-    def _set_X_rel(self, R: NDArray[float] | float) -> None:
+    @property
+    def _R(self) -> NDArray[float]:
+        """Gets the relative design vector using ndarray of values [0, 1].
+
+        Returns
+        -------
+        R: ndarray[float]
+            Array of relative values in range [0, 1].
+        """
+
+        R = []
+        for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
+            match var_type:
+                case VariableType.Real | VariableType.RealPeriodic:
+                    R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
+                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
+                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
+                case VariableType.Integer | VariableType.IntegerPeriodic:
+                    R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
+                case VariableType.Categorical:
+                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
+                case _:
+                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+        R = np.array(R)
+        R.view().flags.writeable = False
+        return R
+    @_R.setter
+    def _R(self, R: NDArray[float] | float) -> None:
         """Sets the design vector using ndarray or float of relative values [0, 1]. Correctly sets the values
         for all variable types. Raises an error if relative values are outside of range [0, 1].
 
@@ -297,29 +324,6 @@ class Candidate:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         self._X = tuple(X)
 
-    def _get_X_rel(self) -> NDArray[float]:
-        """Gets the relative design vector using ndarray of values [0, 1].
-
-        Returns
-        -------
-        R: ndarray[float]
-            Array of relative values in range [0, 1].
-        """
-
-        R = []
-        for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
-            match var_type:
-                case VariableType.Real | VariableType.RealPeriodic:
-                    R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
-                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
-                case VariableType.Integer | VariableType.IntegerPeriodic:
-                    R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
-                case VariableType.Categorical:
-                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
-                case _:
-                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
-        return np.array(R)
 
     def adjust(self) -> bool:
         """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict

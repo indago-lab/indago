@@ -143,13 +143,13 @@ def test_adjust():
     assert c1.adjust()
     assert not c1.X[5] == X[5]
 
-def test_set_rel_x():
+def test_set_r():
 
     c = indago.Candidate(mixed_bounded_variables)
     n = len(c._variables)
 
     r = np.random.uniform(0, 1, n)
-    c._set_X_rel(r)
+    c._R = r
     print(f'{r=}')
     print(f'{c.X=}')
 
@@ -175,14 +175,14 @@ def test_set_rel_x():
     ub = tuple(ub)
 
     r = np.zeros(n)
-    c._set_X_rel(r)
+    c._R = r
     print(f'{r=}')
     print(f'{c.X=}')
     print(f'{lb=}')
     assert c.X == lb, 'Error in relative vale assignment'
 
     r = np.ones(n)
-    c._set_X_rel(r)
+    c._R = r
     print(f'{r=}')
     print(f'{c.X=}')
     print(f'{ub=}')
@@ -195,13 +195,13 @@ def test_get_rel_x():
 
     r = np.random.uniform(0, 1, n)
     print(f'{r=}')
-    c._set_X_rel(r)
+    c._R = r
     oldX = c.X
     print(f'{oldX=}')
 
-    r_get = c._get_X_rel()
+    r_get = c._R
     print(f'{r_get=}')
-    c._set_X_rel(r_get)
+    c._R = r_get
     newX = c.X
     print(f'{newX=}')
     assert oldX == newX, 'Error in relative value extraction'
