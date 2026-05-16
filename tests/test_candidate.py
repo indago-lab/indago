@@ -143,7 +143,7 @@ def test_adjust():
     assert c1.adjust()
     assert not c1.X[5] == X[5]
 
-def test_set_r():
+def test_set_R():
 
     c = indago.Candidate(mixed_bounded_variables)
     n = len(c._variables)
@@ -188,7 +188,7 @@ def test_set_r():
     print(f'{ub=}')
     assert c.X == ub, 'Error in relative value assignment'
 
-def test_get_rel_x():
+def test_get_R():
 
     c = indago.Candidate(mixed_bounded_variables)
     n = len(c._variables)
@@ -205,6 +205,21 @@ def test_get_rel_x():
     newX = c.X
     print(f'{newX=}')
     assert oldX == newX, 'Error in relative value extraction'
+
+def test_mofify_R():
+    c = indago.Candidate(mixed_bounded_variables)
+    c._R = 0.5
+
+    try:
+        c._R[0] = 0.3
+    except Exception as e:
+        print('exception caught, all good')
+    else:
+        assert False, f'assigning elements of _R is not allowed'
+
+
+
+
 
 def test_periodic_1():
 

@@ -286,8 +286,10 @@ class Candidate:
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         R = np.array(R)
-        R.view().flags.writeable = False
+        R.flags.writeable = False
         return R
+
+
     @_R.setter
     def _R(self, R: NDArray[float] | float) -> None:
         """Sets the design vector using ndarray or float of relative values [0, 1]. Correctly sets the values
@@ -315,7 +317,7 @@ class Candidate:
                     i = int(round(r * len(var_options[0]) - 0.5))
                     X.append(var_options[0][i])
                 case VariableType.Integer | VariableType.IntegerPeriodic:
-                    i = int(round(var_options[0] + r * (var_options[1] - var_options[0] + 0.5)))
+                    i = int(round(var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1)))
                     X.append(i)
                 case VariableType.Categorical:
                     i = int(round(r * len(var_options[0]) - 0.5))
