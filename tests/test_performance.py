@@ -20,7 +20,6 @@ from indago import PSO, RS, NM #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, H
 
 def F(x):
     """CEC f3 - Discus Function"""
-    print(x)
     return 1e6 * x[0] ** 2 + np.sum(x[1:] ** 2)
 
 DIM = 10

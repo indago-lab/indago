@@ -236,6 +236,7 @@ class NM(Optimizer):
             # p0.X = avgX
 
             p0._R = np.average([c._R for c in self._candidates[:-1]], axis=0)
+
             # Randomly perturb the position for categorical variables
             for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
                 if var_type == VariableType.Categorical:
