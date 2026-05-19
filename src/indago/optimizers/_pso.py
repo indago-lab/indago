@@ -260,28 +260,24 @@ class PSO(Optimizer):
         self._evaluate_initial_candidates()
         
         # Bounds for position and velocity
-        if self._all_real:
-            # self._v_max = 0.2 * (self.ub - self.lb)
-            dummy = Particle(self.variables, self.objectives, self.constraints, x_format=self._x_format)
-            dummy._R = 0.2
-            self._v_max = np.copy(dummy.X)
-            dummy._R = 0
-            self._v_max -= np.copy(dummy.X)
-        else:
-            v_max = []
-            for var_name, (var_type, *var_options) in self.variables.items():
-                match var_type:
-                    case VariableType.Real | VariableType.RealPeriodic:
-                        v_max.append(0.2 * (var_options[1] - var_options[0]))
-                    case VariableType.Integer | VariableType.IntegerPeriodic:
-                        v_max.append(0.2 * (var_options[1] - var_options[0]))
-                    case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                        v_max.append(0.2 * (np.max(var_options[0]) - np.min(var_options[0])))
-                    case VariableType.Categorical:
-                        v_max.append(0)
-                    case _:
-                        raise ValueError(f'Unknown variable type: {var_type}')
-            self._v_max = np.asarray(v_max)
+        # if self._all_real:
+        #     self._v_max = np.full(self.dimensions, 0.2)
+        # else:
+        #     v_max = []
+        #     for var_name, (var_type, *var_options) in self.variables.items():
+        #         match var_type:
+        #             case VariableType.Real | VariableType.RealPeriodic:
+        #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
+        #             case VariableType.Integer | VariableType.IntegerPeriodic:
+        #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
+        #             case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
+        #                 v_max.append(0.2 * (np.max(var_options[0]) - np.min(var_options[0])))
+        #             case VariableType.Categorical:
+        #                 v_max.append(0)
+        #             case _:
+        #                 raise ValueError(f'Unknown variable type: {var_type}')
+        #     self._v_max = np.asarray(v_max)
+        self._v_max = np.full(self.dimensions, 0.2)
 
         # Generate a swarm
         self._swarm: list[Particle] = \
@@ -431,44 +427,53 @@ class PSO(Optimizer):
                 c2 = 0.5 + (2.5 - 0.5) * self._progress_factor()
 
             # Calculate new velocity and new position
-            if self._all_real:
-                for p, particle in enumerate(self._swarm):
-                    particle.V = w[p] * particle.V + \
-                                   c1 * R1[p, :] * (self._pbests[p].X - particle.X) + \
-                                   c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]].X - particle.X)
-                    particle.X = particle.X + particle.V
-                    # Correct position to the bounds
-                    particle.clip(self)
-            else:
-                for p, particle in enumerate(self._swarm):
-                    V = []
-                    X: list[X_Content_Type] = []
-                    for i, (v, r1, r2, x, pb_minus_p_x, gb_minus_p_x, (var_name, (var_type, *var_options))) in enumerate(
-                            zip(particle.V,
-                                R1[p, :], R2[p, :],
-                                particle.X,
-                                self._pbests[p] - particle,
-                                self._pbests[self._gbest_idx[p]] - particle,
-                                self.variables.items())):
+            for p, particle in enumerate(self._swarm):
+                particle.V = w[p] * particle.V + \
+                               c1 * R1[p, :] * (self._pbests[p]._R - particle._R) + \
+                               c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]]._R - particle._R)
+                particle._R = particle._R + particle.V
+                # Correct position to the bounds
+                particle._R = np.clip(particle._R, 0, 1)
+                # particle.clip(self)
 
-                        if var_type == VariableType.Categorical:
-                            V.append(0)
-                        else:
-                            V.append(w[p] * v + c1 * r1 * pb_minus_p_x + c2 * r2 * gb_minus_p_x)
-
-                        match var_type:
-                            case VariableType.Integer | VariableType.IntegerPeriodic:
-                                X.append(int(round(x + V[i])))
-                            case VariableType.Categorical:
-                                X.append(x if np.random.rand() < self._progress_factor() \
-                                             else np.random.choice(var_options[0]))
-                            case _:
-                                X.append(x + V[i])
-
-                    particle.V = V
-                    particle.X = X
-                    # Validate and correct design vector
-                    particle.adjust()
+            # if self._all_real:
+            #     for p, particle in enumerate(self._swarm):
+            #         particle.V = w[p] * particle.V + \
+            #                        c1 * R1[p, :] * (self._pbests[p].X - particle.X) + \
+            #                        c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]].X - particle.X)
+            #         particle.X = particle.X + particle.V
+            #         # Correct position to the bounds
+            #         particle.clip(self)
+            # else:
+            #     for p, particle in enumerate(self._swarm):
+            #         V = []
+            #         X: list[X_Content_Type] = []
+            #         for i, (v, r1, r2, x, pb_minus_p_x, gb_minus_p_x, (var_name, (var_type, *var_options))) in enumerate(
+            #                 zip(particle.V,
+            #                     R1[p, :], R2[p, :],
+            #                     particle.X,
+            #                     self._pbests[p] - particle,
+            #                     self._pbests[self._gbest_idx[p]] - particle,
+            #                     self.variables.items())):
+            #
+            #             if var_type == VariableType.Categorical:
+            #                 V.append(0)
+            #             else:
+            #                 V.append(w[p] * v + c1 * r1 * pb_minus_p_x + c2 * r2 * gb_minus_p_x)
+            #
+            #             match var_type:
+            #                 case VariableType.Integer | VariableType.IntegerPeriodic:
+            #                     X.append(int(round(x + V[i])))
+            #                 case VariableType.Categorical:
+            #                     X.append(x if np.random.rand() < self._progress_factor() \
+            #                                  else np.random.choice(var_options[0]))
+            #                 case _:
+            #                     X.append(x + V[i])
+            #
+            #         particle.V = V
+            #         particle.X = X
+            #         # Validate and correct design vector
+            #         particle.adjust()
 
                 
             # Get old fitness

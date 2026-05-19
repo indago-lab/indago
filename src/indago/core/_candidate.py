@@ -20,6 +20,7 @@ from __future__ import annotations # To support using Candidate type annotation 
 from typing import TypeAlias
 from numbers import Real
 
+import indago
 from ._enums import VariableType, XFormat
 
 import numpy as np
@@ -278,7 +279,10 @@ class Candidate:
                 case VariableType.Real | VariableType.RealPeriodic:
                     R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
                 case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
+                    # R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
+                    x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
+                    x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
+                    R.append((x - x_min) / (x_max - x_min))
                 case VariableType.Integer | VariableType.IntegerPeriodic:
                     R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
                 case VariableType.Categorical:
@@ -293,7 +297,7 @@ class Candidate:
     @_R.setter
     def _R(self, R: NDArray[float] | float) -> None:
         """Sets the design vector using ndarray or float of relative values [0, 1]. Correctly sets the values
-        for all variable types. Raises an error if relative values are outside of range [0, 1].
+        for all variable types. Raises an error if relative values are outside range [0, 1].
 
         Parameters
         -------
@@ -302,19 +306,26 @@ class Candidate:
         """
 
         # expand scalar to array
-        R = np.asarray(R, dtype=float)
+        R = np.array(R, dtype=float)
         if np.size(R) == 1:
             R = np.full(len(self._variables), R)
 
         X: list[X_Content_Type] = []
+        for i_var, (var_name, (var_type, *var_options)) in enumerate(self._variables.items()):
+            if var_type not in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                R[i_var] = np.clip(R[i_var], 0, 1)
+
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
-            if r < 0 or r > 1:
-                raise ValueError(f'Relative value {r} is out of [0, 1] range for variable {var_name}')
+            # if r < 0 or r > 1:
+            #     raise ValueError(f'Relative value {r} is out of [0, 1] range for variable {var_name}')
             match var_type:
                 case VariableType.Real | VariableType.RealPeriodic:
                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
                 case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                    i = int(round(r * len(var_options[0]) - 0.5))
+                    x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
+                    x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
+                    x = x_min + r * (x_max - x_min)
+                    i = np.argmin(np.abs(np.asarray(var_options[0]) - x))
                     X.append(var_options[0][i])
                 case VariableType.Integer | VariableType.IntegerPeriodic:
                     i = int(round(var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1)))

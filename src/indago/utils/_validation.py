@@ -56,11 +56,12 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                         validation_log.append((ValueError, f'Definition of real discrete variable {var_name} needs to '
                                                            f'be a tuple with exactly two items '
                                                            f'(indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic, list_of_discrete_values)'))
+                    elif not isinstance(var_options[0], (list, tuple, np.ndarray)):
+                        validation_log.append((TypeError, f'Discrete values {var_options[0]} for {var_name} should be a list, tuple, or numpy array'))
                     else:
-                        discrete_values = var_options[0]
-                        if not isinstance(discrete_values, (list, tuple, np.ndarray)):
-                            validation_log.append((TypeError, f'Discrete values {discrete_values} for {var_name} should be a list, tuple, or numpy array'))
-                        else:
+                        discrete_values = list(var_options[0])
+                        variables[var_name] = (var_type, discrete_values)
+                        if isinstance(discrete_values, (list, tuple, np.ndarray)):
                             for v in discrete_values:
                                 if not isinstance(v, Real):
                                     validation_log.append((TypeError, f'Discrete value {v} for {var_name} should be a real number'))
@@ -72,6 +73,8 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                                 discrete_values = np.asarray(discrete_values)
                                 if not np.all(discrete_values[:-1] < discrete_values[1:]):
                                     validation_log.append((ValueError, f'Discrete values {discrete_values} for {var_name} should be sorted'))
+                        else:
+                            validation_log.append((TypeError, f'Discrete values {discrete_values} for {var_name} should be a list, tuple, or numpy array'))
 
                 case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
                     if len(var_options) != 2:

@@ -115,7 +115,7 @@ mixed_variables_set_2: indago.VariableDictType = {
              'var3': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
              'var4': (indago.VariableType.RealDiscretePeriodic, [0.0, 0.25, 0.50, 0.75, 1.0]),
              'var5': (indago.VariableType.IntegerPeriodic, 0, 4),
-             'var6': (indago.VariableType.RealDiscrete, [0, 2, 4, 8, 16]),
+             'var6': (indago.VariableType.RealDiscrete, [0, 1, 4, 8, 16]),
              'var7': (indago.VariableType.IntegerPeriodic, 0, 1),
              'var8': (indago.VariableType.IntegerPeriodic, 0, 2),
              'var9': (indago.VariableType.IntegerPeriodic, 0, 3),
@@ -156,7 +156,7 @@ def uniformity_test(sampler):
 
 
     print(f'{len(XX)=}')
-    eps = 0.01
+    eps = 1e-2
 
     for i_var, (var_name, (var_type, *var_options)) in enumerate(mixed_variables_set_2.items()):
 
@@ -172,8 +172,20 @@ def uniformity_test(sampler):
 
             cnt_sammples_x = {}
             cnt_sammples_r = {}
-            # if unique_x.size > 20:
-            #     continue
+            if var_type in [indago.VariableType.RealDiscrete, indago.VariableType.RealDiscretePeriodic]:
+                discrete_values = np.array(var_options[0])
+                x_min = discrete_values[0] - 0.5 * (discrete_values[1] - discrete_values[0])
+                x_max = discrete_values[-1] + 0.5 * (discrete_values[-1] - discrete_values[-2])
+                x_mid = 0.5 * (discrete_values[1:] + discrete_values[:-1])
+                print(f'{x_mid=}')
+                x_bins = np.hstack([x_min, x_mid, x_max])
+                x_density = x_bins[1:] - x_bins[:-1]
+                x_density /= np.sum(x_density)
+                print(f'{x_bins=}')
+                print(f'{x_density=}')
+            else:
+                x_density = np.full(unique_x.size, 1/ unique_x.size)
+
             for u in unique_x:
                 cnt_sammples_x[u] = np.sum(np.asarray(x) == u) / n_samples
             for u in unique_r:
@@ -181,12 +193,12 @@ def uniformity_test(sampler):
 
             print(f'unique:  {len(cnt_sammples_x)}   {len(cnt_sammples_r)}')
 
-            for k, v in cnt_sammples_x.items():
-                print(f' x={k} share: {float(v)}')
-                assert np.abs(v - 1/unique_x.size) < eps, 'Nonuniform distribution detected!'
-            for k, v in cnt_sammples_r.items():
-                print(f' r={k} share: {float(v)}')
-                assert np.abs(v - 1/unique_r.size) < eps, 'Nonuniform distribution detected!'
+            for (k, v), xd in zip(cnt_sammples_x.items(), x_density):
+                print(f' x={k} share: {float(v):.6f} / {xd:.6f}')
+                assert np.abs(v - xd) < eps, 'Nonuniform distribution detected!'
+            for (k, v), xd in zip(cnt_sammples_r.items(), x_density):
+                print(f' r={k} share: {float(v):.6f} / {xd:.6f}')
+                assert np.abs(v - xd) < eps, 'Nonuniform distribution detected!'
 
         else:
             lb, ub = var_options

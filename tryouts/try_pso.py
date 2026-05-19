@@ -35,7 +35,7 @@ def pso_real():
     optimizer = indago.PSO()
     optimizer.variables = real_variables_10D
     optimizer.evaluator = real_function
-    # optimizer.monitoring = 'basic'
+    optimizer.monitoring = 'basic'
     optimizer.optimize()
 
 def pso_mixed_num():
@@ -45,6 +45,7 @@ def pso_mixed_num():
     numerical_variables_10D['x12'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 1001)
     numerical_variables_10D['x13'] = indago.VariableType.Integer, -100, 100
     numerical_variables_10D['x14'] = indago.VariableType.Integer, -50, 150
+    print(numerical_variables_10D)
 
     optimizer = indago.PSO()
     optimizer.variables = numerical_variables_10D
@@ -60,11 +61,12 @@ def pso_mixed():
     numerical_variables_10D['x13'] = indago.VariableType.Integer, -100, 100
     numerical_variables_10D['x14'] = indago.VariableType.Integer, -50, 150
     numerical_variables_10D['x15'] = indago.VariableType.Categorical, 'A B C'.split()
+    print(numerical_variables_10D)
 
     optimizer = indago.PSO()
     optimizer.variables = numerical_variables_10D
     optimizer.evaluator = mixed_function
-    # optimizer.monitoring = 'basic'
+    optimizer.monitoring = 'basic'
     optimizer.optimize()
     print('Solution:')
     for var_name, x in zip(optimizer.variables, optimizer.best.X):
