@@ -433,9 +433,10 @@ class PSO(Optimizer):
                                c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]]._R - particle._R)
                 R = particle._R + particle.V
 
+                # Randomly perturb the position for categorical variables
                 for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
                     if var_type == VariableType.Categorical:
-                        R[i_var] = particle._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                        R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
 
                 particle._R = R
                 # Correct position to the bounds

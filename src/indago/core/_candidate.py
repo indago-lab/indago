@@ -178,7 +178,7 @@ class Candidate:
                         X.append(int(val))
                     case VariableType.Categorical:
                         assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                        X.append(val)
+                        X.append(str(val))
                     case _:
                         raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
 

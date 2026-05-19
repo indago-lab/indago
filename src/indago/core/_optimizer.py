@@ -225,7 +225,7 @@ class Optimizer(Engine):
         self.params = {}
 
         self._initial_candidates = None
-        self._evaluated_candidates = np.array([])
+        self._evaluated_candidates = []
         self.best = None
         self.it = 0
         self.eval = 0
@@ -707,10 +707,10 @@ class Optimizer(Engine):
                 # if 1D convert to 2D
                 if self.X0.ndim == 1:
                     self.X0 = np.array([self.X0])
-                self._initial_candidates = np.array([Candidate(self.variables,
-                                                               self.objectives,
-                                                               self.constraints,
-                                                               x_format=XFormat.Ndarray) for i in range(self.X0.shape[0])])
+                self._initial_candidates = [Candidate(self.variables,
+                                                      self.objectives,
+                                                      self.constraints,
+                                                      x_format=XFormat.Tuple) for i in range(self.X0.shape[0])]
                 for i, cs in enumerate(self._initial_candidates):
                     cs.X = self.X0[i, :]
 
@@ -718,10 +718,10 @@ class Optimizer(Engine):
                 assert self.X0 > 0, \
                     "optimizer.X0 should be a positive integer"
                 n = self.X0
-                self._initial_candidates = np.array([Candidate(self.variables,
-                                                               self.objectives,
-                                                               self.constraints,
-                                                               x_format=XFormat.Ndarray) for i in range(n)])
+                self._initial_candidates = [Candidate(self.variables,
+                                                      self.objectives,
+                                                      self.constraints,
+                                                      x_format=XFormat.Tuple) for i in range(n)]
                 # for cs in self._initial_candidates:
                 #     cs.X = np.random.uniform(self.lb, self.ub, self.dimensions)
                 self._initialize_X(self._initial_candidates)
@@ -974,7 +974,7 @@ class Optimizer(Engine):
             self.best = None
 
             self._initial_candidates = None
-            self._evaluated_candidates = np.array([])
+            self._evaluated_candidates = []
 
             self.status = Status.RUNNING
             self._err_msg = None
@@ -1148,11 +1148,12 @@ class Optimizer(Engine):
 
         # Post iterational processing
         if self.post_iteration_processing:
-            _candidates = np.sort(self._evaluated_candidates, kind='stable')
+            # _candidates = np.sort(self._evaluated_candidates, kind='stable')
+            _candidates = sorted(self._evaluated_candidates)
             self.post_iteration_processing(self.it, _candidates, self.best)
 
         # Flushing evaluated candidates
-        self._evaluated_candidates = np.array([])
+        self._evaluated_candidates = []
 
         # Tracking time
         self.elapsed_time = time.time() - self._clock_start
@@ -1165,7 +1166,7 @@ class Optimizer(Engine):
             self.it += 1
             return False
 
-    def _multiprocess_evaluate(self, candidates):
+    def _multiprocess_evaluate(self, candidates: list[Candidate]):
         """Private method used for calling parallel evaluation of multiple candidates. 
         It relies on multiprocessing pool using map and starmap methods. The objectives, 
         constraints and fitness of candidates in the list are updated after the evaluation.
@@ -1252,8 +1253,8 @@ class Optimizer(Engine):
                 for ic in range(self.constraints):
                     candidates[p].C[ic] = results[p][self.objectives + ic]
 
-    def _collective_evaluation(self, candidates):
-        """Private function used for evaluation of multiple candidates which 
+    def _collective_evaluation(self, candidates: list[Candidate]):
+        """Private function used for evaluation of multiple candidates that
         automatically conducts parallel or serial evaluation and forwards 
         a unique string to the evaluation function. Evaluation is performed 
         in-place and the candidates provided as argument are updated.
@@ -1351,7 +1352,7 @@ class Optimizer(Engine):
         # print(f'it {self.it:3d}: ' + ', '.join([f'{c.f:.6e}' for c in candidates]))
         # Expand list of candidates evaluated in current iteration
         # TODO _evaluated_candidates could maybe be a list (instead of ndarray)?
-        self._evaluated_candidates = np.append(self._evaluated_candidates, np.array([c.copy() for c in candidates]))
+        self._evaluated_candidates.extend([c.copy() for c in candidates])
 
         # Determine new best candidate state
         if self.best is None:
