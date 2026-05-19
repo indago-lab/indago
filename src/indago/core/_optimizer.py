@@ -710,7 +710,7 @@ class Optimizer(Engine):
                 self._initial_candidates = [Candidate(self.variables,
                                                       self.objectives,
                                                       self.constraints,
-                                                      x_format=XFormat.Tuple) for i in range(self.X0.shape[0])]
+                                                      x_format=self._x_format) for i in range(self.X0.shape[0])]
                 for i, cs in enumerate(self._initial_candidates):
                     cs.X = self.X0[i, :]
 
@@ -721,7 +721,7 @@ class Optimizer(Engine):
                 self._initial_candidates = [Candidate(self.variables,
                                                       self.objectives,
                                                       self.constraints,
-                                                      x_format=XFormat.Tuple) for i in range(n)]
+                                                      x_format=self._x_format) for i in range(n)]
                 # for cs in self._initial_candidates:
                 #     cs.X = np.random.uniform(self.lb, self.ub, self.dimensions)
                 self._initialize_X(self._initial_candidates)

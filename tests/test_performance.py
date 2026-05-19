@@ -8,6 +8,9 @@ A TEST FOR EVERY NEW METHOD/FEATURE PERFORMANCE SHOULD BE ADDED HERE
 
 # need this for local (non-pip) install only
 import sys
+
+import indago
+
 sys.path.append('..')
 sys.path.append('../indagobench')
 
@@ -17,6 +20,7 @@ from indago import PSO, RS, NM #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, H
 
 def F(x):
     """CEC f3 - Discus Function"""
+    print(x)
     return 1e6 * x[0] ** 2 + np.sum(x[1:] ** 2)
 
 DIM = 10
@@ -47,6 +51,7 @@ def test_PSO_defaults() -> None:
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
+    optimizer._x_format = indago.XFormat.Ndarray
     optimizer.X0 = np.ones(DIM)
     expected_result = 2.517708163727869
     tolerance = TOL

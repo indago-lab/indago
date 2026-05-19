@@ -431,12 +431,15 @@ class PSO(Optimizer):
                 particle.V = w[p] * particle.V + \
                                c1 * R1[p, :] * (self._pbests[p]._R - particle._R) + \
                                c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]]._R - particle._R)
+
                 R = particle._R + particle.V
 
                 # Randomly perturb the position for categorical variables
                 for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
                     if var_type == VariableType.Categorical:
                         R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                        if np.abs(particle.V[i_var]) > 0.5:
+                            particle.V[i_var] = 1 - particle.V[i_var]
 
                 particle._R = R
                 # Correct position to the bounds
