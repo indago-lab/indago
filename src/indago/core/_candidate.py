@@ -315,6 +315,8 @@ class Candidate:
         #         R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
+            if np.isnan(r):
+                r = np.random.rand()
             if var_type in [VariableType.Real, VariableType.RealDiscrete, VariableType.Integer]:
                 r = np.clip(r, 0, 1)
             elif var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
@@ -326,8 +328,13 @@ class Candidate:
                 raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
 
             match var_type:
-                case VariableType.Real | VariableType.RealPeriodic:
+                case VariableType.Real:
                     lb, ub = var_options
+                    r = np.clip(r, 0, 1)
+                    X.append(lb + r * (ub - lb))
+                case VariableType.RealPeriodic:
+                    lb, ub = var_options
+                    r = r % 1.0
                     X.append(lb + r * (ub - lb))
                 case VariableType.RealDiscrete:
                     x_discrete = var_options[0]
