@@ -306,14 +306,13 @@ class Candidate:
         """
 
         # expand scalar to array
-        R = np.array(R, dtype=float)
-        if np.size(R) == 1:
-            R = np.full(len(self._variables), R)
+        if isinstance(R, float):
+            R = np.full(len(self._variables), R, dtype=float)
 
         X: list[X_Content_Type] = []
-        for i_var, (var_name, (var_type, *var_options)) in enumerate(self._variables.items()):
-            if var_type not in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
-                R[i_var] = np.clip(R[i_var], 0, 1)
+        # for i_var, (var_name, (var_type, *var_options)) in enumerate(self._variables.items()):
+        #     if var_type not in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+        #         R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
             if var_type in [VariableType.Real, VariableType.RealDiscrete, VariableType.Integer]:
@@ -328,15 +327,29 @@ class Candidate:
 
             match var_type:
                 case VariableType.Real | VariableType.RealPeriodic:
-                    X.append(var_options[0] + r * (var_options[1] - var_options[0]))
-                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                    x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
-                    x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
+                    lb, ub = var_options
+                    X.append(lb + r * (ub - lb))
+                case VariableType.RealDiscrete:
+                    x_discrete = var_options[0]
+                    x_min = x_discrete[0] - 0.5 * (x_discrete[1] - x_discrete[0])
+                    x_max = x_discrete[-1] + 0.5 * (x_discrete[-1] - x_discrete[-2])
                     x = x_min + r * (x_max - x_min)
                     i = np.argmin(np.abs(np.asarray(var_options[0]) - x))
                     X.append(var_options[0][i])
-                case VariableType.Integer | VariableType.IntegerPeriodic:
-                    i = int(round(var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1)))
+                case VariableType.RealDiscretePeriodic:
+                    x_discrete = var_options[0]
+                    x_min = x_discrete[0]
+                    x_max = x_discrete[-1]
+                    x = x_min + r * (x_max - x_min)
+                    i = np.argmin(np.abs(np.asarray(var_options[0]) - x))
+                    X.append(var_options[0][i])
+                case VariableType.Integer:
+                    lb, ub = var_options
+                    i = int(round(lb - 0.5 + r * (ub - lb + 1)))
+                    X.append(i)
+                case VariableType.IntegerPeriodic:
+                    lb, ub = var_options
+                    i = int(round(lb + r * (ub - lb)))
                     X.append(i)
                 case VariableType.Categorical:
                     i = int(round(r * len(var_options[0]) - 0.5))

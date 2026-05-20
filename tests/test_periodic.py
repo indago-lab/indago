@@ -47,16 +47,16 @@ def test_periodic_2():
     # candidate.adjust()
     # print(f'{candidate._R=}')
     # print(f'{candidate.X=}')
-    for attempt in range(20):
-        r_value = np.random.uniform(-3, 5, 1)
+    for attempt, r_value in enumerate([0.05, 0.5, 0.99, 1.05, 1.1, 1.9, -0.05, -0.10, -0.9]):
+        # r_value = np.random.uniform(-3, 5, 1)
         candidate._R = r_value
-        print(f'Attempt {attempt}, {r_value=}')
-        print(f'{candidate._R=}')
-        print(f'{candidate.X=}')
+        print(f'Attempt {attempt+1}, {r_value=}')
+        # print(f'R: {candidate._R.tolist()}')
+        # print(f'X: {list(candidate.X)}')
 
         for v, x, r in zip(vars.items(), candidate.X, candidate._R):
             var_name, (var_type, *var_options) = v
-            # print(f'{var_name=}, {var_type=}, {x=}, {r=}')
+            print(f'  {var_name=}, {var_type=}, {x=}, {r=}')
 
             match var_type:
                 case indago.VariableType.Real:
@@ -79,8 +79,8 @@ def test_periodic_2():
 
                 case indago.VariableType.RealDiscretePeriodic:
                     x_dicrete = np.array(var_options[0])
-                    x_min = x_dicrete[0] - 0.5 * (x_dicrete[1] - x_dicrete[0])
-                    x_max = x_dicrete[-1] + 0.5 * (x_dicrete[-1] - x_dicrete[-2])
+                    x_min = x_dicrete[0]
+                    x_max = x_dicrete[-1]
                     _x = x_min + (r % 1.0) * (x_max - x_min)
                     i = np.argmin(np.abs(x_dicrete - _x))
                     assert np.isclose(x, x_dicrete[i]), f'Periodic mapping wrong for {var_type} variable {var_name}'
@@ -89,13 +89,14 @@ def test_periodic_2():
                     lb, ub = var_options
                     r = np.clip(r, 0, 1)
                     _x = int(round(lb - 0.5 + r * (ub - lb + 1)))
-                    assert np.isclose(x, _x), f'Periodic mapping wrong for {var_type} variable {var_name}'
+                    assert np.isclose(x, _x), f'Periodic mapping wrong for {var_type} variable {var_name} ({x} vs {_x})'
 
                 case indago.VariableType.IntegerPeriodic:
                     lb, ub = var_options
+                    print(f'{lb=}, {ub=}')
                     r = r % 1.0
-                    _x = int(round(lb - 0.5 + r * (ub - lb + 1)))
-                    assert np.isclose(x, _x), f'Periodic mapping wrong for {var_type} variable {var_name}'
+                    _x = int(round(lb + r * (ub - lb)))
+                    assert np.isclose(x, _x), f'Periodic mapping wrong for {var_type} variable {var_name} ({x} vs {_x})'
 
                 case indago.VariableType.Categorical:
                     assert x in var_options[0], f'Periodic mapping wrong for {var_type} variable {var_name}'
