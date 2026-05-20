@@ -316,6 +316,16 @@ class Candidate:
                 R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
+            if var_type in [VariableType.Real, VariableType.RealDiscrete, VariableType.Integer]:
+                r = np.clip(r, 0, 1)
+            elif var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                r = r % 1.0
+            elif var_type == VariableType.Categorical:
+                if r < 0 or r > 1:
+                    r = np.random.rand()
+            else:
+                raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+
             match var_type:
                 case VariableType.Real | VariableType.RealPeriodic:
                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
