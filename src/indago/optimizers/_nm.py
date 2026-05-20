@@ -321,6 +321,10 @@ class NM(Optimizer):
                     self._candidates[p]._R = self._candidates[0]._R + sigma * (self._candidates[p]._R - self._candidates[0]._R)
                     self._candidates[p].adjust()
 
+                    for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
+                        if var_type == VariableType.Categorical:
+                            self._candidates[p]._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+
                 self._collective_evaluation(self._candidates[1:])
 
             if self._finalize_iteration():

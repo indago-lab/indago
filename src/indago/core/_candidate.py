@@ -316,8 +316,6 @@ class Candidate:
                 R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
-            # if r < 0 or r > 1:
-            #     raise ValueError(f'Relative value {r} is out of [0, 1] range for variable {var_name}')
             match var_type:
                 case VariableType.Real | VariableType.RealPeriodic:
                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
@@ -376,9 +374,9 @@ class Candidate:
                     # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
                     _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
                     if var_options[0] is not None and _x < float(var_options[0]):  # lower bound
-                        _x = float(var_options[1]) + float(x % (var_options[0] - var_options[1]))
+                        _x = float((x - var_options[1]) % (var_options[1] - var_options[0]) + var_options[0])
                     if var_options[1] is not None and _x > float(var_options[1]):  # upper bound
-                        _x = float(var_options[0]) + float(x % (var_options[1] - var_options[0]))
+                        _x = float((x - var_options[1]) % (var_options[1] - var_options[0]) + var_options[0])
                     X.append(_x)
 
                 case VariableType.RealDiscretePeriodic:
@@ -387,12 +385,13 @@ class Candidate:
                     elif np.isnan(x) or np.isinf(x):  # nan or inf values
                         X.append(var_options[0][0])
                     else:
-                        # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
-                        _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
-                        if _x < var_options[0][0]:  # lower bound
-                            _x = float(var_options[0][-1]) + float(x % (var_options[0][0] - var_options[0][-1]))
-                        if _x > var_options[0][-1]:  # upper bound
-                            _x = float(var_options[0][0]) + float(x % (var_options[0][-1] - var_options[0][0]))
+                        _x = (x - var_options[0][0]) % (var_options[0][-1] - var_options[0][0])
+                        # # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
+                        # _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
+                        # if _x < var_options[0][0]:  # lower bound
+                        #     _x = float(var_options[0][-1]) + float(x % (var_options[0][0] - var_options[0][-1]))
+                        # if _x > var_options[0][-1]:  # upper bound
+                        #     _x = float(var_options[0][0]) + float(x % (var_options[0][-1] - var_options[0][0]))
                         j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
                         X.append(var_options[0][j])
 
@@ -419,7 +418,7 @@ class Candidate:
                         X.append(np.random.choice(var_options[0]))
 
         X = tuple[X_Content_Type](X)
-        changed = not (X == self._X)
+        changed = not np.all(X == self._X)
         if changed:
             self.X = X
         return changed
