@@ -1,8 +1,11 @@
+from unittest import case
+
 import pytest
 import numpy as np
 
 import indago
 from indago.core._engine import Engine
+from indago.core._enums import VariableType
 from indago.core._optimizer import Optimizer
 from test_utils import mixed_variables
 
@@ -123,3 +126,37 @@ def test_variables_validation():
     e = Engine()
     e.variables = mixed_variables
     e._init_variables()
+
+
+def test_initi_utils():
+    e = Engine()
+    for i in range(10):
+
+        var_type = np.random.choice(indago.VariableType)
+        match var_type:
+            case indago.VariableType.Real | indago.VariableType.RealPeriodic:
+                e.variables[f'x{i}'] = (var_type, -10, 10)
+            case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
+                e.variables[f'x{i}'] = (var_type, np.linspace(-10, 10, 41))
+            case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
+                e.variables[f'x{i}'] = (var_type, -10, 10)
+            case indago.VariableType.Categorical:
+                e.variables[f'x{i}'] = (var_type, 'A B C D E F'.split())
+            case _:
+                raise NotImplementedError(f'Unknown variable type {var_type}')
+
+    e._init_utils()
+    print(e._var_inidices)
+    print(e._var_inidices[indago.VariableType.Categorical])
+
+    c = indago.Candidate(e.variables)
+    c._R = 0.5
+    X = list(c.X)
+    for i in e._var_inidices[indago.VariableType.Categorical]:
+        X[i] = 'F'
+
+    for i in e._var_inidices[indago.VariableType.Real] + e._var_inidices[indago.VariableType.RealPeriodic]:
+        X[i] = 0.99
+
+    c.X = X
+    print(c.X)

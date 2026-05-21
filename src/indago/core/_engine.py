@@ -174,3 +174,15 @@ class Engine:
         for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
             # TODO: What about RealPeriodic?
             self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
+
+    def _init_utils(self) -> None:
+        """A private method for initializing some internal utility attributes."""
+
+        self._var_inidices = {}
+        for var_type in indago.VariableType:
+            self._var_inidices[var_type] = []
+        for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
+            self._var_inidices[var_type].append(i_var)
+
+        for var_type in indago.VariableType:
+            print(f'{var_type}: {self._var_inidices[var_type]}')
