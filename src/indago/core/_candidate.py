@@ -296,12 +296,16 @@ class Candidate:
 
     @_R.setter
     def _R(self, R: NDArray[float] | float) -> None:
-        """Sets the design vector using ndarray or float of relative values [0, 1]. Correctly sets the values
-        for all variable types. Raises an error if relative values are outside range [0, 1].
+        """Sets the design vector using ndarray or float of relative values [0, 1], while taking care of correct values
+        and types for all variables. If the provided relative value is None, the variable remains its previous value. If
+        relative values are outside range [0, 1], the values are corrected differently for each variable type. In case
+        of non-periodic they are clipped to the range or assigned to the nearest discrete value. In the case of periodic
+        variables, they are mapped to the opposite side of the provided variable range (or discrete values). If
+        the provided variable value is NaN, the variable is assigned to a legit random value.
 
         Parameters
         -------
-        R: ndarray[float] or float
+        R: ndarray[float | None] or float or None
             Array of relative values in range [0, 1].
         """
 
@@ -315,6 +319,9 @@ class Candidate:
         #         R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
+            if r is None:
+                X.append(self._get_X_as_dict()[var_name])
+                continue
             if np.isnan(r):
                 r = np.random.rand()
             if var_type in [VariableType.Real, VariableType.RealDiscrete, VariableType.Integer]:
@@ -364,109 +371,6 @@ class Candidate:
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         self._X = tuple(X)
-
-
-    def adjust(self) -> bool:
-        """Checks the values of the design vector X and adjusts them to valid values defined by ``variables`` dict
-        provide in the ``Candidate`` constructor.
-
-        Returns
-        -------
-        changed: bool
-            Return whether a design vector X is changed or not, as a ``bool`` value.
-        """
-
-        X: list[X_Content_Type] = []
-        for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
-            # print(f'{var_name=}  {var_type=}  {var_options=}  {x=}')
-
-            match var_type:
-
-                case VariableType.Real:
-                    # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
-                    _x = 0.0 if np.isnan(x) or np.isinf(x) else x # nan or inf values
-                    if var_options[0] is not None and _x < float(var_options[0]): # lower bound
-                        _x = float(var_options[0])
-                    if var_options[1] is not None and _x > float(var_options[1]): # upper bound
-                        _x = float(var_options[1])
-                    X.append(_x)
-
-                case VariableType.RealDiscrete:
-                    if x in var_options[0]:
-                        X.append(x)
-                    elif np.isnan(x) or np.isinf(x): # nan or inf values
-                        X.append(var_options[0][0])
-                    else:
-                        j = np.argmin(np.abs(np.asarray(var_options[0]) - x))
-                        X.append(var_options[0][j])
-
-                case VariableType.RealPeriodic:
-                    # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
-                    _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
-                    if var_options[0] is not None and _x < float(var_options[0]):  # lower bound
-                        _x = float((x - var_options[1]) % (var_options[1] - var_options[0]) + var_options[0])
-                    if var_options[1] is not None and _x > float(var_options[1]):  # upper bound
-                        _x = float((x - var_options[1]) % (var_options[1] - var_options[0]) + var_options[0])
-                    X.append(_x)
-
-                case VariableType.RealDiscretePeriodic:
-                    if x in var_options[0]:
-                        X.append(x)
-                    elif np.isnan(x) or np.isinf(x):  # nan or inf values
-                        X.append(var_options[0][0])
-                    else:
-                        _x = (x - var_options[0][0]) % (var_options[0][-1] - var_options[0][0])
-                        # # TODO: If x is nan or inf (how is this even possible?) set it to zero? Me not like.
-                        # _x = 0.0 if np.isnan(x) or np.isinf(x) else x  # nan or inf values
-                        # if _x < var_options[0][0]:  # lower bound
-                        #     _x = float(var_options[0][-1]) + float(x % (var_options[0][0] - var_options[0][-1]))
-                        # if _x > var_options[0][-1]:  # upper bound
-                        #     _x = float(var_options[0][0]) + float(x % (var_options[0][-1] - var_options[0][0]))
-                        j = np.argmin(np.abs(np.asarray(var_options[0]) - _x))
-                        X.append(var_options[0][j])
-
-                case VariableType.Integer:
-                    _x = x
-                    if x < var_options[0]:
-                        _x = var_options[0]
-                    elif x > var_options[1]:
-                        _x = var_options[1]
-                    X.append(_x)
-
-                case VariableType.IntegerPeriodic:
-                    _x = x
-                    if x < var_options[0]:
-                        _x = var_options[1] + int(round(x % (var_options[0] - var_options[1])))
-                    elif x > var_options[1]:
-                        _x = var_options[0] + int(round(x % (var_options[1] - var_options[0])))
-                    X.append(_x)
-
-                case VariableType.Categorical:
-                    if x in var_options[0]:
-                        X.append(x)
-                    else:
-                        X.append(np.random.choice(var_options[0]))
-
-        X = tuple[X_Content_Type](X)
-        changed = not np.all(X == self._X)
-        if changed:
-            self.X = X
-        return changed
-
-
-    def clip(self, optimizer) -> None:
-        """Method for clipping (trimming) the design vector (Candidate.X)
-        values to lower and upper bounds.
-
-        Returns
-        -------
-        None
-            Nothing
-
-        """
-
-        # TODO this needs to be reimplemented to use Candidate.variables instead of Optimizer
-        self.X = np.clip(self.X, optimizer.lb, optimizer.ub)
 
 
     def copy(self) -> Candidate:

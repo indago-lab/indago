@@ -27,8 +27,6 @@ def test_variables_initialization():
     candidate = indago.Candidate(optimizer.variables)
     print(candidate.X)
 
-    candidate.adjust()
-    print(candidate.X)
 
 def test_real_rs():
     f = lambda x: 0.0

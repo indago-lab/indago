@@ -186,7 +186,6 @@ class CRS(Optimizer):
             G = np.mean([c._R for c in self._simp[:-1]], axis=0)  # centroid
             self._trial._R = 2 * G - self._simp[-1]._R
             self._randomize_categorical([self._trial])
-            self._trial.adjust()
             self._collective_evaluation([self._trial])
 
             # Insert or mutate
@@ -197,7 +196,6 @@ class CRS(Optimizer):
                 omega = np.random.uniform(0, 1, size=self.dimensions)
                 self._trial._R = (1 + omega) * self._simp[0]._R - omega * self._trial._R
                 self._randomize_categorical([self._trial])
-                self._trial.adjust()
                 self._collective_evaluation([self._trial])
                 if self._trial < self._pop[-1]:
                     self._pop[-1] = self._trial

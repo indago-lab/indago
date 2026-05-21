@@ -134,7 +134,6 @@ class NM(Optimizer):
             dr = np.zeros([self.dimensions])
             dr[p] = self.params['init_step']
             self._candidates[1 + p]._R = self._candidates[0]._R + dr
-            self._candidates[1 + p].adjust()
 
             # if self._all_real:
             #     dx = np.zeros([self.dimensions])
@@ -240,7 +239,6 @@ class NM(Optimizer):
 
             p0._R = np.average([c._R for c in self._candidates[:-1]], axis=0)
             self._randomize_categorical([p0])
-            p0.adjust()
 
             dR = p0._R - self._candidates[-1]._R
 
@@ -249,7 +247,6 @@ class NM(Optimizer):
             cR = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
             cR._R = p0._R + alpha * dR
             self._randomize_categorical([cR])
-            cR.adjust()
 
             self._collective_evaluation([cR])
 
@@ -262,7 +259,6 @@ class NM(Optimizer):
                 cE = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cE._R = p0._R + gamma * dR
                 self._randomize_categorical([cE])
-                cE.adjust()
 
                 self._collective_evaluation([cE])
 
@@ -277,7 +273,6 @@ class NM(Optimizer):
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R + rho + dR
                 self._randomize_categorical([cC])
-                cC.adjust()
 
                 self._collective_evaluation([cC])
 
@@ -292,7 +287,6 @@ class NM(Optimizer):
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R - rho * dR
                 self._randomize_categorical([cC])
-                cC.adjust()
 
                 self._collective_evaluation([cC])
 
@@ -305,9 +299,8 @@ class NM(Optimizer):
             if reduction:
                 for p in range(1, self.dimensions + 1):
                     self._candidates[p]._R = self._candidates[0]._R + sigma * (self._candidates[p]._R - self._candidates[0]._R)
-                    self._candidates[p].adjust()
-                self._randomize_categorical(self._candidates[1:])
 
+                self._randomize_categorical(self._candidates[1:])
                 self._collective_evaluation(self._candidates[1:])
 
             if self._finalize_iteration():

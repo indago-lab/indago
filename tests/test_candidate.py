@@ -69,7 +69,7 @@ def test_candidate_copy():
     # print(c2.X)
 
     c1 = indago.Candidate(mixed_variables)
-    c1.adjust()
+    # c1._R = 0.33
     c1.O = np.array([1.1, 0.01])
     c1.f = 1.11
     c2 = c1.copy()
@@ -84,64 +84,6 @@ def test_candidate_copy():
     # assert c1 != c2, 'Candidate.copy() does not work. Copy points to original!'
     assert c1.X != c2.X, 'Candidate.copy() does not work. Copy points to original!'
 
-def test_adjust():
-
-    c1: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.Tuple)
-    assert c1.adjust()
-
-    X = c1._get_X_as_list()
-    X[0] = 1.2345
-    c1.X = X
-    assert not c1.adjust()
-    assert c1.X[0] == X[0]
-
-    X = c1._get_X_as_list()
-    X[0] = -987.654
-    c1.X = X
-    assert c1.adjust()
-    assert not c1.X[0] == X[0]
-
-    X = c1._get_X_as_list()
-    X[1] = -0.3
-    c1.X = X
-    assert c1.adjust()
-    assert not c1.X[1] == X[1]
-
-    X = c1._get_X_as_list()
-    X[2] = 365.25
-    c1.X = X
-    assert not c1.adjust()
-    assert c1.X[1] == X[1]
-
-    X = c1._get_X_as_list()
-    X[3] = 8.2
-    c1.X = X
-    assert c1.adjust()
-    assert not c1.X[3] == X[3]
-
-    X = c1._get_X_as_list()
-    X[4] = 7
-    c1.X = X
-    c1.adjust()
-    assert c1.X[4] == X[4]
-
-    X = c1._get_X_as_list()
-    X[4] = 11
-    c1.X = X
-    assert c1.adjust()
-    assert not c1.X[4] == X[4]
-
-    X = c1._get_X_as_list()
-    X[5] = 'D'
-    c1.X = X
-    assert not c1.adjust()
-    assert c1.X[5] == X[5]
-
-    X = c1._get_X_as_list()
-    X[5] = 'None'
-    c1.X = X
-    assert c1.adjust()
-    assert not c1.X[5] == X[5]
 
 def test_set_R():
 
@@ -228,16 +170,15 @@ def test_periodic_1():
     c = indago.Candidate(variables)
 
     c.X = [9.99, 0.9]
-    c.adjust()
-    assert np.isclose(c.X[1], 0.9), 'Adjust for periodic variable does not work'
+    assert np.isclose(c.X[1], 0.9), '_R setter for periodic variable does not work'
 
-    c.X = [9.99, 1.2]
-    c.adjust()
-    assert np.isclose(c.X[1], 0.2), 'Adjust for periodic variable does not work'
+    c._R = np.array([1.05, 1.2])
+    assert np.isclose(c.X[0], 100.0), '_R setter for real variable does not work'
+    assert np.isclose(c.X[1], 0.2), '_R setter for real periodic variable does not work'
 
-    c.X = [9.99, -0.05]
-    c.adjust()
-    assert np.isclose(c.X[1], 0.95), 'Adjust for periodic variable does not work'
+    c._R = np.array([None, -0.05])
+    assert np.isclose(c.X[0], 100.0), '_R setter for real variable does not work'
+    assert np.isclose(c.X[1], 0.95), '_R setter for periodic variable does not work'
 
 if __name__ == '__main__':
     test_ndarray_X_format()
