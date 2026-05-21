@@ -159,8 +159,13 @@ def test_mofify_R():
     else:
         assert False, f'assigning elements of _R is not allowed'
 
+def test_R():
 
+    c = indago.Candidate(real_variables_10D)
 
+    for r in [0.0, 1.0, 0.5, 0.123456]:
+        c._R = r
+        assert np.allclose(c._R, r, 1e-15), f'R setter does not work for r={r}'
 
 
 def test_periodic_1():

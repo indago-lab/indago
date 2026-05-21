@@ -310,7 +310,7 @@ class Candidate:
         """
 
         # expand scalar to array
-        if isinstance(R, float):
+        if isinstance(R,  (int, np.integer, float, np.floating)):
             R = np.full(len(self._variables), R, dtype=float)
 
         X: list[X_Content_Type] = []
