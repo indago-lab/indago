@@ -61,7 +61,7 @@ class Candidate:
     f: float
         Fitness.
     _variables: VariableDictType
-        A hidden attribute for accessing variables definitions dictionary.
+        A hidden attribute for accessing variable definitions dictionary.
     _x_format: XFormat:
         A hidden attribute for attribute X's return value format.
     """
