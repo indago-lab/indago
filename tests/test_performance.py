@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, RS, NM #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, HBO, CRS, EEEO
+from indago import PSO, RS, NM, CRS  #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, HBO, EEEO
 
 
 def F(x):
@@ -480,7 +480,7 @@ def test_HBO_Dynamic_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_CRS_defaults():
     description = 'CRS defaults'
     optimizer = CRS()
@@ -509,7 +509,7 @@ def test_CRS_custom_parameters_2():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_EEEO_defaults():
     description = 'EEEO defaults'
     optimizer = EEEO()
@@ -582,8 +582,8 @@ if __name__ == '__main__':
     test_RS_lhs_initializer()
     # test_HBO_Dynamic_defaults()
     # test_HBO_defaults()
-    # test_CRS_defaults()
-    # test_CRS_custom_parameters_1()
-    # test_CRS_custom_parameters_2()
+    test_CRS_defaults()
+    test_CRS_custom_parameters_1()
+    test_CRS_custom_parameters_2()
     # test_EEEO_defaults()
     # test_EEEO_custom_parameters()

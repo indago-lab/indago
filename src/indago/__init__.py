@@ -29,18 +29,18 @@ from indago.core._candidate import Candidate, VariableType, XFormat, VariableDic
 
 from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO
-# from indago._fwa import FWA
-# from indago._ssa import SSA
-# from indago._de import DE
-# from indago._ba import BA
-# from indago._efo import EFO
-# from indago._mrfo import MRFO
-# from indago._abc import ABC
+# from indago.optimizers._fwa import FWA
+# from indago.optimizers._ssa import SSA
+# from indago.optimizers._de import DE
+# from indago.optimizers._ba import BA
+# from indago.optimizers._efo import EFO
+# from indago.optimizers._mrfo import MRFO
+# from indago.optimizers._abc import ABC
 from indago.optimizers._nm import NM
-# from indago._msgd import MSGD
-# from indago._gwo import GWO
-# from indago._hbo import HBO
-# from indago._crs import CRS
+# from indago.optimizers._msgd import MSGD
+# from indago.optimizers._gwo import GWO
+# from indago.optimizers._hbo import HBO
+from indago.optimizers._crs import CRS
 
 # optimizers = [PSO, FWA, SSA, DE, BA, EFO, MRFO, ABC, NM, MSGD, RS, GWO, HBO, CRS]
 """list of Optimizer : A list of all available Indago optimizer classes."""

@@ -115,7 +115,8 @@ class NM(Optimizer):
 
         """
 
-        self._evaluate_initial_candidates()
+        if self._all_real:
+            self._x_format = XFormat.Ndarray
 
         # Generate set of points
         self._candidates: list[Candidate] = \
@@ -123,7 +124,9 @@ class NM(Optimizer):
              for _ in range(self.dimensions + 1)]
 
         # Generate initial positions
+        self._evaluate_initial_candidates()
         self._candidates[0] = self._initial_candidates[0].copy()
+        # TODO: if only one X0 is taken, then this should be checked and user should be informed if len(X0)>1
 
         # Starting simplex
         for p in range(self.dimensions):
