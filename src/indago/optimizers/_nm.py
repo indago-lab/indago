@@ -135,31 +135,6 @@ class NM(Optimizer):
             dr[p] = self.params['init_step']
             self._candidates[1 + p]._R = self._candidates[0]._R + dr
 
-            # if self._all_real:
-            #     dx = np.zeros([self.dimensions])
-            #     dx[p - 1] = self.params['init_step']
-            #     self._candidates[p].X = self._candidates[0].X + dx * (self.ub - self.lb)
-            #     self._candidates[p].clip(self)  # TODO: maybe adjust instead of clip?
-            #
-            # else:
-            #     X = self._candidates[0].X.astype(list)
-            #
-            #     for var_name, (var_type, *var_options) in self._candidates[p]._variables.items():
-            #         match var_type:
-            #             case VariableType.Real | VariableType.RealPeriodic:
-            #                 X[p - 1] += self.params['init_step'] * (var_options[1] - var_options[0])
-            #             case VariableType.Integer | VariableType.IntegerPeriodic:
-            #                 X[p - 1] += self.params['init_step'] * (var_options[1] - var_options[0])
-            #             case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-            #                 X[p - 1] += self.params['init_step'] * (np.max(var_options[0]) - np.min(var_options[0]))
-            #             case VariableType.Categorical:
-            #                 X[p - 1] = np.nan
-            #             case _:
-            #                 raise ValueError(f'Unknown variable type: {var_type}')
-            #
-            #     self._candidates[p].X = X
-            #     self._candidates[p].adjust()
-
         # Evaluate
         self._collective_evaluation(self._candidates[1:])
 
@@ -209,45 +184,15 @@ class NM(Optimizer):
 
             # Center
             p0 = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
-            # avgX = np.zeros(self.dimensions)
-            # for p in range(self.dimensions):
-            #     for i, (var_name, (var_type, *var_options)) in enumerate(p0._variables.items()):
-            #         match var_type:
-            #             case VariableType.Real | VariableType.RealPeriodic:
-            #                 avgX[i] += self._candidates[p].X[i]
-            #             case VariableType.Integer | VariableType.IntegerPeriodic:
-            #                 avgX[i] += self._candidates[p].X[i]
-            #             case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-            #                 avgX[i] += self._candidates[p].X[i]
-            #             case VariableType.Categorical:
-            #                 pass
-            #             case _:
-            #                 raise ValueError(f'Unknown variable type: {var_type}')
-            # for i, (var_name, (var_type, *var_options)) in enumerate(p0._variables.items()):
-            #     match var_type:
-            #         case VariableType.Real | VariableType.RealPeriodic:
-            #             avgX[i] /= self.dimensions
-            #         case VariableType.Integer | VariableType.IntegerPeriodic:
-            #             avgX[i] /= self.dimensions
-            #         case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-            #             avgX[i] /= self.dimensions
-            #         case VariableType.Categorical:
-            #             avgX[i] = np.random.choice(var_options[0])  # TODO: not sure about this
-            #         case _:
-            #             raise ValueError(f'Unknown variable type: {var_type}')
-            # p0.X = avgX
-
             p0._R = np.average([c._R for c in self._candidates[:-1]], axis=0)
             self._randomize_categorical([p0])
 
             dR = p0._R - self._candidates[-1]._R
 
             # Reflection
-            # Xr = np.array(p0.X) + alpha * dR
             cR = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
             cR._R = p0._R + alpha * dR
             self._randomize_categorical([cR])
-
             self._collective_evaluation([cR])
 
             if self._candidates[0] <= cR <= self._candidates[-2]:
@@ -255,11 +200,9 @@ class NM(Optimizer):
 
             elif cR < self._candidates[0]:
                 # Expansion
-                # Xe = np.array(p0.X) + gamma * dX
                 cE = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cE._R = p0._R + gamma * dR
                 self._randomize_categorical([cE])
-
                 self._collective_evaluation([cE])
 
                 if cE < cR:
@@ -269,11 +212,9 @@ class NM(Optimizer):
 
             elif cR < self._candidates[-1]:
                 # Contraction
-                # Xc = np.array(p0.X) + rho * dX
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R + rho + dR
                 self._randomize_categorical([cC])
-
                 self._collective_evaluation([cC])
 
                 if cC < self._candidates[-1]:
@@ -283,11 +224,9 @@ class NM(Optimizer):
 
             else:
                 # Internal contraction
-                # Xc = np.array(p0.X) - rho * dX
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R - rho * dR
                 self._randomize_categorical([cC])
-
                 self._collective_evaluation([cC])
 
                 if cC < self._candidates[-1]:
@@ -307,4 +246,3 @@ class NM(Optimizer):
                 break
 
         return self.best
-

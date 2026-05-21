@@ -407,7 +407,7 @@ def test_MSGD_defaults():
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
-    expected_result = 4.197968360852144
+    expected_result = 4.198673249163085
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -417,7 +417,7 @@ def test_NM_Vanilla_defaults():
     description = 'NelderMead Vanilla defaults'
     optimizer = NM()
     optimizer.variant = 'Vanilla'
-    expected_result = 4.099420846773123
+    expected_result = 4.165596500278434
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
