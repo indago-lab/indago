@@ -236,11 +236,7 @@ class NM(Optimizer):
             # p0.X = avgX
 
             p0._R = np.average([c._R for c in self._candidates[:-1]], axis=0)
-
-            # Randomly perturb the position for categorical variables
-            for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                if var_type == VariableType.Categorical:
-                    p0._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+            self._randomize_categorical([p0])
             p0.adjust()
 
             dR = p0._R - self._candidates[-1]._R
@@ -249,10 +245,7 @@ class NM(Optimizer):
             # Xr = np.array(p0.X) + alpha * dR
             cR = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
             cR._R = p0._R + alpha * dR
-            # Randomly perturb the position for categorical variables
-            for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                if var_type == VariableType.Categorical:
-                    cR._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+            self._randomize_categorical([cR])
             cR.adjust()
 
             self._collective_evaluation([cR])
@@ -265,10 +258,7 @@ class NM(Optimizer):
                 # Xe = np.array(p0.X) + gamma * dX
                 cE = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cE._R = p0._R + gamma * dR
-                # Randomly perturb the position for categorical variables
-                for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type == VariableType.Categorical:
-                        cE._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                self._randomize_categorical([cE])
                 cE.adjust()
 
                 self._collective_evaluation([cE])
@@ -283,10 +273,7 @@ class NM(Optimizer):
                 # Xc = np.array(p0.X) + rho * dX
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R + rho + dR
-                # Randomly perturb the position for categorical variables
-                for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type == VariableType.Categorical:
-                        cC._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                self._randomize_categorical([cC])
                 cC.adjust()
 
                 self._collective_evaluation([cC])
@@ -301,11 +288,7 @@ class NM(Optimizer):
                 # Xc = np.array(p0.X) - rho * dX
                 cC = Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format)
                 cC._R = p0._R - rho * dR
-                # Randomly perturb the position for categorical variables
-                for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type == VariableType.Categorical:
-                        cC._R[i_var] = self.best._R[
-                            i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                self._randomize_categorical([cC])
                 cC.adjust()
 
                 self._collective_evaluation([cC])
@@ -320,10 +303,7 @@ class NM(Optimizer):
                 for p in range(1, self.dimensions + 1):
                     self._candidates[p]._R = self._candidates[0]._R + sigma * (self._candidates[p]._R - self._candidates[0]._R)
                     self._candidates[p].adjust()
-
-                    for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                        if var_type == VariableType.Categorical:
-                            self._candidates[p]._R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+                self._randomize_categorical(self._candidates[1:])
 
                 self._collective_evaluation(self._candidates[1:])
 
