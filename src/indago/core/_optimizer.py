@@ -686,6 +686,24 @@ class Optimizer(Engine):
             #         c.X = X
 
 
+    def _randomize_categorical(self, candidates: list[Candidate]) -> None:
+        """Private method for randomizing categorical variables in given candidates.
+
+        Returns
+        -------
+        None
+            Nothing
+
+        """
+
+        for c in candidates:
+            R = list(c._R)
+            for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
+                if var_type == VariableType.Categorical:
+                    R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
+            c._R = R
+
+
     def _evaluate_initial_candidates(self):
         """Private method for evaluating initial candidates. This method populates 
         and evaluates private list of initial candidates (Optimizer._initial_candidates)
