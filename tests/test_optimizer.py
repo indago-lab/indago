@@ -124,6 +124,7 @@ mixed_variables_set_2: indago.VariableDictType = {
 
 def test_uniformity():
     for sampler in 'random halton sobol lhs'.split():
+
         uniformity_test(sampler)
 
 def uniformity_test(sampler):
@@ -132,6 +133,7 @@ def uniformity_test(sampler):
     optimizer.evaluator = lambda x: x
     optimizer.sampler = 'random'
     optimizer._init_optimizer()
+    print(f'{sampler=}')
 
     XX = []
     RR = []
@@ -153,7 +155,7 @@ def uniformity_test(sampler):
         RR.append(c._R)
 
 
-    print(f'{len(XX)=}')
+    # print(f'{len(XX)=}')
     eps = 1e-2
 
     for i_var, (var_name, (var_type, *var_options)) in enumerate(mixed_variables_set_2.items()):
@@ -170,19 +172,29 @@ def uniformity_test(sampler):
 
             cnt_sammples_x = {}
             cnt_sammples_r = {}
-            if var_type in [indago.VariableType.RealDiscrete, indago.VariableType.RealDiscretePeriodic]:
+            if var_type == indago.VariableType.RealDiscrete:
                 discrete_values = np.array(var_options[0])
                 x_min = discrete_values[0] - 0.5 * (discrete_values[1] - discrete_values[0])
                 x_max = discrete_values[-1] + 0.5 * (discrete_values[-1] - discrete_values[-2])
                 x_mid = 0.5 * (discrete_values[1:] + discrete_values[:-1])
-                print(f'{x_mid=}')
                 x_bins = np.hstack([x_min, x_mid, x_max])
                 x_density = x_bins[1:] - x_bins[:-1]
-                x_density /= np.sum(x_density)
-                print(f'{x_bins=}')
-                print(f'{x_density=}')
+            elif var_type == indago.VariableType.RealDiscretePeriodic:
+                discrete_values = np.array(var_options[0])
+                x_min = discrete_values[0]
+                x_max = discrete_values[-1]
+                x_mid = 0.5 * (discrete_values[1:] + discrete_values[:-1])
+                # print(f'{x_mid=}')
+                x_bins = np.hstack([x_min, x_mid, x_max])
+                x_density = x_bins[1:] - x_bins[:-1]
+            elif var_type == indago.VariableType.IntegerPeriodic:
+                x_density = [0.5] + [1] * (var_options[1] - var_options[0] - 1) + [0.5]
+
             else:
                 x_density = np.full(unique_x.size, 1/ unique_x.size)
+
+            x_density /= np.sum(x_density)
+            # print(f'{x_density=}')
 
             for u in unique_x:
                 cnt_sammples_x[u] = np.sum(np.asarray(x) == u) / n_samples
@@ -193,7 +205,7 @@ def uniformity_test(sampler):
 
             for (k, v), xd in zip(cnt_sammples_x.items(), x_density):
                 print(f' x={k} share: {float(v):.6f} / {xd:.6f}')
-                assert np.abs(v - xd) < eps, 'Nonuniform distribution detected!'
+                assert np.abs(v - xd) < eps, 'Nonuniform distribution /detected!'
             for (k, v), xd in zip(cnt_sammples_r.items(), x_density):
                 print(f' r={k} share: {float(v):.6f} / {xd:.6f}')
                 assert np.abs(v - xd) < eps, 'Nonuniform distribution detected!'

@@ -130,7 +130,7 @@ def test_variables_validation():
 
 def test_initi_utils():
     e = Engine()
-    for i in range(10):
+    for i in range(20):
 
         var_type = np.random.choice(indago.VariableType)
         match var_type:
@@ -146,17 +146,25 @@ def test_initi_utils():
                 raise NotImplementedError(f'Unknown variable type {var_type}')
 
     e._init_utils()
-    print(e._var_inidices)
-    print(e._var_inidices[indago.VariableType.Categorical])
+    # print(e._var_inidices)
+    # print(e._var_inidices[indago.VariableType.Categorical])
 
     c = indago.Candidate(e.variables)
     c._R = 0.5
     X = list(c.X)
+    val_cat = 'F'
     for i in e._var_inidices[indago.VariableType.Categorical]:
-        X[i] = 'F'
+        X[i] = val_cat
 
+    val_real = 0.998877
     for i in e._var_inidices[indago.VariableType.Real] + e._var_inidices[indago.VariableType.RealPeriodic]:
-        X[i] = 0.99
+        X[i] = val_real
 
     c.X = X
     print(c.X)
+
+    for i_var, (var_name, (var_type, *_)) in enumerate(e.variables.items()):
+        if var_type in [indago.VariableType.Real, indago.VariableType.RealPeriodic]:
+            assert c.X[i_var] == val_real, 'Wrong value for variable {var_name}'
+        elif var_type in [indago.VariableType.Categorical]:
+            assert c.X[i_var] == val_cat, 'Wrong value for variable {var_name}'
