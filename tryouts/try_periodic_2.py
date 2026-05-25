@@ -16,7 +16,7 @@ def f(design):
     y1 = r1 * np.sin(phi1)
     x2 = r2 * np.cos(phi2)
     y2 = r2 * np.sin(phi2)
-    return  (x1 - 0.9)**2 + (y1 + 0.01)**2 + (x2 - 0.95)**2 + (y1 + 0.5)**2
+    return  (x1 - 0.9)**2 + (y1 + 0.1)**2 + (x2 - 0.95)**2 + (y1 + 0.5)**2
 
 for vars, lbl in zip([variables_real, variables_periodic], 'Real RealPeriodic'.split()):
     F = []
