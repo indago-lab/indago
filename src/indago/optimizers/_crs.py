@@ -113,9 +113,7 @@ class CRS(Optimizer):
 
         # Generate population
         pop_size = int(self.params['pop_scale'] * (self.dimensions + 1))
-        self._pop: list[Candidate] = \
-            [Candidate(self.variables, self.objectives, self.constraints, x_format=self._x_format) \
-             for _ in range(pop_size)]
+        self._pop: list[Candidate] = [Candidate(**self._problem_info) for _ in range(pop_size)]
 
         # Initialize simplex
         self._simp = [None for _ in range(self.dimensions + 1)]

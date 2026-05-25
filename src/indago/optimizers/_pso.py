@@ -280,9 +280,7 @@ class PSO(Optimizer):
         self._v_max = np.full(self.dimensions, 0.2)
 
         # Generate a swarm
-        self._swarm: list[Particle] = \
-            [Particle(self.variables, self.objectives, self.constraints, x_format=self._x_format) \
-             for c in range(self.params['swarm_size'])]
+        self._swarm: list[Particle] = [Particle(**self._problem_info) for c in range(self.params['swarm_size'])]
         
         # Prepare arrays
         self._dF = np.full(self.params['swarm_size'], np.nan)
