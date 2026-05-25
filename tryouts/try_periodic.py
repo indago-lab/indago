@@ -5,10 +5,16 @@ from copy import deepcopy
 
 real: indago.VariableDictType = {f'var{i}': (indago.VariableType.Real, 0, 360) for i in range(0, 10)}
 real_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealPeriodic, 0, 360) for i in range(0, 10)}
+real_discrete: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscrete, [float(_) for _ in range(0, 361)]) for i in range (0, 10)}
 real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscretePeriodic, [float(_) for _ in range(0, 361)]) for i in range (0, 10)}
+integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.Integer, 0, 360) for i in range(0, 10)}
 integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, 10)}
 
-optimizers = [indago.PSO, indago.NM, indago.CRS, indago.HBO]
+optimizers = [indago.PSO,
+              # indago.NM,
+              # indago.CRS,
+              # indago.HBO,
+              ]
 
 def goalfun(x):
     x = np.asarray(x)
@@ -20,7 +26,9 @@ def goalfun(x):
 # plt.plot(np.arange(0, 361), f(np.arange(0, 361)))
 # plt.show()
 
-for vars in [real, real_periodic, real_discrete_periodic, integer_periodic]:
+for vars in [real, real_periodic,
+             real_discrete, real_discrete_periodic,
+             integer, integer_periodic]:
 
     for opt_class in optimizers:
 

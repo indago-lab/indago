@@ -698,7 +698,7 @@ class Optimizer(Engine):
 
         for c in candidates:
             R = [None] * self.dimensions
-            for i_var in self._var_inidices[indago.VariableType.Categorical]:
+            for i_var in self._var_indices[indago.VariableType.Categorical]:
                 R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
             c._R = R
 

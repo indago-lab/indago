@@ -146,18 +146,18 @@ def test_init_utils():
                 raise NotImplementedError(f'Unknown variable type {var_type}')
 
     e._init_utils()
-    # print(e._var_inidices)
-    # print(e._var_inidices[indago.VariableType.Categorical])
+    # print(e._var_indices)
+    # print(e._var_indices[indago.VariableType.Categorical])
 
     c = indago.Candidate(e.variables)
     c._R = 0.5
     X = list(c.X)
     val_cat = 'F'
-    for i in e._var_inidices[indago.VariableType.Categorical]:
+    for i in e._var_indices[indago.VariableType.Categorical]:
         X[i] = val_cat
 
     val_real = 0.998877
-    for i in e._var_inidices[indago.VariableType.Real] + e._var_inidices[indago.VariableType.RealPeriodic]:
+    for i in e._var_indices[indago.VariableType.Real] + e._var_indices[indago.VariableType.RealPeriodic]:
         X[i] = val_real
 
     c.X = X

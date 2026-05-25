@@ -428,17 +428,25 @@ class PSO(Optimizer):
 
             # Calculate new velocity and new position
             for p, particle in enumerate(self._swarm):
-                old_R = particle._R.copy()
-                particle.V = w[p] * particle.V + \
-                               c1 * R1[p, :] * (self._pbests[p]._R - particle._R) + \
-                               c2 * R2[p, :] * (self._pbests[self._gbest_idx[p]]._R - particle._R)
+                v_cog = self._pbests[p]._R - particle._R
+                v_soc = self._pbests[self._gbest_idx[p]]._R - particle._R
 
-                particle._R = old_R + particle.V
+                for i_var in (self._var_indices[VariableType.RealPeriodic] +
+                              self._var_indices[VariableType.RealDiscretePeriodic] +
+                              self._var_indices[VariableType.IntegerPeriodic]):
+                    if np.abs(v_cog[i_var]) > 0.5:
+                        v_cog[i_var] = v_cog[i_var] - np.sign(v_cog[i_var])
+                    if np.abs(v_soc[i_var]) > 0.5:
+                        v_soc[i_var] = v_soc[i_var] - np.sign(v_soc[i_var])
+
+                particle.V = w[p] * particle.V + c1 * R1[p, :] * v_cog + c2 * R2[p, :] * v_soc
+
+                particle._R = particle._R + particle.V
 
                 self._randomize_categorical([particle])
 
-                # Adjust velocities for periodic variables
-                # particle.V = particle._R - old_R
+                # # # Adjust velocities for periodic variables
+                # # # particle.V = particle._R - old_R
                 # for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
                 #     if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
                 #         if np.abs(particle.V[i_var]) > 0.5:
