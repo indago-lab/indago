@@ -128,7 +128,7 @@ def test_variables_validation():
     e._init_variables()
 
 
-def test_initi_utils():
+def test_init_utils():
     e = Engine()
     for i in range(20):
 

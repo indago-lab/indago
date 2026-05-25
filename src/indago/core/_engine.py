@@ -184,5 +184,5 @@ class Engine:
         for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
             self._var_inidices[var_type].append(i_var)
 
-        for var_type in indago.VariableType:
-            print(f'{var_type}: {self._var_inidices[var_type]}')
+        # for var_type in indago.VariableType:
+        #     print(f'{var_type}: {self._var_inidices[var_type]}')
