@@ -438,13 +438,13 @@ class PSO(Optimizer):
                 self._randomize_categorical([particle])
 
                 # Adjust velocities for periodic variables
-                particle.V = particle._R - old_R
-                for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
-                        if np.abs(particle.V[i_var]) > 0.5:
-                            # print(f'{particle.V[i_var]}', end=' ==> ')
-                            particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
-                            # print(f'{particle.V[i_var]}', )
+                # particle.V = particle._R - old_R
+                # for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
+                #     if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                #         if np.abs(particle.V[i_var]) > 0.5:
+                #             # print(f'{particle.V[i_var]}', end=' ==> ')
+                #             particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
+                #             # print(f'{particle.V[i_var]}', )
 
 
             # Get old fitness
