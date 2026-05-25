@@ -39,7 +39,7 @@ from indago.optimizers._pso import PSO
 from indago.optimizers._nm import NM
 # from indago.optimizers._msgd import MSGD
 # from indago.optimizers._gwo import GWO
-# from indago.optimizers._hbo import HBO
+from indago.optimizers._hbo import HBO
 from indago.optimizers._crs import CRS
 
 # optimizers = [PSO, FWA, SSA, DE, BA, EFO, MRFO, ABC, NM, MSGD, RS, GWO, HBO, CRS]

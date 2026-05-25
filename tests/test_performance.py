@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, RS, NM, CRS  #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, HBO, EEEO
+from indago import PSO, RS, NM, CRS, HBO  #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, EEEO
 
 
 def F(x):
@@ -461,7 +461,7 @@ def test_RS_lhs_initializer():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_HBO_defaults():
     description = 'HBO defaults'
     optimizer = HBO()
@@ -480,7 +480,7 @@ def test_HBO_Dynamic_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_CRS_defaults():
     description = 'CRS defaults'
     optimizer = CRS()
@@ -580,8 +580,8 @@ if __name__ == '__main__':
     test_RS_halton_initializer()
     test_RS_sobol_initializer()
     test_RS_lhs_initializer()
-    # test_HBO_Dynamic_defaults()
-    # test_HBO_defaults()
+    test_HBO_Dynamic_defaults()
+    test_HBO_defaults()
     test_CRS_defaults()
     test_CRS_custom_parameters_1()
     test_CRS_custom_parameters_2()
