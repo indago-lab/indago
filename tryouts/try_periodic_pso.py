@@ -16,6 +16,8 @@ vars = real_periodic
 
 def goalfun(x):
     x = np.asarray(x)
+    # return np.sum((x - 0) ** 2)
+    # return np.sum((x - 180) ** 2)
     offset = (1 + np.arange(np.size(x))) * 1.5
     return np.sum(np.sin(np.deg2rad(x - offset - 90))) + np.size(x)
 
@@ -35,9 +37,9 @@ optimizer = indago.PSO()
 optimizer.variables = vars
 optimizer.evaluator = goalfun  # minimum on bounds
 optimizer._plot_evaluator = plotfun
-optimizer.max_iterations = 200
+optimizer.max_iterations = 20
 optimizer.monitoring = 'basic'
 optimizer.optimize(seed=None)
 optimizer.plot_history()
-print(optimizer.best)
+print(f'{optimizer.best.f=:.3e}')
 plt.show()
