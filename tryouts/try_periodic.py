@@ -19,7 +19,8 @@ optimizers = [indago.PSO,
 def goalfun(x):
     x = np.asarray(x)
     offset = (1 + np.arange(np.size(x))) * 1.5
-    return np.sum(np.sin(np.deg2rad(x - offset - 90))) + np.size(x)
+    return np.sum(np.sin(np.deg2rad(x - offset + 90))) + np.size(x) # Periodic with minimum at the middle
+    return np.sum(np.sin(np.deg2rad(x - offset - 90))) + np.size(x) # Periodic with minimum near the bounds
 
 # import matplotlib.pyplot as plt
 # f = np.vectorize(goalfun)
@@ -34,7 +35,7 @@ for vars in [real, real_periodic,
     for opt_class in optimizers:
 
         res = []
-        for i in range(50):
+        for i in range(100):
             optimizer = opt_class()
             optimizer.variables = vars
             optimizer.evaluator = goalfun  # minimum on bounds

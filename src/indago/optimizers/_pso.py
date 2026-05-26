@@ -411,6 +411,7 @@ class PSO(Optimizer):
                 ax.axvline(x=0, color='k', ls='--', lw=0.5)
                 ax.axvline(x=1, color='k', ls='--', lw=0.5)
                 ax.set_title(str(self.variables['var0'][0]) + f', it={self.it}')
+                ax.axis('off')
 
                 self._plot_evaluator(ax)
 

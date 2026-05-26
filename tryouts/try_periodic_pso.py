@@ -4,7 +4,7 @@ import indago
 import numpy as np
 from copy import deepcopy
 
-dims = 30
+dims = 15
 real: indago.VariableDictType = {f'var{i}': (indago.VariableType.Real, 0, 360) for i in range(0, dims)}
 real_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealPeriodic, 0, 360) for i in range(0, dims)}
 real_discrete: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscrete, [float(_) for _ in range(0, 361)]) for i in range (0, dims)}
@@ -12,7 +12,7 @@ real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableTy
 integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.Integer, 0, 360) for i in range(0, dims)}
 integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, dims)}
 
-vars = real_periodic
+vars = real#_periodic
 
 def goalfun(x):
     x = np.asarray(x)
@@ -37,7 +37,7 @@ optimizer = indago.PSO()
 optimizer.variables = vars
 optimizer.evaluator = goalfun  # minimum on bounds
 optimizer._plot_evaluator = plotfun
-optimizer.max_iterations = 20
+optimizer.max_iterations = 100
 optimizer.monitoring = 'basic'
 optimizer.optimize(seed=None)
 optimizer.plot_history()
