@@ -20,6 +20,8 @@ Usage: from indago import PSO
 
 
 import numpy as np
+from matplotlib import pyplot as plt
+
 from indago.core._optimizer import Optimizer, Status
 from indago.core._candidate import X_Content_Type
 from indago import Candidate, VariableType, VariableDictType, XFormat
@@ -396,14 +398,28 @@ class PSO(Optimizer):
         if 'social_rate' in self.params:
             c2 = self.params['social_rate']
 
+        plot = hasattr(self, '_plot_evaluator')
+
         while True:
-            
+
+            if plot:
+                fig, ax = plt.subplots(figsize=(10, 10))
+                ax.set_xlim(-0.5, 1.5)
+                ax.set_ylim(-0.5, 1.5)
+                ax.axhline(y=0, color='k', ls='--')
+                ax.axhline(y=1, color='k', ls='--')
+                ax.axvline(x=0, color='k', ls='--')
+                ax.axvline(x=1, color='k', ls='--')
+                ax.set_title(str(self.variables['var0'][0]) + f', it={self.it}')
+
+                self._plot_evaluator(ax)
+
             R1 = np.random.uniform(0, 1, [self.params['swarm_size'], self.dimensions])
             R2 = np.random.uniform(0, 1, [self.params['swarm_size'], self.dimensions])
-              
-            if self.params['inertia'] == 'LDIW':                
+
+            if self.params['inertia'] == 'LDIW':
                 w = 1.0 - (1.0 - 0.4) * self._progress_factor()
-            
+
             elif self.params['inertia'] == 'HSIW':
                 w = 0.5 + (0.75 - 0.5) * np.sin(np.pi * self._progress_factor())
 
@@ -437,20 +453,39 @@ class PSO(Optimizer):
                     if np.abs(v_soc[i_var]) > 0.5:
                         v_soc[i_var] = v_soc[i_var] - np.sign(v_soc[i_var])
 
+
+                if plot:
+                    ax.plot(particle._R[0], particle._R[1], 'bo', ms=3)
+                    ax.arrow(particle._R[0], particle._R[1], v_cog[0], v_cog[1], color='orange',
+                             width=0.001, linestyle=':',
+                             head_width=0.01, head_length=0.01, )
+                    ax.arrow(particle._R[0], particle._R[1], v_soc[0], v_soc[1], color='purple',
+                             width=0.001, linestyle=':',
+                             head_width=0.01, head_length=0.01, )
+                    ax.arrow(particle._R[0], particle._R[1], -particle.V[0], -particle.V[1], color='grey',
+                             width=0.001, linestyle=':',
+                             head_width=0.0, head_length=0.0, )
+
                 particle.V = w[p] * particle.V + c1 * R1[p, :] * v_cog + c2 * R2[p, :] * v_soc
+                if plot:
+                    ax.arrow(particle._R[0], particle._R[1], particle.V[0], particle.V[1], color='red',
+                             width=0.001, linestyle=':',
+                             head_width=0.01, head_length=0.01, )
 
                 particle._R = particle._R + particle.V
+                if plot:
+                    ax.plot(particle._R[0], particle._R[1], 'ro', ms=3)
 
                 self._randomize_categorical([particle])
 
-                # # # Adjust velocities for periodic variables
-                # # # particle.V = particle._R - old_R
-                # for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                #     if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
-                #         if np.abs(particle.V[i_var]) > 0.5:
-                #             # print(f'{particle.V[i_var]}', end=' ==> ')
-                #             particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
-                #             # print(f'{particle.V[i_var]}', )
+                # # Adjust velocities for periodic variables
+                # # particle.V = particle._R - old_R
+                for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
+                    if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                        if np.abs(particle.V[i_var]) > 0.5:
+                            # print(f'{particle.V[i_var]}', end=' ==> ')
+                            particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
+                            # print(f'{particle.V[i_var]}', )
 
 
             # Get old fitness
@@ -502,7 +537,11 @@ class PSO(Optimizer):
                     if gbest_cls < gbest_before_cls: 
                         self._swarm[sorted_order[0]] = gbest_cls
                         break
-        
+
+            if plot:
+                plt.savefig(f'/tmp/pso_periodic/it{self.it:03d}', dpi=300)
+                plt.close(fig)
+
             if self._finalize_iteration():
                 break
         

@@ -18,7 +18,7 @@ optimizers = [indago.PSO,
 
 def goalfun(x):
     x = np.asarray(x)
-    offset = np.arange(np.size(x))
+    offset = (1 + np.arange(np.size(x))) * 1.5
     return np.sum(np.sin(np.deg2rad(x - offset - 90))) + np.size(x)
 
 # import matplotlib.pyplot as plt
@@ -28,7 +28,8 @@ def goalfun(x):
 
 for vars in [real, real_periodic,
              real_discrete, real_discrete_periodic,
-             integer, integer_periodic]:
+             integer, integer_periodic,
+             ]:
 
     for opt_class in optimizers:
 
@@ -38,7 +39,7 @@ for vars in [real, real_periodic,
             optimizer.variables = vars
             optimizer.evaluator = goalfun  # minimum on bounds
             # optimizer.evaluator = lambda x: -goalfun(x) + 2*len(vars)  # minimum in the middle
-            optimizer.max_evaluations = 200
+            optimizer.max_evaluations = 2000
             optimizer.optimize()
             res.append(optimizer.best.f)
             # print(f"{vars['var0'][0]} solution #{i+1}: {optimizer.best.f}")

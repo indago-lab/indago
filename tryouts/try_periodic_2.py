@@ -28,4 +28,4 @@ for vars, lbl in zip([variables_real, variables_periodic], 'Real RealPeriodic'.s
         optimizer.optimize()
         F.append(optimizer.best.f)
         # print(optimizer.best.X, optimizer.best.f)
-    print(f'{lbl:20s} {np.median(F)}')
+    print(f'{lbl:20s} {np.mean(F)}')
