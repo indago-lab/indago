@@ -356,6 +356,10 @@ class Optimizer(Engine):
         if self._all_real:
             self._x_format = XFormat.Ndarray
 
+        # Create problem_info dict
+        self._problem_info = {'variables': self.variables, 'n_objectives': self.objectives,
+                              'n_constraints': self.constraints, 'x_format': self._x_format}
+
         assert callable(self.evaluator), \
             "optimizer.evaluator should be callable"
 

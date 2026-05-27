@@ -100,7 +100,9 @@ class Engine:
         self.objective_weights = None
         self.objective_labels: list[str] | None = None
         self.constraints: int = 0
-        self.constraint_labels: list[str] | None= None
+        self.constraint_labels: list[str] | None = None
+
+        self._problem_info: dict = {}
 
         self.evaluator: Callable[[X_Content_Type], NDArray] | None = None
         self.processes: int = 1
