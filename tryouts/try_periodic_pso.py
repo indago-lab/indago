@@ -12,7 +12,7 @@ real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableTy
 integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.Integer, 0, 360) for i in range(0, dims)}
 integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, dims)}
 
-vars = real#_periodic
+vars = real_periodic
 
 def goalfun(x):
     x = np.asarray(x)
