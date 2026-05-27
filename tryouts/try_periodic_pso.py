@@ -39,7 +39,27 @@ optimizer.evaluator = goalfun  # minimum on bounds
 optimizer._plot_evaluator = plotfun
 optimizer.max_iterations = 100
 optimizer.monitoring = 'basic'
-optimizer.optimize(seed=None)
-optimizer.plot_history()
-print(f'{optimizer.best.f=:.3e}')
+# optimizer.optimize(seed=None)
+# optimizer.plot_history()
+# print(f'{optimizer.best.f=:.3e}')
+
+import subprocess
+
+# Frames per second
+fps = 3
+output_video = 'pso.mp4'
+cmd = [
+    "ffmpeg",
+    "-y",  # overwrite output
+    "-framerate", str(fps),
+    "-i", 'it%03d.png',
+    "-c:v", "libx264",
+    "-pix_fmt", "yuv420p",
+    output_video,
+]
+print(' '.join(cmd))
+subprocess.run(cmd, cwd=f'/tmp/pso_periodic/', check=True)
+
+print(f"Video saved to {output_video}")
+
 plt.show()
