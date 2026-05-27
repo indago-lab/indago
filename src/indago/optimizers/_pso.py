@@ -403,14 +403,15 @@ class PSO(Optimizer):
         while True:
 
             if plot:
-                fig, ax = plt.subplots(figsize=(10, 10))
+                fig = plt.figure(figsize=(10, 10))
+                ax = fig.add_subplot((0, 0, 1, 1))
                 ax.set_xlim(-0.5, 1.5)
                 ax.set_ylim(-0.5, 1.5)
                 ax.axhline(y=0, color='k', ls='--', lw=0.5)
                 ax.axhline(y=1, color='k', ls='--', lw=0.5)
                 ax.axvline(x=0, color='k', ls='--', lw=0.5)
                 ax.axvline(x=1, color='k', ls='--', lw=0.5)
-                ax.set_title(str(self.variables['var0'][0]) + f', it={self.it}')
+                ax.set_title(str(self.variables['var0'][0]) + f', it={self.it}', y=0.95)
                 ax.axis('off')
 
                 self._plot_evaluator(ax)

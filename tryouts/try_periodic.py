@@ -11,15 +11,15 @@ integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.Integer, 0, 
 integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, 10)}
 
 optimizers = [indago.PSO,
-              # indago.NM,
-              # indago.CRS,
-              # indago.HBO,
+              indago.NM,
+              indago.CRS,
+              indago.HBO,
               ]
 
 def goalfun(x):
     x = np.asarray(x)
     offset = (1 + np.arange(np.size(x))) * 1.5
-    return np.sum(np.sin(np.deg2rad(x - offset + 90))) + np.size(x) # Periodic with minimum at the middle
+    # return np.sum(np.sin(np.deg2rad(x - offset + 90))) + np.size(x) # Periodic with minimum at the middle
     return np.sum(np.sin(np.deg2rad(x - offset - 90))) + np.size(x) # Periodic with minimum near the bounds
 
 # import matplotlib.pyplot as plt
