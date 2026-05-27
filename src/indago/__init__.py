@@ -35,7 +35,7 @@ from indago.optimizers._pso import PSO
 # from indago.optimizers._ba import BA
 # from indago.optimizers._efo import EFO
 # from indago.optimizers._mrfo import MRFO
-# from indago.optimizers._abc import ABC
+from indago.optimizers._abc import ABC
 from indago.optimizers._nm import NM
 # from indago.optimizers._msgd import MSGD
 # from indago.optimizers._gwo import GWO

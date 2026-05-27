@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, RS, NM, CRS, HBO  #, FWA, SSA, DE, BA, EFO, MRFO, ABC, MSGD, GWO, EEEO
+from indago import PSO, RS, NM, CRS, HBO, ABC  #, FWA, SSA, DE, BA, EFO, MRFO, MSGD, GWO, EEEO
 
 
 def F(x):
@@ -344,7 +344,7 @@ def test_MRFO_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_ABC_defaults():
     description = 'ABC defaults'
     optimizer = ABC()
@@ -375,7 +375,7 @@ def test_ABC_Vanilla_custom_parameters():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_GWO_defaults():
     description = 'GWO defaults'
     optimizer = GWO()
@@ -568,9 +568,9 @@ if __name__ == '__main__':
     # test_BA_defaults()
     # test_EFO_defaults()
     # test_MRFO_defaults()
-    # test_ABC_defaults()
-    # test_ABC_FullyEmployed_defaults()
-    # test_ABC_Vanilla_custom_parameters()
+    test_ABC_defaults()
+    test_ABC_FullyEmployed_defaults()
+    test_ABC_Vanilla_custom_parameters()
     # test_GWO_defaults()
     # test_GWO_HSA_defaults()
     # test_MSGD_defaults()
