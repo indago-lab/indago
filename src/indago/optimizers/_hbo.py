@@ -120,7 +120,7 @@ class HBO(Optimizer):
 
         # Generate population
         popsize = np.sum([self.params['team_size']**i for i in range(self.params['levels'])])
-        self._pop: list[Candidate] = [Candidate(**self._problem_info) for _ in range(popsize)]
+        self._pop: list[Candidate] = [Candidate(**self._candidate_init_info) for _ in range(popsize)]
 
         self._evaluate_initial_candidates()
         n0 = 0 if self._initial_candidates is None else self._initial_candidates.size

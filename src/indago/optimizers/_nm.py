@@ -119,7 +119,7 @@ class NM(Optimizer):
             self._x_format = XFormat.Ndarray
 
         # Generate set of points
-        self._candidates: list[Candidate] = [Candidate(**self._problem_info) for _ in range(self.dimensions + 1)]
+        self._candidates: list[Candidate] = [Candidate(**self._candidate_init_info) for _ in range(self.dimensions + 1)]
 
         # Generate initial positions
         self._evaluate_initial_candidates()
@@ -181,14 +181,14 @@ class NM(Optimizer):
             self._progress_log()
 
             # Center
-            p0 = Candidate(**self._problem_info)
+            p0 = Candidate(**self._candidate_init_info)
             p0._R = np.average([c._R for c in self._candidates[:-1]], axis=0)
             self._randomize_categorical([p0])
 
             dR = p0._R - self._candidates[-1]._R
 
             # Reflection
-            cR = Candidate(**self._problem_info)
+            cR = Candidate(**self._candidate_init_info)
             cR._R = p0._R + alpha * dR
             self._randomize_categorical([cR])
             self._collective_evaluation([cR])
@@ -198,7 +198,7 @@ class NM(Optimizer):
 
             elif cR < self._candidates[0]:
                 # Expansion
-                cE = Candidate(**self._problem_info)
+                cE = Candidate(**self._candidate_init_info)
                 cE._R = p0._R + gamma * dR
                 self._randomize_categorical([cE])
                 self._collective_evaluation([cE])
@@ -210,7 +210,7 @@ class NM(Optimizer):
 
             elif cR < self._candidates[-1]:
                 # Contraction
-                cC = Candidate(**self._problem_info)
+                cC = Candidate(**self._candidate_init_info)
                 cC._R = p0._R + rho + dR
                 self._randomize_categorical([cC])
                 self._collective_evaluation([cC])
@@ -222,7 +222,7 @@ class NM(Optimizer):
 
             else:
                 # Internal contraction
-                cC = Candidate(**self._problem_info)
+                cC = Candidate(**self._candidate_init_info)
                 cC._R = p0._R - rho * dR
                 self._randomize_categorical([cC])
                 self._collective_evaluation([cC])

@@ -95,7 +95,7 @@ class RS(Optimizer):
 
         # Generate all candidates
         n0 = 0 if self._initial_candidates is None else self._initial_candidates.size
-        self._points: list[Candidate] = [Candidate(**self._problem_info) for _ in range(self.params['batch_size'])]
+        self._points: list[Candidate] = [Candidate(**self._candidate_init_info) for _ in range(self.params['batch_size'])]
         self._initialize_X(self._points[n0:])
         
         # Using specified particles initial positions
