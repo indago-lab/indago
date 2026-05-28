@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, RS, NM, CRS, HBO, ABC  #, FWA, SSA, DE, BA, EFO, MRFO, MSGD, GWO, EEEO
+from indago import PSO, FWA, RS, NM, CRS, HBO, ABC  # SSA, DE, BA, EFO, MRFO, MSGD, GWO, EEEO
 
 
 def F(x):
@@ -233,7 +233,6 @@ def test_PSO_defaults_halton_initializer() -> None:
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-"""
 def test_FWA_defaults():
     description = 'FWA defaults'
     optimizer = FWA()
@@ -254,7 +253,7 @@ def test_FWA_custom_parameters():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_SSA_defaults():
     description = 'SSA defaults'
     optimizer = SSA()
@@ -556,9 +555,9 @@ if __name__ == '__main__':
     test_PSO_Chaotic_defaults()
     test_PSO_Chaotic_anakatabatic_Languid()
     test_PSO_defaults_halton_initializer()
-    # test_FWA_defaults()
-    # test_FWA_defaults_1D_X0()
-    # test_FWA_custom_parameters()
+    test_FWA_defaults()
+    test_FWA_defaults_1D_X0()
+    test_FWA_custom_parameters()
     # test_SSA_defaults()
     # test_SSA_custom_parameters()
     # test_SSA_custom_additional_parameters()

@@ -29,7 +29,7 @@ from indago.core._candidate import Candidate, VariableType, XFormat, VariableDic
 
 from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO
-# from indago.optimizers._fwa import FWA
+from indago.optimizers._fwa import FWA
 # from indago.optimizers._ssa import SSA
 # from indago.optimizers._de import DE
 # from indago.optimizers._ba import BA
