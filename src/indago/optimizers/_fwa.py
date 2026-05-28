@@ -175,19 +175,8 @@ class FWA(Optimizer):
 
         while True:
 
-            explosion_sparks = self._explosion()
-            mutation_sparks = self._gaussian_mutation()
-
-            # self._sparks = np.array([], dtype=Candidate)
-            #self.__mapping_rule(sparks, self.lb, self.ub, self.dimensions)
-
-            # for cS in (explosion_sparks + mutation_sparks):
-            #     # cS.clip(self)
-            #     self._sparks = self._sparks.append(cS)
-            self._sparks += explosion_sparks + mutation_sparks
-
+            self._sparks += self._explosion() + self._gaussian_mutation()
             self._collective_evaluation(self._sparks[n:])
-
             self._sparks = sorted(self._sparks)[:n]
 
             if self._finalize_iteration():
@@ -210,11 +199,12 @@ class FWA(Optimizer):
         a = 0.01
         b = 10
 
-        F = np.array([cP.f for cP in self._sparks])
+        F = np.array([c.f for c in self._sparks])
         fmin = np.nanmin(F)
         fmax = np.nanmax(F)
         
-        explosion_sparks = []
+        explosion_sparks: list[Candidate] = []
+
         for p in range(self.params['n']):
                
             cFw = self._sparks[p].copy()
@@ -238,14 +228,10 @@ class FWA(Optimizer):
             if self.variant == 'Rank':
                 
                 # Number of sparks
-                #vn1 = self.params['m1'] * (fmax - cFw.f + eps) / np.sum(fmax - F + eps)
-                #vn1 = self._min_max_round(vn1, self.params['m1'] * a, self.params['m2'] * b)
-                
                 n1 = self.params['m1'] * (self.params['n'] - p)**1 / np.sum(np.arange(self.params['n']+1)**1)
                 n1 = np.random.choice([int(np.floor(n1)), int(np.ceil(n1))])
-                # print(self._sparks[p].f, vn1, n1)
-                
-                Rs = np.array([cP._R for cP in self._sparks])
+
+                Rs = np.array([c._R for c in self._sparks])
                 # print(Rs.shape)
                 
                 # Uniform
@@ -265,9 +251,7 @@ class FWA(Optimizer):
                     
                     for k in range(self.dimensions):
                         if np.random.choice([True, False]):
-                            # Uniform
                             R[k] += np.random.uniform(-A[k], A[k])
-                            # Normal
                             # R[k] += np.random.normal(-A[k], A[k])
                     
                     cFw._R = R
@@ -275,10 +259,9 @@ class FWA(Optimizer):
 
         self._randomize_categorical(explosion_sparks)
 
-        #print('expl sparks:', len(explosion_sparks))
-        #input(' > Press return to continue.')
         return explosion_sparks
-    
+
+
     def _gaussian_mutation(self):
         """Private method for computing mutation sparks.
 
@@ -288,7 +271,8 @@ class FWA(Optimizer):
             FWA mutation sparks.
         """
         
-        mutation_sparks = []
+        mutation_sparks: list[Candidate] = []
+
         for j in range(self.params['m2']):
             cFw = self._sparks[np.random.randint(self.params['n'])].copy()
             g = np.random.normal(1, 1)
@@ -301,10 +285,10 @@ class FWA(Optimizer):
             mutation_sparks.append(cFw)
 
         self._randomize_categorical(mutation_sparks)
-        #print('mut sparks:', np.sort([p.f for p in mutation_sparks]))
-        #print('mut sparks:', len(mutation_sparks))
+
         return mutation_sparks
-    
+
+
     def _min_max_round(self, s, smin, smax):
         """Private method for calculating round of min of max of input parameters.
 
