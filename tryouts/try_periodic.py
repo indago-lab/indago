@@ -14,6 +14,7 @@ optimizers = [indago.PSO,
               indago.NM,
               indago.CRS,
               indago.HBO,
+              indago.DE,
               ]
 
 def goalfun(x):
@@ -35,7 +36,7 @@ for vars in [real, real_periodic,
     for opt_class in optimizers:
 
         res = []
-        for i in range(100):
+        for i in range(50):
             optimizer = opt_class()
             optimizer.variables = vars
             optimizer.evaluator = goalfun  # minimum on bounds

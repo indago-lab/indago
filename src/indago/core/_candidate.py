@@ -383,7 +383,9 @@ class Candidate:
 
         """
 
-        candidate: Candidate = self.__class__(self._variables, self.O.size, self.C.size, self._x_format)
+        candidate: Candidate = self.__class__(variables=self._variables,
+                                              n_objectives=self.O.size, n_constraints=self.C.size,
+                                              x_format=self._x_format)
         candidate.X = self.X
         candidate.O = np.copy(self.O)
         candidate.C = np.copy(self.C)

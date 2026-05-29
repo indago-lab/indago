@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, FWA, RS, NM, CRS, HBO, ABC  # SSA, DE, BA, EFO, MRFO, MSGD, GWO, EEEO
+from indago import PSO, FWA, RS, NM, CRS, HBO, ABC, DE  # SSA, BA, EFO, MRFO, MSGD, GWO, EEEO
 
 
 def F(x):
@@ -285,11 +285,11 @@ def test_SSA_custom_additional_parameters():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_DE_defaults():
     description = 'DE defaults'
     optimizer = DE()
-    expected_result = 2.3996066775068625
+    expected_result = 2.4755412146717592  # before moving to _R: 2.3996066775068625
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -299,7 +299,7 @@ def test_DE_LSHADE_defaults():
     description = 'DE SHADE defaults'
     optimizer = DE()
     optimizer.variant = 'SHADE'
-    expected_result = 3.3448851150990944
+    expected_result = 3.7149900624202368  # before moving to _R: 3.3448851150990944
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
@@ -311,12 +311,12 @@ def test_DE_LSHADE_custom_parameters():
     optimizer.variant = 'LSHADE'
     optimizer.params['pop_init'] = 20
     optimizer.params['f_archive'] = 2
-    expected_result = 1.4083783202220084
+    expected_result = 0.6462833731084903  # before moving to _R: 1.4083783202220084
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_BA_defaults():
     description = 'BA defaults'
     optimizer = BA()
@@ -561,9 +561,9 @@ if __name__ == '__main__':
     # test_SSA_defaults()
     # test_SSA_custom_parameters()
     # test_SSA_custom_additional_parameters()
-    # test_DE_defaults()
-    # test_DE_LSHADE_defaults()
-    # test_DE_LSHADE_custom_parameters()
+    test_DE_defaults()
+    test_DE_LSHADE_defaults()
+    test_DE_LSHADE_custom_parameters()
     # test_BA_defaults()
     # test_EFO_defaults()
     # test_MRFO_defaults()

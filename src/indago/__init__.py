@@ -31,7 +31,7 @@ from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO
 from indago.optimizers._fwa import FWA
 # from indago.optimizers._ssa import SSA
-# from indago.optimizers._de import DE
+from indago.optimizers._de import DE
 # from indago.optimizers._ba import BA
 # from indago.optimizers._efo import EFO
 # from indago.optimizers._mrfo import MRFO
