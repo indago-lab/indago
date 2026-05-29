@@ -182,7 +182,7 @@ class HBO(Optimizer):
         # for EEEO
         if self._inject:
             worst = np.max(self._pop)
-            worst.X = np.copy(self._inject.X)
+            worst.X = self._inject.X
             worst.O = np.copy(self._inject.O)
             worst.C = np.copy(self._inject.C)
             worst.f = self._inject.f
