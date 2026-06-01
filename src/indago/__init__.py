@@ -19,10 +19,10 @@ Usage: import indago
 """
 
 
-__version__ = '0.5.4'
+__version__ = '0.7.0'
 
-from indago.core._candidate import Candidate, VariableType, XFormat, VariableDictType
-# from indago.core._optimizer import Optimizer
+from indago.core._candidate import Candidate, VariableType, VariableDictType, XFormat, X_Content_Type
+from indago.core._optimizer import Optimizer, Status
 
 # from indago._utility import *
 # from indago._utility import _round_smooth
@@ -42,27 +42,26 @@ from indago.optimizers._gwo import GWO
 from indago.optimizers._hbo import HBO
 from indago.optimizers._crs import CRS
 
-# optimizers = [PSO, FWA, SSA, DE, BA, EFO, MRFO, ABC, NM, MSGD, RS, GWO, HBO, CRS]
-"""list of Optimizer : A list of all available Indago optimizer classes."""
+optimizers: list[Optimizer] = [PSO, FWA, DE, ABC, NM, RS, GWO, HBO, CRS]
+"""A list of all available Indago optimizer classes."""
 
-# optimizers_name_list = [o.__name__ for o in optimizers]
-"""list of str : A list of all available Indago method names (abbreviations)."""
+optimizers_name_list: list[str] = [o.__name__ for o in optimizers]
+"""A list of all available Indago method names (abbreviations)."""
 
-# optimizers_dict = {o.__name__: o for o in optimizers}
-"""dict : A dict of all available Indago optimizers, in the form of method
-    name (abbreviation, type: str) as key, and optimizer class (type: Optimizer) 
-    as value."""
+optimizers_dict: dict = {o.__name__: o for o in optimizers}
+"""A dict of all available Indago optimizers, in the form of method name (abbreviation, type: str) 
+as key, and optimizer class (type: Optimizer) as value."""
 
-# # Backward compatibility aliases
-# NelderMead = NM
-#
-# # Undocumented optimizers
-# from indago._eeeo import EEEO
-# from indago._sa import SA
-# from indago._gd import GD
-# from indago._rbs import RBS
-# # from indago._bo import BO
-# from indago._esc import ESC
-# from indago._ga import GA
-# from indago._cmaes import CMAES
-# from indago._dgs import DGS
+# Backward compatibility aliases
+NelderMead = NM
+
+# Undocumented optimizers
+from indago.optimizers._eeeo import EEEO
+# from indago.optimizers._sa import SA
+# from indago.optimizers._gd import GD
+# from indago.optimizers._rbs import RBS
+# # from indago.optimizers._bo import BO
+# from indago.optimizers._esc import ESC
+# from indago.optimizers._ga import GA
+# from indago.optimizers._cmaes import CMAES
+# from indago.optimizers._dgs import DGS
