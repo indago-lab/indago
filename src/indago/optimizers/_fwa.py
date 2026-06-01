@@ -152,17 +152,12 @@ class FWA(Optimizer):
             
         """
 
-        # for EEEO
         if self._inject:
-            worst = np.max(self._sparks)
-            worst.X = self._inject.X
-            worst.O = np.copy(self._inject.O)
-            worst.C = np.copy(self._inject.C)
-            worst.f = self._inject.f
+            self._eeeo_inject(self._sparks)
 
         self._check_params()
 
-        self._check_resume()
+        self._resuming()
         
         n = self.params['n']
 

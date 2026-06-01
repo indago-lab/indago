@@ -152,9 +152,10 @@ class NM(Optimizer):
 
         """
 
-        self._check_params()
+        if self._inject:
+            self._eeeo_inject(self._candidates)
 
-        self._check_resume()
+        self._check_params()
 
         # Prepare parameters
         if self.variant == 'Vanilla':
@@ -167,6 +168,8 @@ class NM(Optimizer):
             gamma = 1 + 2 / self.dimensions
             rho = 0.75 - 1 / 2 / self.dimensions
             sigma = 1 - 1 / self.dimensions
+
+        self._resuming()
 
         while True:
             self._candidates = sorted(self._candidates)

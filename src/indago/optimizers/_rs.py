@@ -127,7 +127,7 @@ class RS(Optimizer):
 
         self._check_params()
 
-        self._check_resume()
+        self._resuming()
 
         while True:
 

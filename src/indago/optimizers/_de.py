@@ -222,17 +222,12 @@ class DE(Optimizer):
             Best solution found during the DE optimization.
         """
 
-        # for EEEO
         if self._inject:
-            worst = np.max(self._Pop)
-            worst.X = self._inject.X
-            worst.O = np.copy(self._inject.O)
-            worst.C = np.copy(self._inject.C)
-            worst.f = self._inject.f
+            self._eeeo_inject(self._Pop)
 
         self._check_params()
 
-        if not self._check_resume():
+        if not self._resuming():
             self._k = 0  # memory index
 
         while True:

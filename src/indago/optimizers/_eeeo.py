@@ -144,7 +144,7 @@ class EEEO(Optimizer):
 
         self._check_params()
 
-        self._check_resume()
+        self._resuming()
 
         evals = [0] * len(self.methods)
 

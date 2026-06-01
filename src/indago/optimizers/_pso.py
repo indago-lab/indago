@@ -371,21 +371,15 @@ class PSO(Optimizer):
             
         """
 
-        # for EEEO
         if self._inject:
-            worst = np.max(self._swarm)
-            worst.X = self._inject.X
-            worst.O = np.copy(self._inject.O)
-            worst.C = np.copy(self._inject.C)
-            worst.f = self._inject.f
-
             # PSO specific
+            worst = self._eeeo_inject(self._swarm)
             worst._dF = 0
             self._find_neighborhood_best()
 
         self._check_params()
 
-        self._check_resume()
+        self._resuming()
 
         if 'inertia' in self.params:
             w = self.params['inertia']

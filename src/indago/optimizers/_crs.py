@@ -150,18 +150,12 @@ class CRS(Optimizer):
             
         """
 
-        # EEEO
         if self._inject:
-            worst = np.max(self._pop)
-            worst.X = self._inject.X
-            worst.O = np.copy(self._inject.O)
-            worst.C = np.copy(self._inject.C)
-            worst.f = self._inject.f
+            self._eeeo_inject(self._pop)
 
-        # Checking user/default-defined parameters
         self._check_params()
 
-        self._check_resume()
+        self._resuming()
 
         while True:
 

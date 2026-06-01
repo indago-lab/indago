@@ -1053,7 +1053,7 @@ class Optimizer(Engine):
 
         return r_c
 
-    def _check_resume(self):
+    def _resuming(self):
         """Private method for checking if optimizer is resuming, and acting accordingly.
 
         Returns
@@ -1704,3 +1704,26 @@ class Optimizer(Engine):
         return self_dict
     def __setstate__(self, state):
         self.__dict__.update(state)
+
+    def _eeeo_inject(self, population: list[Candidate]):
+        """Method for injecting external solutions into a population, as per EEEO.
+
+        Parameters
+        ----------
+        population : list
+            List of Candidates for which the worst one will be overwritten with the external solution.
+
+        Returns
+        -------
+        worst : Candidate
+            Newly overwritten candidate.
+
+        """
+
+        worst = np.max(population)
+        worst.X = self._inject.X
+        worst.O = np.copy(self._inject.O)
+        worst.C = np.copy(self._inject.C)
+        worst.f = self._inject.f
+
+        return worst
