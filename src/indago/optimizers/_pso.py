@@ -20,13 +20,12 @@ Usage: from indago import PSO
 
 
 import numpy as np
-from matplotlib import pyplot as plt
-
-from indago.core._optimizer import Optimizer, Status
-from indago.core._candidate import X_Content_Type
-from indago import Candidate, VariableType, VariableDictType, XFormat
+from indago import Optimizer, Candidate, Status
+from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 from scipy.interpolate import make_interp_spline  # need this for akb_model
 
+# for testing purposes
+from matplotlib import pyplot as plt
 
 class Particle(Candidate):
     """PSO Particle class. PSO Particle is a member of a PSO swarm.

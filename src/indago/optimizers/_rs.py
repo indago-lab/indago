@@ -20,7 +20,8 @@ Usage: from indago import RS
 
 
 import numpy as np
-from indago.core._optimizer import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, Status
+from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
 class RS(Optimizer):

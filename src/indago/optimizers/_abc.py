@@ -20,9 +20,8 @@ Usage: from indago import ABC
 
 
 import numpy as np
-from indago.core._optimizer import Optimizer, Status
-from indago.core._candidate import X_Content_Type
-from indago import Candidate, VariableType, VariableDictType, XFormat
+from indago import Optimizer, Candidate, Status
+from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
 class ABC(Optimizer):

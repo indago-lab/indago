@@ -19,8 +19,8 @@ Usage: from indago import NM
 """
 
 import numpy as np
-from indago.core._optimizer import Optimizer, Status
-from indago import Candidate, VariableType, VariableDictType, XFormat
+from indago import Optimizer, Candidate, Status
+from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
 class NM(Optimizer):
