@@ -79,7 +79,10 @@ class Engine:
 
     @property
     def dimensions(self) -> int:
-        return len(self.variables)
+        if len(self.variables) > 0:  # fully initialized
+            return len(self.variables)
+        else:  # not yet initialized
+            return self._dimensions
 
     @dimensions.setter
     def dimensions(self, value: int):
@@ -88,7 +91,7 @@ class Engine:
     def __init__(self):
 
         self.variables: indago.VariableDictType = dict()
-        self.dimensions: int = 0 # Just to remove mypy warning (not having dimensions before initialization since it is a property)
+        self.dimensions: int = 0  # Just to remove mypy warning (not having dimensions before initialization since it is a property)
         self._dimensions: int | None = None
         self._all_real: bool = False
         self.lb: NDArray = None
@@ -117,7 +120,8 @@ class Engine:
         valid, log = validate_variables(self.variables)
         for line in log:
             print(line)
-        if log: raise Exception("Variables validation failed\n" + "\n".join(' - ' + v[1] for v in log))
+        if log:
+            raise Exception("Variables validation failed\n" + "\n".join(' - ' + v[1] for v in log))
 
         if self._all_real:
             lb: list[float] = []

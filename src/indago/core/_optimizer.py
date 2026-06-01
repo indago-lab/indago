@@ -1238,12 +1238,14 @@ class Optimizer(Engine):
                         self._log(f'evaluation function failed, attempting retry #{i + 1}')
                         
                         if self.best:
-                            goodX = self.best.X
+                            goodR = self.best._R
                         else:
-                            goodX = (self.lb + self.ub) / 2
-                    
-                        candidates[p].X += self.eval_retry_recede * \
-                                           (goodX - candidates[p].X)
+                            goodR = 0.5
+
+                        R = candidates[p]._R.copy()
+                        R += self.eval_retry_recede * (goodR - R)
+                        candidates[p]._R = R
+
                         # re-evaluate
                         result_p = self._evaluation_function_safe(candidates[p].X)
 
@@ -1339,12 +1341,14 @@ class Optimizer(Engine):
                             self._log(f'evaluation function failed, attempting retry #{i + 1}')
                             
                             if self.best:
-                                goodX = self.best.X
+                                goodR = self.best._R
                             else:
-                                goodX = (self.lb + self.ub) / 2
-                            
-                            candidates[p].X += self.eval_retry_recede * \
-                                               (goodX - candidates[p].X)
+                                goodR = 0.5
+
+                            R = candidates[p]._R.copy()
+                            R += self.eval_retry_recede * (goodR - R)
+                            candidates[p]._R = R
+
                             # re-evaluate
                             result = self._evaluation_function_safe(candidates[p].X)
                             if self.objectives == 1 and self.constraints == 0:
