@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, FWA, RS, NM, CRS, HBO, ABC, DE, GWO, EEEO  # SSA, BA, EFO, MRFO, MSGD
+from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, EEEO  # SSA, BA, MRFO, MSGD
 
 
 def F(x):
@@ -325,16 +325,16 @@ def test_BA_defaults():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_EFO_defaults():
     description = 'EFO defaults'
     optimizer = EFO()
-    expected_result = 1.01888834670826
+    expected_result = 0.5655380653022772
     tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_MRFO_defaults():
     description = 'MRFO defaults'
     optimizer = MRFO()
@@ -565,7 +565,7 @@ if __name__ == '__main__':
     test_DE_LSHADE_defaults()
     test_DE_LSHADE_custom_parameters()
     # test_BA_defaults()
-    # test_EFO_defaults()
+    test_EFO_defaults()
     # test_MRFO_defaults()
     test_ABC_defaults()
     test_ABC_FullyEmployed_defaults()

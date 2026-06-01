@@ -16,15 +16,14 @@ File content: Definition of Candidate classes.
 Usage: from indago import Candidate
 """
 
-from __future__ import annotations # To support using Candidate type annotation inside Candidate class code
+from __future__ import annotations  # To support using Candidate type annotation inside Candidate class code
 from typing import TypeAlias
 from numbers import Real
+from numpy.typing import NDArray
 
-import indago
 from ._enums import VariableType, XFormat
 
 import numpy as np
-from numpy.typing import NDArray
 
 from rich.console import Console
 from rich.table import Table

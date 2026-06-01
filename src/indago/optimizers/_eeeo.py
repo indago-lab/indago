@@ -77,7 +77,7 @@ class EEEO(Optimizer):
             'optimizer.methods should provide at least 2 optimization methods'
 
         for method in self.methods:
-            assert method in 'ABC DE NM FWA GWO PSO RS HBO CRS'.split(), \
+            assert method in 'ABC DE NM FWA GWO PSO RS HBO CRS EFO'.split(), \
                 'EEEO does not support {method} at this time'
         
         defined_params = list(self.params.keys())
