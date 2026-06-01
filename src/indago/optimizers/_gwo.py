@@ -37,8 +37,8 @@ class GWO(Optimizer):
         Name of the GWO variant (``Vanilla`` or ``HSA``). Default: ``Vanilla``.
     params : dict
         A dictionary of GWO parameters.
-    _wolves : ndarray
-        Array of Candidate instances.
+    _wolves : list
+        Solution candidates.
         
     Returns
     -------

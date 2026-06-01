@@ -33,7 +33,7 @@ class RS(Optimizer):
         Name of the RS variant. Default (and the only available option): ``Vanilla``.
     params : dict
         A dictionary of RS parameters.
-    _points : ndarray
+    _points : list
         Solution candidates.
         
     Returns

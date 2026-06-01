@@ -37,7 +37,7 @@ class HBO(Optimizer):
         Name of the HBO variant (``Vanilla`` or ``Dynamic``). Default: ``Vanilla``.
     params : dict
         A dictionary of HBO parameters.
-    _pop : ndarray
+    _pop : list
         Solution candidates.
     _boss_of : list
         List of boss indices corresponding to worker indices.

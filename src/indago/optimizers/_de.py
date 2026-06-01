@@ -64,9 +64,9 @@ class DE(Optimizer):
         Name of the DE variant (``SHADE`` or ``LSHADE``). Default: ``LSHADE``.
     params : dict
         A dictionary of DE parameters.
-    _Pop : ndarray
-        Array of Solution instances.
-    _Trials : ndarray
+    _Pop : list
+        Solution instances.
+    _Trials : list
         Trial solutions.
     _A : ndarray
         Archive.

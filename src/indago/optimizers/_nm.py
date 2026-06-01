@@ -34,10 +34,10 @@ class NM(Optimizer):
     ----------
     variant : str
         Name of the NM variant (``Vanilla`` or ``GaoHan``). Default: ``GaoHan``.
-    X0 : ???
-        ???
-    _candidates : ndarray
-        Array of Candidate instances.
+    X0 : TBD
+        TBD
+    _candidates : list
+        Solution candidates.
 
     Returns
     -------

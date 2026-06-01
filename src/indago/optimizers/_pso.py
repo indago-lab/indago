@@ -77,8 +77,8 @@ class PSO(Optimizer):
         A dictionary of PSO parameters.
     _v_max : ndarray
         Maximum particle velocities.
-    _swarm : ndarray
-        Array of Particle instances.
+    _swarm : list
+        Particle instances.
     _dF : ndarray
         Fitness differences, used in anakatabatic inertia.
     _pbests : ndarray

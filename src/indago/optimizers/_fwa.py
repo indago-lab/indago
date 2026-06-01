@@ -33,7 +33,7 @@ class FWA(Optimizer):
         Name of the FWA variant (``Vanilla`` or ``Rank``). Default: ``Rank``.
     params : dict
         A dictionary of FWA parameters.
-    _sparks : ndarray
+    _sparks : list
         Solution candidates.
         
     Returns

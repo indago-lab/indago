@@ -66,7 +66,7 @@ class MNM(Optimizer):
         Name of the MNM variant (``Vanilla`` or ``SomeVariant``). Default: ``Vanilla``.
     params : dict
         A dictionary of MNM parameters.
-    _pop : ndarray
+    _pop : list
         Solution candidates.
 
     Returns

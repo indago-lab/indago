@@ -33,15 +33,15 @@ class ABC(Optimizer):
         Name of the ABC variant (``Vanilla`` or ``FullyEmployed``). Default: ``Vanilla``.
     params : dict
         A dictionary of ABC parameters.
-    _hive_em : ndarray
+    _hive_em : list
         Employed part of the bee population.
-    _hive_em_v : ndarray
+    _hive_em_v : list
         Mutated employed bees.
     _trials_em : ndarray
         Trial counters for the employed bees.
-    _hive_on : ndarray
+    _hive_on : list
         Onlooker part of the bee population.
-    _hive_on_v : ndarray
+    _hive_on_v : list
         Mutated onlooker bees.
     _trials_on : ndarray
         Trial counters for the onlooker bees.

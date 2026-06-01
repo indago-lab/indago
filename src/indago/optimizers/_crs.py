@@ -41,7 +41,7 @@ class CRS(Optimizer):
         Name of the CRS variant (only ``Vanilla`` available). Default: ``Vanilla``.
     params : dict
         A dictionary of CRS parameters.
-    _pop : ndarray
+    _pop : list
         Population of solution candidates.
     _simp : ndarray
         Simplex for direct search.
