@@ -373,8 +373,8 @@ class PSO(Optimizer):
 
         if self._inject:
             # PSO specific
-            worst = self._eeeo_inject(self._swarm)
-            worst._dF = 0
+            new = self._eeeo_inject(self._swarm)
+            new._dF = 0
             self._find_neighborhood_best()
 
         self._check_params()
