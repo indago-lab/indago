@@ -385,13 +385,7 @@ class PSO(Optimizer):
 
         self._check_params()
 
-        if self.status == Status.RESUMED:
-            # TODO inspect why this is necessary for resume to work:
-            if self._stopping_criteria():
-                return self.best
-            self.it += 1
-        else:
-            self._init_method()
+        self._check_resume()
 
         if 'inertia' in self.params:
             w = self.params['inertia']

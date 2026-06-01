@@ -162,13 +162,7 @@ class FWA(Optimizer):
 
         self._check_params()
 
-        if self.status == Status.RESUMED:
-            if self._stopping_criteria():
-                return self.best
-            # TODO inspect why this is necessary for resume to work:
-            self.it += 1
-        else:
-            self._init_method()
+        self._check_resume()
         
         n = self.params['n']
 

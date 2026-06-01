@@ -1053,6 +1053,26 @@ class Optimizer(Engine):
 
         return r_c
 
+    def _check_resume(self):
+        """Private method for checking if optimizer is resuming, and acting accordingly.
+
+        Returns
+        -------
+        stop : bool
+            ``True`` or ``False``, whether the optimization has been resumed.
+
+        """
+
+        if self.status == Status.RESUMED:
+            if self._stopping_criteria():
+                return self.best
+            # TODO inspect why this is necessary for resume to work:
+            self.it += 1
+            return True
+        else:
+            self._init_method()
+            return False
+
     def _stopping_criteria(self):
         """Private method used to evaluate all specified stopping conditions.
 
