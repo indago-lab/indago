@@ -43,7 +43,7 @@ Specific parameters for each of the available methods and their variants are lis
 | **all**       | swarm_size     | (int)                                               | [1, -]     | max (10, *dimensions*) | Number of PSO particles                                    |
 |               | inertia        | (float)                                             | [0.5, 1.0] | 0.72                   | Inertia weight                                             |
 |               |                | 'LDIW'                                              |            |                        | Linearly decreasing inertia weight (from 1.0 to 0.4)       |
-|               |                | 'HSIW'                                              |            |                        | Half sinusoidal inertia weight (from 0.5 to 0.75 and back) |
+|               |                | 'HSIW'                                              |            |                        | Half-sinusoidal inertia weight (from 0.5 to 0.75 and back) |
 |               |                | 'anakatabatic'                                      |            |                        | Adaptive inertia weight technique (Družeta and Ivić, 2020) |
 | **'Vanilla'** | cognitive_rate | (float)                                             | [0.0, 2.0] | 1.0                    | PSO parameter also known as c1                             |
 |               | social_rate    | (float)                                             | [0.0, 2.0] | 1.0                    | PSO parameter also known as c2                             |
