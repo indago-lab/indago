@@ -38,7 +38,7 @@ from indago.optimizers._de import DE
 from indago.optimizers._abc import ABC
 from indago.optimizers._nm import NM
 # from indago.optimizers._msgd import MSGD
-# from indago.optimizers._gwo import GWO
+from indago.optimizers._gwo import GWO
 from indago.optimizers._hbo import HBO
 from indago.optimizers._crs import CRS
 
