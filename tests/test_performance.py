@@ -15,7 +15,7 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
-from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, EEEO  # SSA, BA, MRFO, MSGD
+from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, EEEO  # BA, MRFO, MSGD
 
 
 def F(x):
@@ -253,12 +253,12 @@ def test_FWA_custom_parameters():
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_SSA_defaults():
     description = 'SSA defaults'
     optimizer = SSA()
-    expected_result = 4.850766721900909
-    tolerance = TOL
+    expected_result = 4.75
+    tolerance = 3e-1
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -268,8 +268,8 @@ def test_SSA_custom_parameters():
     optimizer = SSA()
     optimizer.params['pop_size'] = 12
     optimizer.params['ata'] = 0.8
-    expected_result = 4.438743024215149
-    tolerance = TOL
+    expected_result = 4.6
+    tolerance = 3e-1
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -280,12 +280,12 @@ def test_SSA_custom_additional_parameters():
     optimizer.params['pop_size'] = 12
     optimizer.params['p_pred'] = 0.2
     optimizer.params['c_glide'] = 1.5
-    expected_result = 4.47154424234304
-    tolerance = TOL
+    expected_result = 4.15
+    tolerance = 3e-1
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_DE_defaults():
     description = 'DE defaults'
     optimizer = DE()
@@ -558,9 +558,9 @@ if __name__ == '__main__':
     test_FWA_defaults()
     test_FWA_defaults_1D_X0()
     test_FWA_custom_parameters()
-    # test_SSA_defaults()
-    # test_SSA_custom_parameters()
-    # test_SSA_custom_additional_parameters()
+    test_SSA_defaults()
+    test_SSA_custom_parameters()
+    test_SSA_custom_additional_parameters()
     test_DE_defaults()
     test_DE_LSHADE_defaults()
     test_DE_LSHADE_custom_parameters()

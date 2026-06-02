@@ -30,7 +30,7 @@ from indago.core._optimizer import Optimizer, Status
 from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO
 from indago.optimizers._fwa import FWA
-# from indago.optimizers._ssa import SSA
+from indago.optimizers._ssa import SSA
 from indago.optimizers._de import DE
 # from indago.optimizers._ba import BA
 from indago.optimizers._efo import EFO
@@ -42,7 +42,7 @@ from indago.optimizers._gwo import GWO
 from indago.optimizers._hbo import HBO
 from indago.optimizers._crs import CRS
 
-optimizers: list[Optimizer] = [RS, PSO, FWA, DE, EFO, ABC, NM, GWO, HBO, CRS]
+optimizers: list[Optimizer] = [RS, PSO, FWA, SSA, DE, EFO, ABC, NM, GWO, HBO, CRS]
 """A list of all available Indago optimizer classes."""
 
 optimizers_name_list: list[str] = [o.__name__ for o in optimizers]
