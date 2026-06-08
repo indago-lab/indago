@@ -170,7 +170,7 @@ class SSA(Optimizer):
 
             # Moving FSnt
             Nnt2at = int(len(FSnt) * ATA)  # attracted to acorn trees
-            random.shuffle(FSnt)
+            np.random.shuffle(FSnt)
             for fs in FSnt[:Nnt2at]:
                 if np.random.rand() >= Pdp:  # move towards FSat
                     dg = np.random.uniform(gd_lim[0], gd_lim[1])

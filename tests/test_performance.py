@@ -268,8 +268,8 @@ def test_SSA_custom_parameters():
     optimizer = SSA()
     optimizer.params['pop_size'] = 12
     optimizer.params['ata'] = 0.8
-    expected_result = 4.6
-    tolerance = 3e-1
+    expected_result = 4.438743024215173
+    tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -280,8 +280,8 @@ def test_SSA_custom_additional_parameters():
     optimizer.params['pop_size'] = 12
     optimizer.params['p_pred'] = 0.2
     optimizer.params['c_glide'] = 1.5
-    expected_result = 4.15
-    tolerance = 3e-1
+    expected_result = 4.4715442423430485
+    tolerance = TOL
     result = run(optimizer)
     assert expected_result - tolerance < result < expected_result + tolerance, \
         f'{description} FAILED, result={result}, expected={expected_result}'
