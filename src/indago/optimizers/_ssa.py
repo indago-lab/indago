@@ -23,7 +23,6 @@ import numpy as np
 from indago import Optimizer, Candidate, Status
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 from scipy.special import gamma
-import random
 
 
 class SSA(Optimizer):
