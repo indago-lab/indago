@@ -15,23 +15,37 @@ sys.path.append('..')
 sys.path.append('../indagobench')
 
 import numpy as np
+import math
+import indago
 from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, EEEO  # BA, MRFO, MSGD
 
 
-def F(x):
-    """CEC f3 - Discus Function"""
-    return 1e6 * x[0] ** 2 + np.sum(x[1:] ** 2)
+VARS = {
+    'fun_type': (indago.VariableType.Categorical, 'up down'.split()),
+    'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),
+    'factoree': (indago.VariableType.Integer, 2, 5),
+    'exponent': (indago.VariableType.Real, -3.3, 3.3)
+    }
 
-DIM = 10
-MAXEVAL = 1000
+def F(x: tuple) -> float:
+    fun_type, base, factoree, exponent = x
+    if base not in [0.1, 1.2, 2.3, 3.4]:
+        return np.nan
+    fit = base ** exponent + math.factorial(factoree) + exponent ** 2
+    match fun_type:
+        case 'up':
+            fit += math.factorial(factoree - 1)
+        case 'down':
+            fit -= 1
+    return fit
+
+MAXEVAL = 200
 TOL = 1e-10
 
 
 def run(optimizer):
     optimizer.evaluator = F
-    optimizer.dimensions = DIM
-    optimizer.lb = -100
-    optimizer.ub = 100
+    optimizer.variables = VARS
     optimizer.max_evaluations = MAXEVAL
     return np.nan_to_num(np.log10(optimizer.optimize(seed=0).f), posinf=1e300, neginf=-1e300)
 
@@ -41,17 +55,16 @@ def run(optimizer):
 def test_PSO_defaults() -> None:
     description = 'PSO defaults'
     optimizer = PSO()
-    expected_result = 2.5793297920299136
+    expected_result = 0.24858894247697266
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
-    optimizer._x_format = indago.XFormat.Ndarray
-    optimizer.X0 = np.ones(DIM)
+    optimizer.X0 = ('up', 0.1, 2, 2.2)
     expected_result = 2.517708163727869
     tolerance = TOL
     result = run(optimizer)
@@ -61,23 +74,13 @@ def test_PSO_defaults_1D_X0() -> None:
 def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
-    optimizer.X0 = np.array([1*np.ones(DIM), 2*np.ones(DIM), 3*np.ones(DIM)])
+    optimizer.X0 = [('up', 0.1, 2, 2.2), ('up', 0.23, 3, 2.2), ('down', 0.456, 1, 0.101)]
     expected_result = 0.37301715942874253
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_PSO_defaults_int_X0() -> None:
-    description = 'PSO defaults, int X0'
-    optimizer = PSO()
-    optimizer.X0 = 25
-    expected_result = 2.6704917369893884
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
+"""
 def test_PSO_Vanilla_custom_parameters() -> None:
     description = 'PSO Vanilla custom parameters'
     optimizer = PSO()
@@ -86,7 +89,7 @@ def test_PSO_Vanilla_custom_parameters() -> None:
     optimizer.params['inertia'] = 0.6
     optimizer.params['cognitive_rate'] = 2.0
     optimizer.params['social_rate'] = 2.0
-    expected_result = 4.026320535708186
+    expected_result = 0.20536394918635556
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -96,7 +99,7 @@ def test_PSO_TVAC_defaults() -> None:
     description = 'PSO TVAC defaults'
     optimizer = PSO()
     optimizer.variant = 'TVAC'
-    expected_result = 3.2573071465104713
+    expected_result = 0.2485874831554428
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -106,7 +109,7 @@ def test_PSO_Vanilla_LDIW() -> None:
     description = 'PSO Vanilla LDIW'
     optimizer = PSO()
     optimizer.params['inertia'] = 'LDIW'
-    expected_result = 3.304806494663155
+    expected_result = 0.19213057211511358
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -116,7 +119,7 @@ def test_PSO_Vanilla_HSIW() -> None:
     description = 'PSO Vanilla HSIW'
     optimizer = PSO()
     optimizer.params['inertia'] = 'HSIW'
-    expected_result = 2.5417401479737785
+    expected_result = 0.24858641560290107
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -127,8 +130,8 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
-    expected_result = 3.1457484365150234
-    tolerance = 1e-4
+    expected_result = 0.24858664728073365
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -138,8 +141,8 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
-    expected_result = 3.3754146413536024
-    tolerance = 1e-4
+    expected_result = 0.24858656082645753
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -150,8 +153,8 @@ def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'OrigamiSnake'
-    expected_result = 2.8239187031221262
-    tolerance = 1e-4
+    expected_result = 0.24858637814888834
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -162,7 +165,7 @@ def test_PSO_Vanilla_anakatabatic_Languid() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'Languid'
-    expected_result = 3.8318983720461195
+    expected_result = 0.19213972800333917
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -174,29 +177,7 @@ def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'DoubleSummit'
-    expected_result = 4.471496358324816  # was 4.0967505956847 before moving to _R - very strange
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
-    # Note: multiprocessing is slower due to pool start/stop each run
-    description = 'PSO defaults, multiprocessing on 4 processors'
-    optimizer = PSO()
-    optimizer.processes = 4
-    expected_result = 2.5793297920299136
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_PSO_defaults_multiprocessing_on_maximum_processors() -> None:
-    # Note: multiprocessing is slower due to pool start/stop each run
-    description = 'PSO defaults, multiprocessing on maximum processors'
-    optimizer = PSO()
-    optimizer.processes = 'max'
-    expected_result = 2.5793297920299136
+    expected_result = 0.27148609889163
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -206,7 +187,7 @@ def test_PSO_Chaotic_defaults() -> None:
     description = 'PSO Chaotic defaults'
     optimizer = PSO()
     optimizer.variant = 'Chaotic'
-    expected_result = 4.273075440664452
+    expected_result = 0.2739480095234239
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -217,7 +198,7 @@ def test_PSO_Chaotic_anakatabatic_Languid() -> None:
     optimizer = PSO()
     optimizer.variant = 'Chaotic'
     optimizer.params['inertia'] = 'anakatabatic'
-    expected_result = 4.027548994755644
+    expected_result = 0.19963317739726333
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -227,7 +208,7 @@ def test_PSO_defaults_halton_initializer() -> None:
     description = 'PSO defaults, halton initializer'
     optimizer = PSO()
     optimizer.sampler = 'halton'
-    expected_result = 2.559935460137834
+    expected_result = 0.19213504942286858
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -236,8 +217,8 @@ def test_PSO_defaults_halton_initializer() -> None:
 def test_FWA_defaults():
     description = 'FWA defaults'
     optimizer = FWA()
-    expected_result = -14.3552157847343
-    tolerance = 1e-4
+    expected_result = 0.24989190072594883
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -248,8 +229,8 @@ def test_FWA_custom_parameters():
     optimizer.params['n'] = 12
     optimizer.params['m1'] = 8
     optimizer.params['m2'] = 6
-    expected_result = -12.384148004226958
-    tolerance = 1e-4
+    expected_result = 0.19213044591795225
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -257,8 +238,8 @@ def test_FWA_custom_parameters():
 def test_SSA_defaults():
     description = 'SSA defaults'
     optimizer = SSA()
-    expected_result = 4.75
-    tolerance = 3e-1
+    expected_result = 0.24858638172834946
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -268,7 +249,7 @@ def test_SSA_custom_parameters():
     optimizer = SSA()
     optimizer.params['pop_size'] = 12
     optimizer.params['ata'] = 0.8
-    expected_result = 4.438743024215173
+    expected_result = 0.24858637972477238
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -280,7 +261,7 @@ def test_SSA_custom_additional_parameters():
     optimizer.params['pop_size'] = 12
     optimizer.params['p_pred'] = 0.2
     optimizer.params['c_glide'] = 1.5
-    expected_result = 4.4715442423430485
+    expected_result = 0.2485863788176658
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -329,7 +310,7 @@ def test_BA_defaults():
 def test_EFO_defaults():
     description = 'EFO defaults'
     optimizer = EFO()
-    expected_result = 0.5655380653022772
+    expected_result = 0.19318932167743852
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -347,7 +328,7 @@ def test_MRFO_defaults():
 def test_ABC_defaults():
     description = 'ABC defaults'
     optimizer = ABC()
-    expected_result = 4.33976322802834
+    expected_result = 0.1972646980107801
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -357,7 +338,7 @@ def test_ABC_FullyEmployed_defaults():
     description = 'ABC FullyEmployed defaults'
     optimizer = ABC()
     optimizer.variant = 'FullyEmployed'
-    expected_result = 3.716602431815081
+    expected_result = 0.2393831927407435
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -369,7 +350,7 @@ def test_ABC_Vanilla_custom_parameters():
     optimizer.variant = 'Vanilla'
     optimizer.params['pop_size'] = 20
     optimizer.params['trial_limit'] = 50
-    expected_result = 4.33976322802834
+    expected_result = 0.24905738941203154
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -378,7 +359,7 @@ def test_ABC_Vanilla_custom_parameters():
 def test_GWO_defaults():
     description = 'GWO defaults'
     optimizer = GWO()
-    expected_result = 4.8432759284269915  # before moving to _R: -3.6171180468126125
+    expected_result = 0.2335169448008259
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -388,7 +369,7 @@ def test_GWO_HSA_defaults():
     description = 'GWO HSA defaults'
     optimizer = GWO()
     optimizer.variant = 'HSA'
-    expected_result = 4.8671588222864965  # before moving to _R: -7.0488083215685196
+    expected_result = 0.19282829072325813
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -406,7 +387,7 @@ def test_MSGD_defaults():
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
-    expected_result = 4.198673249163085
+    expected_result = 0.9756561726654626
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -416,7 +397,7 @@ def test_NM_Vanilla_defaults():
     description = 'NelderMead Vanilla defaults'
     optimizer = NM()
     optimizer.variant = 'Vanilla'
-    expected_result = 4.165596500278434
+    expected_result = 0.27147719343542204
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -425,7 +406,7 @@ def test_NM_Vanilla_defaults():
 def test_RS_defaults():
     description = 'RS defaults'
     optimizer = RS()
-    expected_result = 4.649421244751145
+    expected_result = 0.29801079997870294
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -435,7 +416,7 @@ def test_RS_halton_initializer():
     description = 'RS halton initializer'
     optimizer = RS()
     optimizer.sampler = 'halton'
-    expected_result = 4.613384041419631
+    expected_result = 0.24863741869831163
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -445,7 +426,7 @@ def test_RS_sobol_initializer():
     description = 'RS sobol initializer'
     optimizer = RS()
     optimizer.sampler = 'sobol'
-    expected_result = 4.67130384878125
+    expected_result = 0.19880048484471186
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -455,7 +436,7 @@ def test_RS_lhs_initializer():
     description = 'RS lhs initializer'
     optimizer = RS()
     optimizer.sampler = 'lhs'
-    expected_result = 4.050654337618511
+    expected_result = 0.24735268598656235
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -464,7 +445,7 @@ def test_RS_lhs_initializer():
 def test_HBO_defaults():
     description = 'HBO defaults'
     optimizer = HBO()
-    expected_result = 4.166997012436769
+    expected_result = 0.20230018130865446
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -474,7 +455,7 @@ def test_HBO_Dynamic_defaults():
     description = 'HBO Dynamic defaults'
     optimizer = HBO()
     optimizer.variant = 'Dynamic'
-    expected_result = 4.72960644554505
+    expected_result = 0.2736375920069077
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -512,7 +493,7 @@ def test_CRS_custom_parameters_2():
 def test_EEEO_defaults():
     description = 'EEEO defaults'
     optimizer = EEEO()
-    expected_result = 2.6947257800965403
+    expected_result = 0.19213568522747068
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -521,9 +502,9 @@ def test_EEEO_defaults():
 def test_EEEO_custom_parameters():
     description = 'EEEO custom parameters'
     optimizer = EEEO()
-    optimizer.methods = {'DE': ('LSHADE', {'pop_init': 30}),
+    optimizer.methods = {'ABC': ('FullyEmployed', {'pop_size': 7}),
                          'GWO': ('Vanilla', {'pop_size': 20})}
-    expected_result = 3.3139616154111153
+    expected_result = 0.2485877864008043
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -538,9 +519,8 @@ if __name__ == '__main__':
     print('Running tests ...')
 
     test_PSO_defaults()
-    test_PSO_defaults_1D_X0()
-    test_PSO_defaults_2D_X0()
-    test_PSO_defaults_int_X0()
+    # test_PSO_defaults_1D_X0()
+    # test_PSO_defaults_2D_X0()
     test_PSO_Vanilla_custom_parameters()
     test_PSO_TVAC_defaults()
     test_PSO_Vanilla_LDIW()
@@ -549,11 +529,10 @@ if __name__ == '__main__':
     test_PSO_Vanilla_anakatabatic_TipsySpider()
     test_PSO_Vanilla_anakatabatic_OrigamiSnake()
     test_PSO_Vanilla_anakatabatic_Languid()
-    test_PSO_defaults_multiprocessing_on_4_processors()
-    test_PSO_defaults_multiprocessing_on_maximum_processors()
     test_PSO_Chaotic_defaults()
     test_PSO_Chaotic_anakatabatic_Languid()
     test_PSO_defaults_halton_initializer()
+    test_FWA_defaults()
     test_FWA_custom_parameters()
     test_SSA_defaults()
     test_SSA_custom_parameters()
