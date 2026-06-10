@@ -115,7 +115,10 @@ class EEEO(Optimizer):
 
             # pass parameters
             opt.evaluator = self.evaluator
-            opt.lb, opt.ub = self.lb, self.ub
+            if self.variables:
+                opt.variables = self.variables
+            else:
+                opt.lb, opt.ub = self.lb, self.ub
             opt.dimensions = self.dimensions
             opt.X0 = self.X0
             opt.sampler = self.sampler
