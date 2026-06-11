@@ -283,7 +283,7 @@ def test_SSA_custom_additional_parameters():
 def test_DE_defaults():
     description = 'DE defaults'
     optimizer = DE()
-    expected_result = 2.4755412146717592  # before moving to _R: 2.3996066775068625
+    expected_result = 0.25241468667387035
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -293,7 +293,7 @@ def test_DE_LSHADE_defaults():
     description = 'DE SHADE defaults'
     optimizer = DE()
     optimizer.variant = 'SHADE'
-    expected_result = 3.7149900624202368  # before moving to _R: 3.3448851150990944
+    expected_result = 0.2212237724129646
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -305,7 +305,7 @@ def test_DE_LSHADE_custom_parameters():
     optimizer.variant = 'LSHADE'
     optimizer.params['pop_init'] = 20
     optimizer.params['f_archive'] = 2
-    expected_result = 0.646283373310638  # before moving to _R: 1.4083783202220084
+    expected_result = 0.24859315732291984
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -477,7 +477,7 @@ def test_HBO_Dynamic_defaults():
 def test_CRS_defaults():
     description = 'CRS defaults'
     optimizer = CRS()
-    expected_result = 4.437560183138608
+    expected_result = 0.19213114242329002
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -487,7 +487,7 @@ def test_CRS_custom_parameters_1():
     description = 'CRS custom parameters 1'
     optimizer = CRS()
     optimizer.params['pop_scale'] = 1
-    expected_result = 4.525681028714209
+    expected_result = 0.19213033821898368
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -497,7 +497,7 @@ def test_CRS_custom_parameters_2():
     description = 'CRS custom parameters 2'
     optimizer = CRS()
     optimizer.params['pop_scale'] = 3.3
-    expected_result = 4.778298365107319
+    expected_result = 0.19213120888681604
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

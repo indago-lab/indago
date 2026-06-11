@@ -289,7 +289,7 @@ def test_SSA_custom_additional_parameters():
 def test_DE_defaults():
     description = 'DE defaults'
     optimizer = DE()
-    expected_result = 2.4755412146717592  # before moving to _R: 2.3996066775068625
+    expected_result = 2.4053635948242538  # before moving to _R: 2.3996066775068625
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -299,7 +299,7 @@ def test_DE_LSHADE_defaults():
     description = 'DE SHADE defaults'
     optimizer = DE()
     optimizer.variant = 'SHADE'
-    expected_result = 3.7149900624202368  # before moving to _R: 3.3448851150990944
+    expected_result = 3.44022075320384  # before moving to _R: 3.3448851150990944
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -311,7 +311,7 @@ def test_DE_LSHADE_custom_parameters():
     optimizer.variant = 'LSHADE'
     optimizer.params['pop_init'] = 20
     optimizer.params['f_archive'] = 2
-    expected_result = 0.646283373310638  # before moving to _R: 1.4083783202220084
+    expected_result = 2.0116745779210747  # before moving to _R: 1.4083783202220084
     tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -523,7 +523,7 @@ def test_EEEO_custom_parameters():
     optimizer = EEEO()
     optimizer.methods = {'DE': ('LSHADE', {'pop_init': 30}),
                          'GWO': ('Vanilla', {'pop_size': 20})}
-    expected_result = 3.3139616154111153
+    expected_result = 3.5935775313818827
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

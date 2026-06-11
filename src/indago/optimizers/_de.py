@@ -197,6 +197,7 @@ class DE(Optimizer):
         n0 = 0 if self._initial_candidates is None else self._initial_candidates.size
         
         self._initialize_X(self._Pop)
+        self._initialize_X(self._Trials)
         
         # Using specified particles initial positions
         for i in range(self.params['pop_init']):
