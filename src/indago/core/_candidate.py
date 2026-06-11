@@ -365,8 +365,11 @@ class Candidate:
                     i = int(round(lb + r * (ub - lb)))
                     X.append(i)
                 case VariableType.Categorical:
-                    i = int(round(r * len(var_options[0]) - 0.5 - 1e-10))  # 1e-10 is a fix for round(1.5) = 2
-                    i = max(i, 0)  # fix for round(-0.5 - 1e-10) = -1
+                    i = int(round(r * len(var_options[0]) - 0.5))
+                    i = min(i, len(var_options[0]) - 1)  # fix for r=1.0, e.g. round(1.5)=2
+                    i = max(i, 0)  # just in case
+                    # i = int(round(r * len(var_options[0]) - 0.5 - 1e-10))  # 1e-10 is a fix for round(1.5)=2
+                    # i = max(i, 0)  # fix for round(-0.5 - 1e-10) = -1
                     X.append(var_options[0][i])
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
