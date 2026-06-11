@@ -128,7 +128,7 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
     expected_result = 3.1457484365150234
-    tolerance = 1e-4
+    tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -139,7 +139,7 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
     expected_result = 3.3754146413536024
-    tolerance = 1e-4
+    tolerance = 1e-7
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -151,7 +151,7 @@ def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'OrigamiSnake'
     expected_result = 2.8239187031221262
-    tolerance = 1e-4
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -237,7 +237,7 @@ def test_FWA_defaults():
     description = 'FWA defaults'
     optimizer = FWA()
     expected_result = -14.3552157847343
-    tolerance = 1e-4
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -249,7 +249,7 @@ def test_FWA_custom_parameters():
     optimizer.params['m1'] = 8
     optimizer.params['m2'] = 6
     expected_result = -12.384148004226958
-    tolerance = 1e-4
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -312,7 +312,7 @@ def test_DE_LSHADE_custom_parameters():
     optimizer.params['pop_init'] = 20
     optimizer.params['f_archive'] = 2
     expected_result = 0.646283373310638  # before moving to _R: 1.4083783202220084
-    tolerance = TOL
+    tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'

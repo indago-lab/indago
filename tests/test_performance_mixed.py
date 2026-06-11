@@ -29,7 +29,7 @@ VARS = {
 
 def F(x: tuple) -> float:
     fun_type, base, factoree, exponent = x
-    if base not in [0.1, 1.2, 2.3, 3.4]:
+    if base not in [0.1, 1.2, 2.3, 3.4] or fun_type not in 'up down'.split():
         return np.nan
     fit = base ** exponent + math.factorial(factoree) + exponent ** 2
     match fun_type:
@@ -37,6 +37,8 @@ def F(x: tuple) -> float:
             fit += math.factorial(factoree - 1)
         case 'down':
             fit -= 1
+        case _:
+            fit = np.nan
     return fit
 
 MAXEVAL = 200
@@ -55,6 +57,17 @@ def run(optimizer):
 def test_PSO_defaults() -> None:
     description = 'PSO defaults'
     optimizer = PSO()
+    expected_result = 0.24858894247697266
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
+    # Note: multiprocessing is slower due to pool start/stop each run
+    description = 'PSO defaults, multiprocessing on 4 processors'
+    optimizer = PSO()
+    optimizer.processes = 4
     expected_result = 0.24858894247697266
     tolerance = TOL
     result = run(optimizer)
