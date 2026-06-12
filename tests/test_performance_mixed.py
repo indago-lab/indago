@@ -73,12 +73,12 @@ def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
     optimizer.X0 = ('up', 0.1, 2, 2.2)
-    expected_result = 2.517708163727869
+    expected_result = 0.1921303723592867
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -87,13 +87,13 @@ def test_PSO_defaults_1D_X0() -> None:
 def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
-    optimizer.X0 = [('up', 0.1, 2, 2.2), ('up', 0.23, 3, 2.2), ('down', 0.456, 1, 0.101)]
-    expected_result = 0.37301715942874253
+    optimizer.X0 = [('up', 0.1, 2, 2.2), ('up', 2.3, 3, 2.2), ('down', 3.4, 5, 0.101)]
+    expected_result = 0.19213037796114987
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_PSO_Vanilla_custom_parameters() -> None:
     description = 'PSO Vanilla custom parameters'
     optimizer = PSO()
@@ -532,8 +532,8 @@ if __name__ == '__main__':
     print('Running tests ...')
 
     test_PSO_defaults()
-    # test_PSO_defaults_1D_X0()
-    # test_PSO_defaults_2D_X0()
+    test_PSO_defaults_1D_X0()
+    test_PSO_defaults_2D_X0()
     test_PSO_Vanilla_custom_parameters()
     test_PSO_TVAC_defaults()
     test_PSO_Vanilla_LDIW()

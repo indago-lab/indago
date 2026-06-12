@@ -418,11 +418,11 @@ This means that we want to hyper-optimize `'cognitive_rate'` and `'social_rate'`
 
 Optionally, we can provide pre-defined design vector(s) for initialization. This can be useful for boosting the optimizer by feeding it known near-optimal solutions, or using non-uniform random generators, etc. The provided design vectors are injected into the method's population at the start of the optimization (the rest of the population will be initialized with uniform random values, as per usual). These initial solutions are given via the `X0` parameter:
 ```python
-optimizer.X0 = np.array([[1,2,3], [2,3,4]])  # 1d or 2d np.array with each row representing one design vector
+optimizer.X0 = [(1,2,3), (2,3,4)]  # 1d or 2d np.array with each row representing one design vector
 ```
 Note that for unbound optimization (i.e. `lb` and/or `ub` partially or fully undefined) `X0` is a mandatory parameter.
 
-Alternatively, `X0` can represent the number of random candidates generated at the start of optimization (`int`). Each method utilizes these candidates, fully or partially, for initial population, swarm or starting point. Initial candidates are chosen in order of their fitness. This is useful in MSGD which does not utilize starting population but rather starts from a single point: specifying `msgd.X0 = 10` randomly generates 10 candidates and starts the search from the best one. 
+Alternatively, `X0` can represent the number of random candidates generated at the start of optimization (`int`). Each method utilizes these candidates, fully or partially, for initial population, swarm or starting point. Initial candidates are chosen in order of their fitness. This is useful for methods like MSGD which does not utilize starting population but rather starts from a single point: specifying `msgd.X0 = 10` randomly generates 10 candidates and starts the search from the best one. 
 
 The position of initial solution candidates is obtained randomly by default. Alternatively we can use Halton, Sobol, or LatinHypercube sequence, which will cover the domain more evenly. These can be enabled with `optimizer.sampler = 'halton'`, `'sobol'`, or `'lhs'`.
 

@@ -87,14 +87,14 @@ class Optimizer(Engine):
         Maximum allowed time (in seconds) to be used in the optimization process. Default: ``None``.
     best : Candidate
         The best candidate state insofar encountered in the optimization process.
-    X0 : ndarray or int
-        Starting point(s) for the optimization. 1d ndarray, or 2d ndarray with each row representing one design vector.
-        If int, represents the number of random candidates generated at the start of optimization. 
-        Each method embeds these candidates, fully or partially, in initial population, swarm or starting points. 
-        Initial candidates are selected in order of their fitness. 
+    X0 : tuple, list of tuples, or int
+        Starting point(s) for the optimization. A tuple of variables, or a list of tuples of variables,
+        with each row representing one design vector. If int, represents the number of random candidates generated
+        at the start of optimization. Each method embeds these candidates, fully or partially, in its
+        initial population, swarm, or starting points. Initial candidates are selected in order of their fitness.
     _initial_candidates : ndarray
         Private array of candidates populated and evaluated according to given Optimizer.X0 parameter.
-        The array is adopted in each method for establishing initial population, swarm or starting point.
+        The array is adopted in each method for establishing initial population, swarm, or starting point.
     _evaluated_candidates : ndarray of Candidate
         Private array used as a buffer of evaluated candidates in current iteration. Enables forwarding a list of all
         evaluated candidates in an interation to be forwarded to post_iteration_processing function even if multiple
@@ -720,31 +720,28 @@ class Optimizer(Engine):
         """
 
         if self.X0 is not None:
-            assert isinstance(self.X0, np.ndarray) or isinstance(self.X0, int), \
-                "optimizer.X0 should be 1d or 2d np.array, or integer"
-            if isinstance(self.X0, np.ndarray):
-                assert self.X0.ndim == 1 or self.X0.ndim == 2, \
-                    "optimizer.X0 should be 1d or 2d np.array"
-                # if 1D convert to 2D
-                if self.X0.ndim == 1:
-                    self.X0 = np.array([self.X0])
-                self._initial_candidates = [Candidate(self.variables,
-                                                      self.objectives,
-                                                      self.constraints,
-                                                      x_format=self._x_format) for i in range(self.X0.shape[0])]
-                for i, cs in enumerate(self._initial_candidates):
-                    cs.X = self.X0[i, :]
+            assert isinstance(self.X0, tuple) or isinstance(self.X0, list) or isinstance(self.X0, int), \
+                "optimizer.X0 should be tuple, list of tuples, or integer"
+
+            if isinstance(self.X0, tuple):
+                assert len(self.X0) == self.dimensions, \
+                    "optimizer.X0 should be tuple of length equal to optimizer.dimensions"
+                self._initial_candidates = [Candidate(**self._candidate_init_info)]
+                self._initial_candidates[0].X = self.X0
+
+            if isinstance(self.X0, list):
+                self._initial_candidates = []
+                for x0 in self.X0:
+                    assert len(x0) == self.dimensions and isinstance(x0, tuple), \
+                        "optimizer.X0 should be list of tuples of length equal to optimizer.dimensions"
+                    self._initial_candidates.append(Candidate(**self._candidate_init_info))
+                    self._initial_candidates[-1].X = x0
 
             if isinstance(self.X0, int):
                 assert self.X0 > 0, \
                     "optimizer.X0 should be a positive integer"
                 n = self.X0
-                self._initial_candidates = [Candidate(self.variables,
-                                                      self.objectives,
-                                                      self.constraints,
-                                                      x_format=self._x_format) for i in range(n)]
-                # for cs in self._initial_candidates:
-                #     cs.X = np.random.uniform(self.lb, self.ub, self.dimensions)
+                self._initial_candidates = [Candidate(**self._candidate_init_info) for i in range(n)]
                 self._initialize_X(self._initial_candidates)
 
             self._collective_evaluation(self._initial_candidates)

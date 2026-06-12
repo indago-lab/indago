@@ -50,8 +50,7 @@ def test_PSO_defaults() -> None:
 def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
-    optimizer._x_format = indago.XFormat.Ndarray
-    optimizer.X0 = np.ones(DIM)
+    optimizer.X0 = tuple(np.ones(DIM))
     expected_result = 2.517708163727869
     tolerance = TOL
     result = run(optimizer)
@@ -61,7 +60,7 @@ def test_PSO_defaults_1D_X0() -> None:
 def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
-    optimizer.X0 = np.array([1*np.ones(DIM), 2*np.ones(DIM), 3*np.ones(DIM)])
+    optimizer.X0 = [tuple(1*np.ones(DIM)), tuple(2*np.ones(DIM)), tuple(3*np.ones(DIM))]
     expected_result = 0.37301715942874253
     tolerance = TOL
     result = run(optimizer)

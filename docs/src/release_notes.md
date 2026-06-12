@@ -16,6 +16,7 @@ Released on yyyy-mm-dd
 ### Improvements
 - **Significant code refactoring, making Indago ready for future extensions**
 - `Optimizer.evaluation_function` renamed to `Optimizer.evaluator` <i class="fa-solid fa-triangle-exclamation"></i>
+- For compatibility with mixed-variable optimization, `Candidate.X0` is now a `tuple` or a `list` of `tuple` instead of an `ndarray` (or `int`, as previously) <i class="fa-solid fa-triangle-exclamation"></i>
 ### Bug fixes
 
 ***
