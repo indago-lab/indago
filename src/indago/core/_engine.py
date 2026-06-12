@@ -30,7 +30,7 @@ class Engine:
     Attributes
     ----------
     variables : VariablesDictType
-        A dictionary of optimization variables.
+        A dictionary of optimization variables with their types, bounds, and allowed values.
     dimensions : int
         Number of dimensions of the search space i.e. number of optimization variables.
     _dimensions : int | None

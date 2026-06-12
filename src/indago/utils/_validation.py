@@ -16,10 +16,12 @@ License: MIT
 File content: Validation utility functions.
 Usage: from indago.utils._validation import validate_variables
 """
-import numpy as np
 
+
+import numpy as np
 import indago
 from numbers import Real
+
 
 def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[tuple[Exception, str]]]:
 

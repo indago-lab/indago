@@ -44,10 +44,10 @@ from rich.progress import Progress, BarColumn, TimeRemainingColumn, TimeElapsedC
 from rich.live import Live
 from rich.table import Table
 
-#import indago
 from ._candidate import Candidate, X_Content_Type
 from ._enums import VariableType, XFormat
 from ._engine import Engine
+
 
 class Status(Enum):
     """Enum class for optimization status tracking."""
