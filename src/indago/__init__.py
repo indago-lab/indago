@@ -24,8 +24,7 @@ __version__ = '0.7.0'
 from indago.core._candidate import Candidate, VariableType, VariableDictType, XFormat, X_Content_Type
 from indago.core._optimizer import Optimizer, Status
 
-# from indago._utility import *
-# from indago._utility import _round_smooth
+from indago.utils._minimize import minimize
 
 from indago.optimizers._rs import RS
 from indago.optimizers._pso import PSO

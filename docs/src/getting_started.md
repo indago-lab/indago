@@ -60,11 +60,11 @@ print(result.X)  # design vector at minimum
 Alternatively, you can achieve the same by using a shorthand one-line solution, which is also available in Indago:
 ```python
 from indago import minimize
-X, f = minimize(goalfun, -10, 10 + np.arange(8), 'PSO', 
+X, f = minimize(goalfun, None, -10, 10 + np.arange(8), 'PSO', 
                 objectives=1, objective_labels=['Squared sum minimization'], 
                 constraints=2, constraint_labels=['Constraint 1', 'Constraint 2'])
 ```
-Instead of stating `'PSO'` as the method you want to use, you can use a different one, or easily iterate through all the available methods, as they are listed in `indago.optimizers_name_list` and `indago.optimizers_dict`. The default method is `'PSO'`.
+Instead of stating `'PSO'` as the method you want to use, you can use a different one (method name abbreviations are available in `indago.optimizers_name_list` and `indago.optimizers_dict`). The default method is `'PSO'`. If you want to provide a variables dict instead of lb/ub, you can give it as second argument (instead of the `None` given above).
 
 ## Methods
 
@@ -382,37 +382,6 @@ RS randomly produces and evaluates solution candidates and reports the best of t
 ## Which method to choose?
 
 There are so many methods, which one do you pick? You can consult the **Benchmarking** section of the Documentation, where we present the results of the extensive method testing we have conducted and give some hopefully useful guidelines.
-
-If you want to test optimization methods on the very problem you are trying to solve, Indago offers some utility functions for that as well.
-
-You can quickly test a selection of methods on your evaluation function by using the `inspect` function, for example:
-```python
-from indago import inspect
-# trying 20 runs of PSO, FWA and EFO on the evaluation function of 8 dimensions with two constraints, with lb=-10, ub=10, on 1000 evaluations executed in parallel
-results, X_best = inspect(goalfun, -10*np.ones(8), 10*np.ones(8), objectives=1, constraints=2,
-				  evaluations=1000, optimizers_name_list=['PSO', 'FWA', 'EFO'], 
-				  runs=20, processes=4) 
-```
-You'll get a table printout with results of the test, which are also available in the returned Python dict (`results`). If you skip the list of optimization method names, `inspect` will try all available methods. Note that the optimizers used for this test are default-set, i.e. no customization is possible.
-
-If you want to test customized optimizers and compare their performance, you can use `inspect_optimizers` function. Say we have two optimizers prepared, `opt1` and `opt2`. We can quickly test them like this:
-```python
-from indago import inspect_optimizers
-results, X_best = inspect_optimizers({'opt1 description': opt1, 'opt2 description': opt2}, runs=200)
-```
-Again, we'll get the results in a nice table printout, as well as in the returned object.
-
-In both of these functions, you can turn off the table printout by specifying `printout=False`.
-
-So you've used `inspect` and found a method which seems to work well. But what about its `params`? The choice of method parameters can sometimes strongly affect the method's performance. If your evaluation function is not very expensive or you can afford it, you could use `minimize_exhaustive`, which will try to tune your optimizer on a large number of runs and report the best solution found. Say we want to optimize our evaluation function with tuned PSO, and use NM for tuning:
-```python
-from indago import minimize_exhaustive
-result, tuned_params = minimize_exhaustive(goalfun, -10*np.ones(8), 10*np.ones(8), 'PSO', 
-                                           {'cognitive_rate': [1, 2], 'social_rate': [1, 2]}, 'NM',
-                                           runs=50, hyper_evaluations=2000, 
-                                           evaluations=1000, objectives=1, constraints=2, processes=4)
-```
-This means that we want to hyper-optimize `'cognitive_rate'` and `'social_rate'` parameters, by varying them both in the range of `[1, 2]`. (If you omit the entire dict, all parameters will be tuned. If you give `None` as the range, the default range will be used.) Due to the strong stochasticity of the PSO method, we want to repeat every optimization 50 times (recommended minimum, also default), and utilize NM (default=FWA) to hyper-optimize PSO in 2000 evaluations (i.e. `hyper_evaluations`, default=1000). Note that this could be prohibitively expensive, but if you can afford it also quite useful. The best solution found is in the `result` tuple, and the hyper-optimized parameters are returned in the `tuned_params` dict.
 
 ## Custom initialization
 

@@ -13,6 +13,7 @@ Released on yyyy-mm-dd
 ### New features
 - **Variable types and mixed-variable support**
 - New anakatabatic model for PSO: `'DoubleSummit'`
+- Utility functions `inspect`, `inspect_optimizers` and `minimize_exhaustive` have been removed for the time being <i class="fa-solid fa-triangle-exclamation"></i>
 ### Improvements
 - **Significant code refactoring, making Indago ready for future extensions**
 - `Optimizer.evaluation_function` renamed to `Optimizer.evaluator` <i class="fa-solid fa-triangle-exclamation"></i>
