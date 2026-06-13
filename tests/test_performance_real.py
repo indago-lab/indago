@@ -235,7 +235,7 @@ def test_PSO_defaults_halton_initializer() -> None:
 def test_FWA_defaults():
     description = 'FWA defaults'
     optimizer = FWA()
-    expected_result = -14.3552157847343
+    expected_result = 2.356448407269118  # before moving to _R: -14.3552157847343
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -247,7 +247,7 @@ def test_FWA_custom_parameters():
     optimizer.params['n'] = 12
     optimizer.params['m1'] = 8
     optimizer.params['m2'] = 6
-    expected_result = -12.384148004226958
+    expected_result = 3.8042159003269016  # before moving to _R: -12.384148004226958
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

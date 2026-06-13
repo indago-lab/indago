@@ -1,6 +1,7 @@
 # import sys
 # sys.path.append('../tests/')
 # from test_utils import *
+
 import copy
 import timeit
 from typing import Any
@@ -29,7 +30,7 @@ def mixed_function(x):
     # print(f'{x=}, {f=}')
     return f
 
-def pso_real():
+def run_real():
     real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(14)}
     print(real_variables_10D)
 
@@ -44,7 +45,7 @@ def pso_real():
     print('-' * 20)
     print(f'f: {optimizer.best.f}')
 
-def pso_mixed_num():
+def run_mixed_num():
     real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(10)}
     numerical_variables_10D = copy.deepcopy(real_variables_10D)
     numerical_variables_10D['x11'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 2001)
@@ -53,7 +54,7 @@ def pso_mixed_num():
     numerical_variables_10D['x14'] = indago.VariableType.Integer, -50, 150
     print(numerical_variables_10D)
 
-    optimizer = indago.PSO()
+    optimizer = indago.FWA()
     optimizer.variables = numerical_variables_10D
     optimizer.evaluator = real_function
     # optimizer.monitoring = 'basic'
@@ -64,7 +65,7 @@ def pso_mixed_num():
     print('-' * 20)
     print(f'f: {optimizer.best.f}')
 
-def pso_mixed():
+def run_mixed():
     real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(10)}
     numerical_variables_10D = copy.deepcopy(real_variables_10D)
     numerical_variables_10D['x11'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 2001)
@@ -86,15 +87,6 @@ def pso_mixed():
     print(f'f: {optimizer.best.f}')
 
 if __name__ == '__main__':
-    pso_real()
-    pso_mixed_num()
-    pso_mixed()
-
-    # t_real = timeit.timeit(pso_real, number=10)
-    # print(f'PSO 14D real-variable problem, {t_real=}')
-    #
-    # t_mixed_num = timeit.timeit(pso_mixed_num, number=10)
-    # print(f'PSO 14D numerical mixed-variable problem, {t_mixed_num=}')
-    #
-    # t_mixed = timeit.timeit(pso_mixed, number=10)
-    # print(f'PSO 14D mixed-variable problem, {t_mixed=}')
+    run_real()
+    run_mixed_num()
+    run_mixed()
