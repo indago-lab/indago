@@ -648,8 +648,8 @@ class Candidate:
 
         return self.__gt__(other) or self.__eq__(other)
 
-    def __sub__(self, other: Candidate) -> NDArray[float]:
-        """Computes the distance (vector difference) between the positions (X) of two candidates.
+    def _distance_to(self, other: Candidate) -> NDArray[float]:
+        """Computes the distance (vector difference) between the positions (X) of two candidates (self - other).
 
         Parameters
         ----------
@@ -699,7 +699,10 @@ class Candidate:
                         x_alt = x - (var_options[0][-1] - var_options[0][0])
 
                 case VariableType.Categorical:
-                    deltaX.append(np.nan)  # np.nan is good because it survives NumPy operations
+                    if x == selfx:
+                        deltaX.append(0)
+                    else:
+                        deltaX.append(np.nan)  # np.nan is good because it survives NumPy operations
                     continue
 
             if abs(selfx - x) < abs(selfx - x_alt):
