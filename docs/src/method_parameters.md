@@ -18,9 +18,7 @@ Avaliable methods and their variants are summarized in the following table.
 | **Squirrel Search Algorithm (SSA)**          | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                                             |
 | **Differential Evolution (DE)**              | 'SHADE'                                      | <i class="fa-solid fa-xmark"></i>          |                                                                                                                                                           |
 |                                              | 'LSHADE' <i class="fa-regular fa-star"></i>  | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *optimizer.max_iterations*, *optimizer.max_evaluations*, *optimizer.max_elapsed_time*. |
-| **Bat Algorithm (BA)**                       | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                                             |
 | **Electromagnetic Field Optimization (EFO)** | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | Significantly slower than other methods. Does not support parallel evaluation.                                                                            |
-| **Manta Ray Foraging Optimization (MRFO)**   | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *optimizer.max_iterations*, *optimizer.max_evaluations*, *optimizer.max_elapsed_time*. |
 | **Artificial Bee Colony (ABC)**              | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                                             |
 |                                              | 'FullyEmployed'                              | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                                             |
 | **Grey Wolf Optimizer (GWO)**                | 'Vanilla' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *optimizer.max_iterations*, *optimizer.max_evaluations*, *optimizer.max_elapsed_time*. |
@@ -80,17 +78,6 @@ Specific parameters for each of the available methods and their variants are lis
 |         | hist_size  | (int)          | [1, -]     | 6                         | Size of historical memory    |
 |         | p_mutation | (float)        | [0.0, 1.0] | 0.11                      | Mutation probability         |
 
-## Bat Algorithm (BA)
-
-| Variant       | Parameter  | Allowed values     | Range  | Default                | Description                |
-|---------------|------------|--------------------|--------|------------------------|----------------------------|
-| **'Vanilla'** | pop_size   | (int)              | [1, -] | max (15, *dimensions*) | Number of BA bats          |
-|               | loudness   | (float)            | [-, -] | 1.0                    | Loudness                   |
-|               | pulse_rate | (float)            | [-, -] | 0.001                  | Pulse rate                 |
-|               | alpha      | (float)            | [-, -] | 0.9                    | Alpha                      |
-|               | gamma      | (float)            | [-, -] | 0.1                    | Gamma                      |
-|               | freq_range | (list of 2 floats) |        | [0.0, 1.0]             | Frequency range (min, max) |
-
 ## Electromagnetic Field Optimization (EFO)
 
 | Variant       | Parameter | Allowed values | Range       | Default                | Description                                                                |
@@ -100,13 +87,6 @@ Specific parameters for each of the available methods and their variants are lis
 |               | Ps_rate   | (float)        | [0.1, 0.4]  | 0.25                   | Probability of selecting EMs of generated particle from the positive field |
 |               | P_field   | (float)        | [0.05, 0.1] | 0.075                  | Portion of population which belongs to positive field                      |
 |               | N_field   | (float)        | [0.4, 0.5]  | 0.45                   | Portion of population which belongs to negative field                      |
-
-## Manta Ray Foraging Optimization (MRFO)
-
-| Variant       | Parameter | Allowed values     | Range  | Default                | Description           |
-|---------------|-----------|--------------------|--------|------------------------|-----------------------|
-| **'Vanilla'** | pop_size  | (int)              | [1, -] | max (10, *dimensions*) | Number of MRFO mantas |
-|               | f_som     | (float)            | [-, -] | 2.0                    | Somersault factor     |
 
 ## Artificial Bee Colony (ABC)
 

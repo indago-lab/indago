@@ -3,7 +3,7 @@
 # Benchmarking
 In order to analyze the performance of Indago methods, we designed **IndagoBench**, a benchmark suite designed to reflect real-world engineering optimization scenarios and assess the practical performance of modern algorithms. In addition to reporting achieved objective values, it employs nonlinear normalization based on random sampling. The suite is under continuous development as new engineering problems and optimization methods are incorporated, with planned extensions to discrete-variable, multi-objective, and constrained optimization tasks.
 
-**IndagoBench is not published with Indago**, but as separate code collection periodically whenever a sufficient number of new problems or methods are added, or when methodological improvements are introduced. Each version is accompanied by complete result files for the entire benchmark. Because it is under active development, these published milestones ensure the reproducibility of results.
+**IndagoBench is not published with Indago**, but as a separate code collection periodically whenever a sufficient number of new problems or methods are added, or when methodological improvements are introduced. Each version is accompanied by complete result files for the entire benchmark. Because it is under active development, these published milestones ensure the reproducibility of results.
 
 ## IndagoBench25
 
@@ -22,9 +22,9 @@ To cite the paper, please use the following:
 }
 ```
 
-Indagobench25 consists of 231 unconstrained bounded continuous optimization problems, with dimensionality ranging from 3D to 58D.
+Indagobench25 consists of 235 unconstrained bounded continuous optimization problems, with dimensionality ranging from 3D to 58D.
 
-The optimization methods implemented in Indago were tested on IndagoBench25 and key results are shown below. For a more detailed analysis consult the paper.
+The optimization methods implemented in Indago 0.5.4 were tested on IndagoBench25 and key results are shown below. For a more detailed analysis consult the paper.
 
 ### Overall method performance
 
