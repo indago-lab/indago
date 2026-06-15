@@ -10,7 +10,7 @@ Indago is developed for in-house research and teaching purposes and is not offic
 
 ## Installation
 
-You can install Indago via pip:
+You can install Indago via pip (or uv or other similar package managers):
 ```
 pip install indago
 ```
@@ -21,8 +21,14 @@ pip install indago --upgrade
 
 ## Optimization problem setup
 
-Using Indago is easy. The setup of the optimization problem in Indago is the same regardless of the used optimization method. Say we want to optimize a function in 8 dimensions, with constraints:
+Using Indago is easy. There are two, very similar, ways to set up an optimization problem. You can use the interface for strictly real-value variables, or the alternative interface for mixed-type variables. The setup of the optimization problem in Indago is the same regardless of the used optimization method. 
+
+### Using strictly real-value variables
+
+Say we want to optimize a real-domain function in 8 dimensions, with constraints:
 ```python
+import numpy as np
+
 # Evaluation function
 def goalfun(x):
     obj = np.sum(x ** 2)  # minimization objective
@@ -55,16 +61,79 @@ result = optimizer.optimize()  # (using default parameters of the method)
 
 # Extract results
 print(result.f)  # minimum of obj with constr1 and constr2 satisfied
-print(result.X)  # design vector at minimum
+print(result.X)  # design vector at minimum (as tuple)
 ```
 Alternatively, you can achieve the same by using a shorthand one-line solution, which is also available in Indago:
 ```python
 from indago import minimize
-X, f = minimize(goalfun, None, -10, 10 + np.arange(8), 'PSO', 
-                objectives=1, objective_labels=['Squared sum minimization'], 
-                constraints=2, constraint_labels=['Constraint 1', 'Constraint 2'])
+X, f, O, C = minimize(goalfun, None, -10, 10 + np.arange(8), 'PSO', 
+                      objectives=1, objective_labels=['Squared sum minimization'], 
+                      constraints=2, constraint_labels=['Constraint 1', 'Constraint 2'])
 ```
-Instead of stating `'PSO'` as the method you want to use, you can use a different one (method name abbreviations are available in `indago.optimizers_name_list` and `indago.optimizers_dict`). The default method is `'PSO'`. If you want to provide a variables dict instead of lb/ub, you can give it as second argument (instead of the `None` given above).
+The `O` and `C` are the objective and constraint values, respectively. When using only one objective and no constraints, both of these are omitted. Instead of stating `'PSO'` as the method you want to use, you can use a different one (method name abbreviations are available in `indago.optimizers_name_list` and `indago.optimizers_dict`). The default method is `'PSO'`.
+
+### Using mixed-type variables
+
+Indago supports several types of variables, namely: Real, RealDiscrete, RealDiscretePeriodic, Integer, IntegerDiscrete, IntegerPeriodic, and Categorical. You can mix them however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary. 
+
+Here's an example in which we will optimize a function with four variables of different types:
+```python
+import math
+import numpy as np
+import indago
+
+# Optimization variables dictionary in the form of {name: (type, bounds | values)}
+VARS = {'type': (indago.VariableType.Categorical, ['up', 'down']),  # only strings allowed for Categorical variables
+	'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
+	'n': (indago.VariableType.Integer, 2, 5),  # for non-discrete types we must provide bounds...
+	'a': (indago.VariableType.Real, -3.3, 3.3)  # ...instead of allowed values
+	}
+
+# Evaluation function
+def goalfun(x):
+	type, base, n, a = x  # x is a tuple
+	obj = base ** a + math.factorial(n) + a ** 2  # minimization objective
+	match type:
+		case 'up':
+			obj += math.factorial(n - 1)
+		case 'down':
+			obj -= 1
+		case _:
+			obj = np.nan
+	constr = base - n  # constraint base - n <= 0
+	return obj, constr
+
+# Initialize the chosen method
+from indago import FWA  # ...or any other Indago method
+optimizer = FWA()
+
+# Optimization variables settings
+optimizer.variables = VARS
+
+# Set evaluation function
+optimizer.evaluator = goalfun
+
+# Objectives and constraints settings
+optimizer.objectives = 1  # number of objectives (optional parameter, default objectives=1), this is obj in evaluation function
+optimizer.constraints = 1  # number of constraints (optional parameter, default constraints=0), this is constr in evaluation function
+
+# Print optimizer parameters
+print(optimizer)  # not necessary, but useful for checking the setup of the optimizer
+
+# Run optimization
+result = optimizer.optimize()  # (using default parameters of the method)
+
+# Extract results
+print(result.f)  # minimum of obj with constr satisfied
+print(result.X)  # design vector at minimum (as tuple)
+```
+Again, you can alternatively use the shorthand one-line solution:
+```python
+from indago import minimize
+X, f, O, C = minimize(goalfun, VARS, None, None, 'FWA', 
+                      objectives=1, constraints=1)
+```
+This way, instead of the lower/upper bounds (note the `None, None`), we have provided the variables dictionary (`VARS`) as the second argument.
 
 ## Methods
 
@@ -347,9 +416,9 @@ There are so many methods, which one do you pick? You can consult the **Benchmar
 
 Optionally, we can provide pre-defined design vector(s) for initialization. This can be useful for boosting the optimizer by feeding it known near-optimal solutions, or using non-uniform random generators, etc. The provided design vectors are injected into the method's population at the start of the optimization (the rest of the population will be initialized with uniform random values, as per usual). These initial solutions are given via the `X0` parameter:
 ```python
-optimizer.X0 = [(1,2,3), (2,3,4)]  # 1d or 2d np.array with each row representing one design vector
+optimizer.X0 = [(1,2,3), (2,3,4)]  # tuple or a list of tuples
 ```
-Note that for unbound optimization (i.e. `lb` and/or `ub` partially or fully undefined) `X0` is a mandatory parameter.
+Note that for unbound optimization (i.e. `lb` and/or `ub` partially or fully undefined), `X0` is a mandatory parameter.
 
 Alternatively, `X0` can represent the number of random candidates generated at the start of optimization (`int`). Each method utilizes these candidates, fully or partially, for initial population, swarm or starting point. Initial candidates are chosen in order of their fitness. This is useful for methods like MSGD which does not utilize starting population but rather starts from a single point: specifying `msgd.X0 = 10` randomly generates 10 candidates and starts the search from the best one. 
 
