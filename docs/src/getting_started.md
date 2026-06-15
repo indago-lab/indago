@@ -2,11 +2,11 @@
 
 Indago is a Python 3 module for numerical optimization.
 
-Indago contains several modern methods for real fitness function optimization over a real parameter domain. It was developed at the Department for Fluid Mechanics and Computational Engineering of the University of Rijeka, Faculty of Engineering, by Stefan Ivić, Siniša Družeta, Luka Grbčić, and others. 
+Indago contains several modern optimization methods adapted for real fitness function optimization over a mixed-type parameter domain. It was developed at the Department for Fluid Mechanics and Computational Engineering of the University of Rijeka, Faculty of Engineering, by Stefan Ivić, Siniša Družeta, and Luka Grbčić. 
 
-Indago is developed for in-house research and teaching purposes and is not officially supported in any way, comes with no guarantees whatsoever and is not properly documented. However, we use it regulary and it seems to be working fine. Hopefully you will find it useful as well.
+Indago is developed for in-house research and teaching purposes, and comes with no guarantees and with insufficient documentation. However, we have been developing and using it regulary for years, and it seems to be working fine. Hopefully you will find it useful as well.
 
-**Important: After every Indago update please check this documentation since Indago methods and API can undergo significant changes at any time.**
+**Important: After every Indago update please check this documentation since Indago methods and API may change at any time** (although we do try to not break things too frequently).
 
 ## Installation
 
@@ -155,11 +155,11 @@ and gradient-free local search methods:
 - Nelder-Mead method (NM) [10]
 - Multi-Scale Grid Descent (MSGD) [11]
 
-These methods are available through a unified API, which was designed to be as accessible as possible. Indago relies heavily on *NumPy*, so the inputs and outputs of the optimizers are mostly *NumPy* arrays. Besides *NumPy*, Indago uses only *Matplotlib*, a couple of *SciPy* functions, and *rich* for fancy console printouts. Indago methods also include some of our original research improvements, so feel free to try those as well.
+These methods are available through a unified API, which was designed to be as accessible as possible. Besides *NumPy*, Indago uses only *Matplotlib*, a couple of *SciPy* functions, and *rich* for fancy console printouts. Indago methods also include some of our original research improvements, so feel free to try those as well.
 
 ### Particle Swarm Optimization
 
-Let us use PSO as a primary step-by-step example. First, we need to import NumPy and Indago PSO, and then initialize an optimizer object:
+Let's use PSO as a primary step-by-step example. First, we need to import NumPy and Indago PSO, and then initialize an optimizer object:
 ```python
 import numpy as np
 from indago import PSO
@@ -191,13 +191,13 @@ pso.params['social_rate'] = 1.0  # PSO parameter also known as c2 (should range 
 
 If we want to use our novel adaptive inertia weight technique [14-16], which will often produce faster convergence and better accuracy, we invoke it by:
 ```python
-pso.params['inertia'] = 'anakatabatic'
+pso.params['inertia'] = 'anakatabatic'  # other options for dynamic inertia are 'LDIW' and 'HSIW'
 ```
 and then we need to also specify the anakatabatic model:
 ```python
 pso.params['akb_model'] = 'Languid'  # other options explained below
 ```
-Apart from `'Languid'` [15, 16], we can use `'TipsySpider'`, `'FlyingStork'` or `'MessyTie'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'Languid'` and `'TipsySpider'`.
+Apart from `'Languid'` [15, 16], we can use `'DoubleSummit'`, `'TipsySpider'`, `'FlyingStork'` or `'MessyTie'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'Languid'` and `'DoubleSummit'`.
 
 We can enable reporting during the optimization process by providing the monitoring argument:
 ```python
@@ -208,11 +208,11 @@ Finally, we can start the optimization and retrieve the results:
 ```python
 result = pso.optimize()
 min_f = result.f  # fitness at minimum, scalar number
-x_min = result.X  # design vector at minimum, 1d np.array
+x_min = result.X  # design vector at minimum, tuple
 ```
 And that's it!
 
-(If you're using the `indago.minimize` function instead, note that `params` used above is a Python dict, hence it should be prepared as such and then given as a keyword argument, e.g. `params={'swarm_size': 15, 'inertia': 0.8}`).
+If you're using the `indago.minimize` function instead, note that `params` used above is a Python dict, hence it should be prepared as such and then given as a keyword argument, e.g. `params={'swarm_size': 15, 'inertia': 0.8}`.
 
 ### Fireworks Algorithm
 
