@@ -489,8 +489,16 @@ class Candidate:
 
         """
 
-        # return np.sum(np.abs(a.X - b.X)) + np.sum(np.abs(a.O - b.O)) + np.sum(np.abs(a.C - b.C)) == 0.0
-        return (a.X == b.X).all() and (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
+        all_real = True
+        for var_type in list(a._variables.values()) + list(b._variables.values()):
+            if var_type[0] != VariableType.Real:
+                all_real = False
+                break
+
+        if all_real:
+            return (a.X == b.X).all() and (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
+        else:
+            return a.X == b.X and a.O == b.O and a.C == b.C and a.f == b.f
 
     def __ne__(self, other: Candidate) -> bool:
         """Inequality operator.
