@@ -251,7 +251,7 @@ def test_FWA_custom_parameters():
 def test_SSA_defaults():
     description = 'SSA defaults'
     optimizer = SSA()
-    expected_result = 0.24858638172834946
+    expected_result = 0.2501249629394819
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -262,7 +262,7 @@ def test_SSA_custom_parameters():
     optimizer = SSA()
     optimizer.params['pop_size'] = 12
     optimizer.params['ata'] = 0.8
-    expected_result = 0.24858637972477238
+    expected_result = 0.24858637807170483
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -274,7 +274,7 @@ def test_SSA_custom_additional_parameters():
     optimizer.params['pop_size'] = 12
     optimizer.params['p_pred'] = 0.2
     optimizer.params['c_glide'] = 1.5
-    expected_result = 0.2485863788176658
+    expected_result = 0.27147719344983456
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

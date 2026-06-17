@@ -657,17 +657,18 @@ class Candidate:
         return self.__gt__(other) or self.__eq__(other)
 
     def _distance_to(self, other: Candidate) -> NDArray[float]:
-        """Computes the distance (vector difference) between the positions (X) of two candidates (self - other).
+        """Computes the distance (vector difference) between the relative positions (_R)
+        of two candidates (self - other).
 
         Parameters
         ----------
         other : Candidate
-            Candidate object with which the subtraction (self.X - other.X) is performed.
+            Candidate object with which the subtraction (self._R - other._R) is performed.
 
         Returns
         -------
         distance : ndarray
-            Computed distance vector.
+            Computed relative distance vector.
         """
 
         all_real = True
@@ -676,49 +677,36 @@ class Candidate:
                 all_real = False
                 break
         if all_real:
-            return self.X - other.X
+            return self._R - other._R
 
-        deltaX = []
+        delta_R = []
         for i, (var_type, *var_options) in enumerate(self._variables.values()):
 
-            x = other.X[i]
-            x_alt = np.inf
-            selfx = self.X[i]
+            r = other._R[i]
+            r_alt = np.inf
+            self_r = self._R[i]
+
             match var_type:
 
-                case VariableType.RealPeriodic:
-                    if x < float((var_options[1] - var_options[0])/2):  # from left half to far right
-                        x_alt = x + (var_options[1] - var_options[0])
+                case VariableType.RealPeriodic | VariableType.IntegerPeriodic | VariableType.RealDiscretePeriodic:
+                    if r < 0.5:  # from left half to far right
+                        r_alt = r + 1
                     else:  # from right half to far left
-                        x_alt = x - (var_options[1] - var_options[0])
-
-                case VariableType.IntegerPeriodic:
-                    x_med = np.median([_ for _ in range(var_options[0], var_options[1] + 1)])
-                    if x < x_med:  # from left half to far right
-                        x_alt = x + (var_options[1] - var_options[0])
-                    else:  # from right half to far left
-                        x_alt = x - (var_options[1] - var_options[0])
-
-                case VariableType.RealDiscretePeriodic:  # TODO: maybe this should be index-based, not value-based?
-                    x_med = np.median(var_options[0])
-                    if x < x_med:  # from left half to far right
-                        x_alt = x + (var_options[0][-1] - var_options[0][0])
-                    else:  # from right half to far left
-                        x_alt = x - (var_options[0][-1] - var_options[0][0])
+                        r_alt = r - 1
 
                 case VariableType.Categorical:
-                    if x == selfx:
-                        deltaX.append(0)
+                    if other.X[i] == self.X[i]:
+                        delta_R.append(0)
                     else:
-                        deltaX.append(np.nan)  # np.nan is good because it survives NumPy operations
+                        delta_R.append(np.nan)  # np.nan is good because it survives NumPy operations
                     continue
 
-            if abs(selfx - x) < abs(selfx - x_alt):
-                deltaX.append(selfx - x)
+            if abs(self_r - r) < abs(self_r - r_alt):
+                delta_R.append(self_r - r)
             else:
-                deltaX.append(selfx - x_alt)
+                delta_R.append(self_r - r_alt)
 
-        return np.array(deltaX)
+        return np.array(delta_R)
 
     def is_feasible(self) -> bool:
         """

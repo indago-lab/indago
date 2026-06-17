@@ -173,13 +173,15 @@ class SSA(Optimizer):
             for fs in FSnt[:Nnt2at]:
                 if np.random.rand() >= Pdp:  # move towards FSat
                     dg = np.random.uniform(gd_lim[0], gd_lim[1])
-                    fs._R = fs._R + dg * Gc * (np.random.choice(FSat)._R - fs._R)
+                    # fs._R = fs._R + dg * Gc * (np.random.choice(FSat)._R - fs._R)
+                    fs._R = fs._R + dg * Gc * np.random.choice(FSat)._distance_to(fs)
                 else:  # respawning randomly
                     fs._R = np.random.uniform(0, 1, self.dimensions)
             for fs in FSnt[Nnt2at:]:
                 if np.random.rand() >= Pdp:  # move towards FSht
                     dg = np.random.uniform(gd_lim[0], gd_lim[1])
-                    fs._R = fs._R + dg * Gc * (FSht._R - fs._R)
+                    # fs._R = fs._R + dg * Gc * (FSht._R - fs._R)
+                    fs._R = fs._R + dg * Gc * FSht._distance_to(fs)
                 else:  # respawning randomly
                     fs._R = np.random.uniform(0, 1, self.dimensions)
             self._randomize_categorical(FSnt)
@@ -188,7 +190,8 @@ class SSA(Optimizer):
             for fs in FSat:
                 if np.random.rand() >= Pdp:  # move towards FSht
                     dg = np.random.uniform(gd_lim[0], gd_lim[1])
-                    fs._R = fs._R + dg * Gc * (FSht._R - fs._R)
+                    # fs._R = fs._R + dg * Gc * (FSht._R - fs._R)
+                    fs._R = fs._R + dg * Gc * FSht._distance_to(fs)
                 else:  # respawning randomly
                     fs._R = np.random.uniform(0, 1, self.dimensions)
             self._randomize_categorical(FSat)
@@ -196,7 +199,8 @@ class SSA(Optimizer):
             # Seasonal constants (for FSat)
             Sc = np.empty(3)
             for i, fs in enumerate(FSat):
-                Sc[i] = np.sqrt(np.sum((fs._R - FSht._R)**2))
+                # Sc[i] = np.sqrt(np.sum((fs._R - FSht._R)**2))
+                Sc[i] = np.sqrt(np.sum(fs._distance_to(FSht) ** 2))
                 
             # Minimum value of seasonal constant
             Scmin = 1e-6 / (365**(self._progress_factor() * 2.5))
