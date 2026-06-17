@@ -74,7 +74,9 @@ The `O` and `C` are the objective and constraint values, respectively. When usin
 
 ### Using mixed-type variables
 
-Indago supports several types of variables, namely: Real, RealDiscrete, RealDiscretePeriodic, Integer, IntegerDiscrete, IntegerPeriodic, and Categorical. You can mix them however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary. 
+Indago supports several types of variables, namely: Real, RealDiscrete, RealDiscretePeriodic, Integer, IntegerDiscrete, IntegerPeriodic, and Categorical. For the periodic variable types it is expected that the evaluation function returns the exact same objective(s and constraints) at the first and last allowed variable value, or lower and upper bound.
+
+You can mix these variable types however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary, given as `optimizer.variables`.
 
 Here's an example in which we will optimize a function with four variables of different types:
 ```python
