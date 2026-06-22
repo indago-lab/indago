@@ -24,8 +24,8 @@ class VariableType(Enum):
     ``VariableType.Integer``, ``VariableType.IntegerDiscrete``, ``VariableType.Categorical``."""
 
     Real = 'R'
-    RealDiscrete = 'RD'
     RealPeriodic = 'RP'
+    RealDiscrete = 'RD'
     RealDiscretePeriodic = 'RDP'
     Integer = 'I'
     IntegerPeriodic = 'IP'

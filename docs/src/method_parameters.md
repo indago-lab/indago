@@ -6,7 +6,7 @@ Method parameters are listed and explained here.
 
 ## Overview of methods and their variants
 
-Avaliable methods and their variants are summarized in the following table.
+Available methods and their variants are summarized in the following table.
 
 | Method                                       | Variant                                      | Supports constraints                       | Remarks                                                                                                                                                   |
 |----------------------------------------------|----------------------------------------------|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|

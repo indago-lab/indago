@@ -16,7 +16,7 @@ import indago
 
 
 project = 'Indago'
-copyright = '2023, Department of fluid mechanics and computational engineering, Faculty of Engineering, University of Rijeka'
+copyright = 'Department of fluid mechanics and computational engineering, Faculty of Engineering, University of Rijeka (2023-)'
 author = 'Department of fluid mechanics and computational engineering, Faculty of Engineering, University of Rijeka'
 version = indago.__version__
 release = version

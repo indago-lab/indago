@@ -21,7 +21,7 @@ pip install indago --upgrade
 
 ## Optimization problem setup
 
-Using Indago is easy. There are two, very similar, ways to set up an optimization problem. You can use the interface for strictly real-value variables, or the alternative interface for mixed-type variables. The setup of the optimization problem in Indago is the same regardless of the used optimization method. 
+Using Indago is easy. There are two, very similar, ways to set up an optimization problem. You can use the interface for strictly real-value variables, or the alternative interface for non-real and mixed-type variables. The setup of the optimization problem in Indago is the same regardless of the used optimization method. 
 
 ### Using strictly real-value variables
 
@@ -72,11 +72,11 @@ X, f, O, C = minimize(goalfun, None, -10, 10 + np.arange(8), 'PSO',
 ```
 The `O` and `C` are the objective and constraint values, respectively. When using only one objective and no constraints, both of these are omitted. Instead of stating `'PSO'` as the method you want to use, you can use a different one (method name abbreviations are available in `indago.optimizers_name_list` and `indago.optimizers_dict`). The default method is `'PSO'`.
 
-### Using mixed-type variables
+### Using non-real and mixed-type variables
 
-Indago supports several types of variables, namely: Real, RealDiscrete, RealDiscretePeriodic, Integer, IntegerDiscrete, IntegerPeriodic, and Categorical. For the periodic variable types it is expected that the evaluation function returns the exact same objective(s and constraints) at the first and last allowed variable value, or lower and upper bound.
+Indago supports several types of variables, namely: Real, RealPeriodic, RealDiscrete, RealDiscretePeriodic, Integer, IntegerPeriodic, and Categorical. For the periodic variable types it is expected that the evaluation function returns the exact same objective(s and constraints) at the first and last allowed variable value, or lower and upper bound.
 
-You can mix these variable types however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary, given as `optimizer.variables`.
+For more information on variable types, consult the **Variable types** section of the documentation. You can mix these variable types however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary, given as `optimizer.variables`. Keep in mind that the evaluation function needs to take in variables in the exact order as they are given in the variables dict.
 
 Here's an example in which we will optimize a function with four variables of different types:
 ```python
