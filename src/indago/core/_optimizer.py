@@ -461,13 +461,12 @@ class Optimizer(Engine):
         else:
             self.sampler = 'random'
 
-        # future todo: in the code below change seed to rng (due to Scipy 1.15 changes)
         if self.sampler == 'halton':
-            self._sampler_method = Halton(self.dimensions, seed=self._seed)
+            self._sampler_method = Halton(self.dimensions, rng=self._seed)
         elif self.sampler == 'sobol':
-            self._sampler_method = Sobol(self.dimensions, seed=self._seed)
+            self._sampler_method = Sobol(self.dimensions, rng=self._seed)
         elif self.sampler == 'lhs':
-            self._sampler_method = LatinHypercube(self.dimensions, seed=self._seed)
+            self._sampler_method = LatinHypercube(self.dimensions, rng=self._seed)
 
         assert isinstance(self.monitoring, str) or self.monitoring is None, \
             'optimizer.monitoring should be a string or None'

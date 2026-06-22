@@ -226,7 +226,7 @@ def test_PSO_defaults_halton_initializer() -> None:
     description = 'PSO defaults, halton initializer'
     optimizer = PSO()
     optimizer.sampler = 'halton'
-    expected_result = 2.559935460137834
+    expected_result = 2.842724403296825
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -434,7 +434,7 @@ def test_RS_halton_initializer():
     description = 'RS halton initializer'
     optimizer = RS()
     optimizer.sampler = 'halton'
-    expected_result = 4.613384041419631
+    expected_result = 4.525787597082141
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -444,7 +444,7 @@ def test_RS_sobol_initializer():
     description = 'RS sobol initializer'
     optimizer = RS()
     optimizer.sampler = 'sobol'
-    expected_result = 4.67130384878125
+    expected_result = 4.631488062493909
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -454,7 +454,7 @@ def test_RS_lhs_initializer():
     description = 'RS lhs initializer'
     optimizer = RS()
     optimizer.sampler = 'lhs'
-    expected_result = 4.050654337618511
+    expected_result = 4.407026455595645
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
