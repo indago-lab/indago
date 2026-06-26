@@ -36,16 +36,16 @@ class Engine:
     _dimensions : int | None
         Private attribute used when user explicitly sets optimizer.dimensions. Do not use it, use optimizer.dimensions
         instead.
-    lb : ndarray or list of float or float
+    lb : ndarray or list of float, or float
         Lower bounds for a real-variable problem. If of type float, it will be expanded to ndarray of float of size
-        **dimensions**. If None, defaults to -1e100. Non finite (np.inf, np.nan) values (or members of ndarray or list)
-        default to -1e100. If (all members) not float, Optimizer.X0 must be provided. Default: ``None``.
-        TODO: Last sentence is confusing.
-    ub : ndarray or list of float or float
+        **dimensions**. If ``None``, defaults to -1e100. Non-finite (``np.inf``, ``np.nan``) values (or members of
+        ndarray or list) default to -1e100. If not all members are float, Optimizer.X0 must be provided.
+        Default: ``None``.
+    ub : ndarray or list of float, or float
         Upper bounds for a real-variable problem. If of type float, it will be expanded to ndarray of float of size
-        **dimensions**. If None, defaults to 1e100. Non finite (np.inf, np.nan) values (or members of ndarray or list)
-        default to 1e100. If (all members) not float, Optimizer.X0 must be provided. Default: ``None``.
-        TODO: Last sentence is confusing.
+        **dimensions**. If ``None``, defaults to 1e100. Non-finite (``np.inf``, ``np.nan``) values (or members of
+        ndarray or list) default to -1e100. If not all members are float, Optimizer.X0 must be provided.
+        Default: ``None``.
     _all_real : bool
         Private flag indicating whether all variables are real (real-valued). Used for better performances of some
          optimization algorithms when dealing with real-variable problems.
@@ -78,7 +78,7 @@ class Engine:
     """
 
     @property
-    def dimensions(self) -> int:
+    def dimensions(self) -> int | None:
         if len(self.variables) > 0:  # fully initialized
             return len(self.variables)
         else:  # not yet initialized
@@ -94,8 +94,8 @@ class Engine:
         self.dimensions: int = 0  # Just to remove mypy warning (not having dimensions before initialization since it is a property)
         self._dimensions: int | None = None
         self._all_real: bool = False
-        self.lb: NDArray = None
-        self.ub: NDArray = None
+        self.lb: NDArray | float | None  = None
+        self.ub: NDArray | float | None  = None
 
         self._x_format = indago.XFormat.Tuple
 

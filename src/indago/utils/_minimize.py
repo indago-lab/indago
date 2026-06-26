@@ -20,21 +20,18 @@ Usage: from indago import minimize, minimize_exhaustive, inspect, inspect_optimi
 
 
 import indago
-import numpy as np
-import time
-from rich.table import Table
-from rich.console import Console
-from copy import deepcopy
-import os
+
+from typing import Callable
+from numpy.typing import NDArray
 
 
-def minimize(evaluator,
-             variables=None,
-             lb=None, 
-             ub=None, 
-             optimizer_name='PSO', 
-             seed=None,
-             **kwargs):
+def minimize(evaluator: Callable,
+             variables: indago.VariableDictType | None = None,
+             lb: NDArray | float | None = None,
+             ub: NDArray | float | None = None,
+             optimizer_name: str='PSO',
+             seed: int | None = None,
+             **kwargs) -> tuple[tuple, float] | tuple[tuple, float, NDArray, NDArray]:
     """Shorthand one-line utility function for running an optimization.
         
     Parameters
@@ -51,7 +48,7 @@ def minimize(evaluator,
         Upper bounds. If ``None`` upper bounds will be taken from **evaluator.ub**.
     optimizer_name : str
         Name (abbreviation) of the optimization method used. Default value is ``'PSO'``.
-    optimize_seed : int or None
+    seed : int or None
         A random seed. Use the same value for reproducing identical stochastic procedures.
     **kwargs : kwarg
         Keyword arguments passed to the Optimizer object corresponding to the **optimizer_name**.
@@ -63,7 +60,6 @@ def minimize(evaluator,
         and the corresponding minimum fitness **f** (float).
         In case of more than one objective and/or defined constraints, results also include
         objectives **O** (ndarray), and constraints **C** (ndarray).
-        :param variables:
     """
     
     assert optimizer_name in indago.optimizers_name_list, \

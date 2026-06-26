@@ -31,7 +31,7 @@ class VariableType(Enum):
     IntegerPeriodic = 'IP'
     Categorical = 'C'
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation for design variable type."""
         return self.name
 
@@ -45,5 +45,5 @@ class XFormat(Enum):
     Ndarray = 'ndarray'
     Grouped = 'grouped'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name + ': ' + self.value

@@ -28,21 +28,21 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-X_Content_Type: TypeAlias = int | float | str
+
 """Type for possible content of design vector ``X``"""
+X_Content_Type: TypeAlias = int | float | str
 
-X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Content_Type] | NDArray[np.float64]
 """All possible (container) types for the design vector ``X``"""
+X_All_Containers = tuple[X_Content_Type] | list[X_Content_Type] | dict[str, X_Content_Type] | NDArray[np.float64]
 
-X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 """Container type which is used for storing design vector ``X`` (``Candidate._X``)"""
+X_Storage_Type: TypeAlias = tuple[X_Content_Type]
 
+"""A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
+# TODO: maybe update these to include Periodic types?
 VariableDictMinMaxType = tuple[VariableType, Real, Real]
 VariableDictDiscreteType = tuple[VariableType, list[Real | str]]
 VariableDictType = dict[str, VariableDictMinMaxType | VariableDictDiscreteType]
-# TODO: maybe update these to include Periodic types?
-"""A (container) type ``Optimizer.variables`` dictionary uses for variable definitions"""
-
 
 
 class Candidate:
@@ -716,7 +716,7 @@ class Candidate:
         Returns
         -------
         is_feasible : bool
-            ``True`` if the Candidate design vector is feasible, ``False`` otherwise.
+            ``True`` if Candidate design vector is feasible, ``False`` otherwise.
 
         """
 
