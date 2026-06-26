@@ -5,8 +5,8 @@ description = "Python module for numerical optimization"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "matplotlib>=3.10.8",
-    "numpy>=2.4.2",
-    "rich>=14.3.2",
-    "scipy>=1.17.0",
+    "matplotlib>=3.9.2",
+    "numpy>=2.1.3",
+    "rich>=13.9.4",
+    "scipy>=1.15.1",
 ]
