@@ -1480,15 +1480,15 @@ class Optimizer(Engine):
                         case VariableType.Real | VariableType.RealPeriodic:
                             X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
                         case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
-                            # TODO implement
+                            # TODO implement/check
                             X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
                         case VariableType.Integer | VariableType.IntegerPeriodic:
-                            # TODO implement
-                            X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
+                            # TODO implement/check
+                            X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
                         case VariableType.Categorical:
-                            # TODO implement
-                            i = var_options[0].index(self.history['X'][:, i])
-                            X = (len(var_options[0]) - i - 1) / (len(var_options[0]) - 1)
+                            # TODO implement/check
+                            cati = np.array([var_options[0].index(x) for x in self.history['X'][:, i]])
+                            X = (len(var_options[0]) - cati - 1) / (len(var_options[0]) - 1)
                         case _:
                             raise ValueError(f'Invalid variable type {var_type}')
 
