@@ -873,7 +873,7 @@ class Optimizer(Engine):
 
         # the following are important, explicitly adding them to printout
         if self.best:
-            table.add_row('best.X', np.array_str(self.best.X, max_line_width=np.inf), style='bold')
+            table.add_row('best.X', str(self.best.X), style='bold')
             table.add_row('best.f', str(self.best.f), style='bold')
 
         Console().print(table)
