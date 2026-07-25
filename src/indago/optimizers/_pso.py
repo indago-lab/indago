@@ -43,6 +43,24 @@ class Particle(Candidate):
 
     def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
                  x_format: XFormat = XFormat.Tuple) -> None:
+        """Particle constructor.
+
+        Parameters
+        ----------
+        variables : VariableDictType
+            A dictionary containing definitions of all design variables.
+        n_objectives : int
+            Number of objectives.
+        n_constraints : int
+            Number of constraints.
+        x_format : XFormat
+            A format for attribute X's return value.
+
+        Returns
+        -------
+        Particle
+            Particle instance.
+        """
 
         super().__init__(variables, n_objectives, n_constraints, x_format)
         
@@ -301,8 +319,9 @@ class PSO(Optimizer):
             # No fitness change at the start
             self._dF[p] = 0.0
 
-        self.v_avg = []
-        self.v_avg.append(np.sum([np.linalg.norm(particle.V) for p, particle in enumerate(self._swarm)]))
+        # TODO: v_avg is not used anywhere, could be removed entirely
+        # self.v_avg = []
+        # self.v_avg.append(np.sum([np.linalg.norm(particle.V) for p, particle in enumerate(self._swarm)]))
 
         # Evaluate
         if n0 < self.params['swarm_size']:
@@ -327,7 +346,7 @@ class PSO(Optimizer):
         """Method for reinitializing the PSO swarm topology.
         Removes existing and creates new connections in the swarm topology.
         
-        Attributes
+        Parameters
         ----------
         k : int
             Size of PSO swarm neighborhood.
@@ -481,7 +500,7 @@ class PSO(Optimizer):
                             particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
                             # print(f'{particle.V[i_var]}', )
 
-            self.v_avg.append(np.sum([np.linalg.norm(particle.V) for p, particle in enumerate(self._swarm)]))
+            # self.v_avg.append(np.sum([np.linalg.norm(particle.V) for p, particle in enumerate(self._swarm)]))
 
             # Get old fitness
             f_old = np.array([particle.f for particle in self._swarm])

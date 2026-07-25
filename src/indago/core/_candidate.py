@@ -51,7 +51,7 @@ class Candidate:
 
     Attributes
     ----------
-    X: list[float | int | str]
+    X : X_All_Containers
         Design vector.
     O: ndarray
         Objectives' values.
@@ -59,10 +59,18 @@ class Candidate:
         Constraints' values.
     f: float
         Fitness.
+    unique_str : str or None
+        Unique string associated with the candidate when unique string forwarding is enabled.
     _variables: VariableDictType
-        A hidden attribute for accessing variable definitions dictionary.
-    _x_format: XFormat:
+        A hidden attribute for accessing variable definition dictionary.
+    _x_format: XFormat
         A hidden attribute for attribute X's return value format.
+    _get_x : callable
+        A hidden callable used for returning the design vector in the selected format.
+    _eq_fn : callable
+        A hidden callable used for candidate equality comparison.
+    _lt_fn : callable
+        A hidden callable used for candidate less-than comparison.
     """
 
     def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
@@ -303,7 +311,7 @@ class Candidate:
         the provided variable value is NaN, the variable is assigned to a legit random value.
 
         Parameters
-        -------
+        ----------
         R: ndarray[float | None] or float or None
             Array of relative values in range [0, 1].
         """

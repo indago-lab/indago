@@ -33,6 +33,7 @@ class VariableType(Enum):
 
     def __str__(self) -> str:
         """String representation for design variable type."""
+
         return self.name
 
 
@@ -46,4 +47,6 @@ class XFormat(Enum):
     Grouped = 'grouped'
 
     def __str__(self) -> str:
+        """String representation for design vector format."""
+
         return self.name + ': ' + self.value

@@ -68,7 +68,7 @@ class DE(Optimizer):
         Solution instances.
     _Trials : list
         Trial solutions.
-    _A : ndarray
+    _A : list
         Archive.
     _M_CR : ndarray
         M_CR values.

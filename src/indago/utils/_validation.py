@@ -24,6 +24,20 @@ from numbers import Real
 
 
 def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[tuple[Exception, str]]]:
+    """Validate an optimization variables dictionary.
+
+    Parameters
+    ----------
+    variables : VariableDictType
+        A dictionary of optimization variables with their types, bounds, and allowed values.
+
+    Returns
+    -------
+    valid : bool
+        ``True`` if the variables dictionary is valid, ``False`` otherwise.
+    validation_log : list of tuple[Exception, str]
+        A list of validation errors represented by exception type and error message pairs.
+    """
 
     validation_log = []
     if not isinstance(variables, dict):

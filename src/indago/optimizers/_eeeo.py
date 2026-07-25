@@ -37,7 +37,7 @@ class EEEO(Optimizer):
     ----------
     variant : str
         Name of the EEEO variant. Default: ``Vanilla``.
-    methods : dict
+    methods : dict or None
         Indago methods (variant, params) to use. Default: ``{'PSO': (None, None),
         'FWA': (None, None)}``. ``None`` values for variant and params will activate the
         corresponding default variant and params.
