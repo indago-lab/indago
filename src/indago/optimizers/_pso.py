@@ -254,16 +254,7 @@ class PSO(Optimizer):
                             w[i] = 0
                     return w
                 self.params['akb_fun_start'] = akb_fun_languid
-                self.params['akb_fun_stop'] = akb_fun_languid
-
-            print(f'akb_model: {self.params["akb_model"]}')
-            if self.params['akb_model'] != 'Languid':
-                print(f'akb_fun_start, t: {self.params["akb_fun_start"].t}')
-                print(f'akb_fun_start, c: {self.params["akb_fun_start"].c}')
-                print(f'akb_fun_start, k: {self.params["akb_fun_start"].k}')
-                print(f'akb_fun_stop, t: {self.params["akb_fun_stop"].t}')
-                print(f'akb_fun_stop, c: {self.params["akb_fun_stop"].c}')
-                print(f'akb_fun_stop, k: {self.params["akb_fun_stop"].k}')
+                self.params['akb_fun_stop'] = akb_fun_languid 
 
         Optimizer._check_params(self, mandatory_params, optional_params, defined_params)
 
@@ -445,20 +436,13 @@ class PSO(Optimizer):
 
             elif self.params['inertia'] == 'anakatabatic':
                 theta = np.arctan2(self._dF, np.min(self._dF))
-                print(f'theta: {theta}')
                 theta[theta < 0] += 2 * np.pi  # 3rd quadrant
-                print(f'theta, after 3rd quadrant correction: {theta}')
                 # fix for atan2(0,0)=0
-                theta0 = theta < 1e-300
-                print(f'theta0: {theta0}')
+                theta0 = theta < 1e-100  # previously 1e-300
                 theta[theta0] = np.pi / 4 + np.random.rand(np.sum(theta0)) * np.pi
-                print(f'theta, after theta < 1e-300 correction: {theta}')
                 w_start = self.params['akb_fun_start'](theta)
-                print(f'w_start: {w_start}')
                 w_stop = self.params['akb_fun_stop'](theta)
-                print(f'w_stop: {w_stop}')
                 w = w_start * (1 - self._progress_factor()) + w_stop * self._progress_factor()
-                print(f'w: {w}')
             
             w = w * np.ones(self.params['swarm_size']) # ensure w is a vector
             
