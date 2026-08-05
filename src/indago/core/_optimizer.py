@@ -200,13 +200,8 @@ class Optimizer(Engine):
         
         self.variant = None
 
-        self.max_iterations = None
-        self.max_evaluations = None
-        self.max_stalled_iterations = None
-        self.max_stalled_evaluations = None
-        self.target_fitness = None
-        self.max_elapsed_time = None
-
+        # stopping criteria
+        self.target_fitness: float | None = None
 
         self.X0 = None
         self.sampler = None

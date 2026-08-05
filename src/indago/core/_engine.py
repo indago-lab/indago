@@ -123,6 +123,13 @@ class Engine:
 
         self._candidate_init_info: dict = {}
 
+        # stopping criteria
+        self.max_iterations: int | None = None
+        self.max_evaluations: int | None  = None
+        self.max_stalled_iterations: int | None  = None
+        self.max_stalled_evaluations: int | None  = None
+        self.max_elapsed_time: float | None  = None
+
         self.evaluator: Callable[[X_Content_Type], NDArray] | None = None
         self.processes: int = 1
         self._pool = None
