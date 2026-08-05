@@ -438,7 +438,7 @@ class PSO(Optimizer):
                 theta = np.arctan2(self._dF, np.min(self._dF))
                 theta[theta < 0] += 2 * np.pi  # 3rd quadrant
                 # fix for atan2(0,0)=0
-                theta0 = theta < 1e-100  # previously 1e-300
+                theta0 = theta < 1e-300
                 theta[theta0] = np.pi / 4 + np.random.rand(np.sum(theta0)) * np.pi
                 w_start = self.params['akb_fun_start'](theta)
                 w_stop = self.params['akb_fun_stop'](theta)
