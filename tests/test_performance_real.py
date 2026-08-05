@@ -32,7 +32,8 @@ def run(optimizer):
     optimizer.dimensions = DIM
     optimizer.lb = -100
     optimizer.ub = 100
-    optimizer.max_evaluations = MAXEVAL
+    if optimizer.max_evaluations is None:
+        optimizer.max_evaluations = MAXEVAL
     return np.nan_to_num(np.log10(optimizer.optimize(seed=0).f), posinf=1e300, neginf=-1e300)
 
 
@@ -126,8 +127,9 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
-    expected_result = 3.1457484365150234
-    tolerance = 1e-9
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 4.061416915882142
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -137,8 +139,9 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     optimizer = PSO()
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
-    expected_result = 3.3754146413536024
-    tolerance = 1e-7
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 3.9111847131244133
+    tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -149,7 +152,21 @@ def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'OrigamiSnake'
-    expected_result = 2.8239187031221262
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 3.6391625656148943
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
+    description = 'PSO TVAC anakatabatic DoubleSummit'
+    optimizer = PSO()
+    optimizer.variant = 'TVAC'
+    optimizer.params['inertia'] = 'anakatabatic'
+    optimizer.params['akb_model'] = 'DoubleSummit'
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 4.476265941753379
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -162,18 +179,6 @@ def test_PSO_Vanilla_anakatabatic_Languid() -> None:
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'Languid'
     expected_result = 3.8318983720461195
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
-    description = 'PSO TVAC anakatabatic DoubleSummit'
-    optimizer = PSO()
-    optimizer.variant = 'TVAC'
-    optimizer.params['inertia'] = 'anakatabatic'
-    optimizer.params['akb_model'] = 'DoubleSummit'
-    expected_result = 4.471496358324816  # was 4.0967505956847 before moving to _R - very strange
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -547,6 +552,7 @@ if __name__ == '__main__':
     test_PSO_Vanilla_anakatabatic_FlyingStork()
     test_PSO_Vanilla_anakatabatic_TipsySpider()
     test_PSO_Vanilla_anakatabatic_OrigamiSnake()
+    test_PSO_Vanilla_anakatabatic_DoubleSummit()
     test_PSO_Vanilla_anakatabatic_Languid()
     test_PSO_defaults_multiprocessing_on_4_processors()
     test_PSO_defaults_multiprocessing_on_maximum_processors()
