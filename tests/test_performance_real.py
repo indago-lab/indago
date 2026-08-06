@@ -149,30 +149,28 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
 def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     description = 'PSO Vanilla anakatabatic OrigamiSnake'
     optimizer = PSO()
-    optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'OrigamiSnake'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
-    expected_result = 3.6391625656148943
+    expected_result = 3.7188374942095686
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
 def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
-    description = 'PSO TVAC anakatabatic DoubleSummit'
+    description = 'PSO Vanilla anakatabatic DoubleSummit'
     optimizer = PSO()
-    optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'DoubleSummit'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
-    expected_result = 4.476265941753379
-    tolerance = TOL
+    expected_result = 3.5775186218393524
+    tolerance = 1e-8
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_PSO_Vanilla_anakatabatic_Languid() -> None:
+def test_PSO_TVAC_anakatabatic_Languid() -> None:
     description = 'PSO TVAC anakatabatic Languid'
     optimizer = PSO()
     optimizer.variant = 'TVAC'
@@ -553,7 +551,7 @@ if __name__ == '__main__':
     test_PSO_Vanilla_anakatabatic_TipsySpider()
     test_PSO_Vanilla_anakatabatic_OrigamiSnake()
     test_PSO_Vanilla_anakatabatic_DoubleSummit()
-    test_PSO_Vanilla_anakatabatic_Languid()
+    test_PSO_TVAC_anakatabatic_Languid()
     test_PSO_defaults_multiprocessing_on_4_processors()
     test_PSO_defaults_multiprocessing_on_maximum_processors()
     test_PSO_Chaotic_defaults()
