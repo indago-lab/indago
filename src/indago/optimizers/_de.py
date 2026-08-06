@@ -126,7 +126,7 @@ class DE(Optimizer):
                 defined_params += 'p_mutation'.split()    
             optional_params = 'rank_enabled'.split()
             if 'rank_enabled' not in self.params:
-                self.params['rank_enabled'] = False # Rank-based variant off by default
+                self.params['rank_enabled'] = False  # Rank-based variant off by default
                 defined_params += 'rank_enabled'.split()  
         elif self.variant == 'LSHADE':
             mandatory_params = 'pop_init f_archive hist_size p_mutation'.split()
@@ -149,8 +149,8 @@ class DE(Optimizer):
         else:
             assert False, f'Unknown variant! {self.variant}'
         
-        if self.constraints > 0:
-            assert False, 'DE does not support constraints'
+        if not self.params['rank_enabled'] and self.constraints > 0:
+            assert False, 'DE does not support constraints by default! Set param rank_enabled=True to enable it.'
         
         assert isinstance(self.params['pop_init'], int) \
             and self.params['pop_init'] > 0, \
@@ -241,9 +241,6 @@ class DE(Optimizer):
             top = max(round(len(self._Pop) * self.params['p_mutation']), 1)
             pbest = np.random.choice(sorted(self._Pop)[0:top])
             
-            if self.params['rank_enabled']:
-                self._Pop = sorted(self._Pop)
-            
             for p, t in zip(self._Pop, self._Trials):
                 
                 # Update CR, F
@@ -263,7 +260,7 @@ class DE(Optimizer):
                     r1 = np.random.choice(self._Pop)
                     r2 = np.random.choice(self._Pop + self._A)
                 p.V = p._R + p.F * (pbest._R - p._R) + p.F * (r1._R - r2._R)
-                p.V = np.clip(p.V, (p._R + 0)/2, (p._R + 1)/2)
+                p.V = np.clip(p.V, (0 + p._R)/2, (p._R + 1)/2)
                 
                 # Compute trial vector
                 t.CR = p.CR
@@ -279,49 +276,54 @@ class DE(Optimizer):
 
             self._randomize_categorical(self._Trials)
 
-            # Evaluate population
+            # Evaluate trials
             self._collective_evaluation(self._Trials)
             
-            # Survival for next generation
+            # Survival for next generation...
+
+            # standard fitness-based algorithm
             if not self.params['rank_enabled']:
                 for p, t in zip(self._Pop, self._Trials):
-                    if not np.isnan(t.f) and t.f < p.f:
+                    if t < p:
+
                         # Update external archive
                         self._A.append(p)
                         if len(self._A) > round(len(self._Pop) * self.params['f_archive']):
-                            # self._A = np.delete(self._A, np.random.randint(np.size(self._A)))
                             self._A.remove(np.random.choice(self._A))
+
                         S_CR = np.append(S_CR, t.CR) 
                         S_F = np.append(S_F, t.F)
                         S_df = np.append(S_df, p.f - t.f)
+
                         # Update population
                         p._R = np.copy(t._R)
                         p.f = t.f
-                        p.O, p.C = np.copy(t.O), np.copy(t.C)
+                        p.O, p.C = np.copy(t.O), np.copy(t.C)  # formally copying, natively not supporting constraints
             
-            # Rank-based variant - very poor performance
-            if self.params['rank_enabled']: 
-                # p_ranking = np.argsort(self._Pop)
-                p_ranking = np.arange(len(self._Pop))
-                # self._Trials = np.sort(self._Trials)
-                t_ranking = np.argsort(self._Trials)
-                # Calculating rank-based improvement of trials
-                S_df = (p_ranking - t_ranking) / (1 + p_ranking)**2
-                S_df = S_df[S_df > 0]
-                # S_df = 1.0 + S_df ** 2                                               
+            # rank-based variant - very poor performance!
+            else:
+                ranking = np.argsort(self._Pop + self._Trials)
+                p_ranking = ranking[0:len(self._Pop)]
+                t_ranking = ranking[len(self._Pop):]
+
                 for p, t, p_rank, t_rank in zip(self._Pop, self._Trials, p_ranking, t_ranking):
-                    if t_rank < p_rank:                      
+                    if t < p:
+
                         # Update external archive
-                        self._A.append(p)
-                        if len(self._A) > round(len(self._Pop) * self.params['f_archive']):
-                            # self._A = np.delete(self._A, np.random.randint(np.size(self._A)))
-                            self._A.remove(np.random.choice(self._A))
+                        if p.is_feasible():
+                            self._A.append(p)
+                            if len(self._A) > round(len(self._Pop) * self.params['f_archive']):
+                                self._A.remove(np.random.choice(self._A))
+
                         S_CR = np.append(S_CR, t.CR) 
                         S_F = np.append(S_F, t.F)
-                        #S_df = np.append(S_df, p_rank - t_rank)
+                        df = (p_rank - t_rank) #/ max(np.mean(p_ranking) - np.mean(t_ranking), 1)
+                        df = max(df, 1/2)
+                        S_df = np.append(S_df, df)
+
                         # Update population
                         p._R = np.copy(t._R)
-                        p.f = t.f 
+                        p.f = t.f
                         p.O, p.C = np.copy(t.O), np.copy(t.C)
 
             # Memory update
