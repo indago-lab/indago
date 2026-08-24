@@ -21,7 +21,7 @@ from enum import Enum
 class VariableType(Enum):
     """Enum class for design variable types. Supported variable types are ``VariableType.Real``,
     ``VariableType.RealDiscrete``, ``VariableType.RealPeriodic``, ``VariableType.RealDiscretePeriodic``,
-    ``VariableType.Integer``, ``VariableType.IntegerDiscrete``, ``VariableType.Categorical``."""
+    ``VariableType.Integer``, ``VariableType.IntegerPeriodic``, ``VariableType.Categorical``."""
 
     Real = 'R'
     RealPeriodic = 'RP'

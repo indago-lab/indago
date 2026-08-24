@@ -20,8 +20,6 @@ Usage: from indago import MNM
 
 
 import numpy as np
-from pip._internal.models import candidate
-
 from indago import Optimizer, Candidate, Status
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
@@ -105,13 +103,13 @@ class MNM(Optimizer):
                 assert self.params['param1'] > 0, \
                     "param1 parameter should be positive integer"
             else:
-                self.params['param1'] = int(max(self.dimensions, 10))
+                self.params['param1'] = int(max(self.dimensions, 10))  # or some other default value
             defined_params += 'param1'.split()
 
             if 'param2' in self.params:
-                self.params['param2'] = int(self.params['param2'])
+                self.params['param2'] = float(self.params['param2'])
                 assert self.params['param2'] > 0, \
-                    "levels parameter should be positive float"
+                    "param2 parameter should be positive float"
             else:
                 self.params['param2'] = 3
             defined_params += 'param2'.split()
