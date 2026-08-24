@@ -1,43 +1,66 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 26 11:34:28 2021
-
-@author: stefan
+testing performance of Indago optimizers on constrained problems
 """
 
 import sys
 sys.path.append('..')
-from indago import PSO, FWA, SSA, DE
+import indago
 import numpy as np
-import matplotlib.pyplot as plt
 
-def f(X):
+
+RUNS = 30
+
+def f2(X):
     return np.array([np.sum(X**2), 
                      12 + np.sum(np.sin(X)),
                      7 - np.average(X),
                      ])
+f2.constraints = 2
 
-for optimizer in [SSA(),
-                  PSO(), 
-                  FWA(),
-                  DE()
-                  ]:
+def f1_1(X):
+    return np.array([np.sum(X**2),
+                     12 + np.sum(np.sin(X)),
+                     ])
+f1_1.constraints = 1
 
-    optimizer.evaluator = f
-    optimizer.processes = 1
-    optimizer.dimensions = 20
-    optimizer.lb = np.ones(optimizer.dimensions) * -10
-    optimizer.ub = np.ones(optimizer.dimensions) *  10
-    optimizer.objectives = 1
-    optimizer.constraints = 2
-    optimizer.max_evaluations = 30000
+def f1_2(X):
+    return np.array([np.sum(X**2),
+                     7 - np.average(X),
+                     ])
+f1_2.constraints = 1
 
-    if type(optimizer).__name__ == 'DE':
-        optimizer.variant = 'LSHADE'
-        optimizer.params['rank_enabled'] = True
 
-    optimizer.optimize()
-    optimizer.plot_history()
+for f in [f1_1, f1_2,f2]:
 
-plt.show()
+    print(f'testing on {f.__name__}...')
+
+    for optimizer in indago.optimizers:
+
+        res = []
+        for _ in range(RUNS):
+
+            opt = optimizer()
+
+            opt.evaluator = f
+            opt.processes = 1
+            opt.dimensions = 20
+            opt.lb = np.ones(opt.dimensions) * -10
+            opt.ub = np.ones(opt.dimensions) *  10
+            opt.objectives = 1
+            opt.constraints = f.constraints
+            opt.max_evaluations = 30000
+
+            if optimizer == indago.DE:
+                opt.variant = 'LSHADE'
+                opt.params['rank_enabled'] = True
+
+            c = opt.optimize()
+
+            if c.is_feasible():
+                res.append(c.f)
+            else:
+                res.append(np.inf)
+
+        print(f'   {optimizer.__name__}... {np.median(res):.2e}')
