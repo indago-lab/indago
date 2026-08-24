@@ -400,7 +400,7 @@ def test_MSGD_defaults():
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
-    expected_result = 0.9756561726654626
+    expected_result = 0.9932648872233105
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -477,7 +477,7 @@ def test_HBO_Dynamic_defaults():
 def test_CRS_defaults():
     description = 'CRS defaults'
     optimizer = CRS()
-    expected_result = 0.19213114242329002
+    expected_result = 0.25058585102576797
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

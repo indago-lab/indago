@@ -367,6 +367,9 @@ class Candidate:
                 case VariableType.Integer:
                     lb, ub = var_options
                     i = int(round(lb - 0.5 + r * (ub - lb + 1)))
+                    # TODO: maybe do something smarter instead of the following fix for out-of-bound values
+                    i = min(i, ub)
+                    i = max(i, lb)
                     X.append(i)
                 case VariableType.IntegerPeriodic:
                     lb, ub = var_options
