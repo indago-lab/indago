@@ -175,7 +175,9 @@ class ACO(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._pop)
+            new = self._eeeo_inject(self._pop)
+            if new < self.best:
+                self.best = new
 
         # Checking user/default-defined parameters
         self._check_params()
@@ -194,13 +196,15 @@ class ACO(Optimizer):
                         self._ph[i][j] += 1
 
                         if self.variant == 'Spillover':
-                            if j == 0 and var[0] == var[-1]:  # periodic variable
-                                self._ph[i][-2] += self.params['so_rate']
+                            if j == 0:
+                                if var[0] == var[-1]:  # periodic variable
+                                    self._ph[i][-2] += self.params['so_rate']
                                 self._ph[i][j+1] += self.params['so_rate']
-                            elif j == len(var) - 1 and var[0] == var[-1]:  # periodic variable
+                            elif j == len(var) - 1:
                                 self._ph[i][j-1] += self.params['so_rate']
-                                self._ph[i][1] += self.params['so_rate']
-                            elif type(val) is not str:  # not Categorical variable
+                                if var[0] == var[-1]:  # periodic variable
+                                    self._ph[i][1] += self.params['so_rate']
+                            elif type(val) is not str:  # non-periodic, non-Categorical variable
                                 if j - 1 >= 0:
                                     self._ph[i][j-1] += self.params['so_rate']
                                 if j + 1 <= len(var) - 1:
