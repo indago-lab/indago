@@ -643,55 +643,11 @@ class Optimizer(Engine):
             for c in candidates:
                 c._R = np.random.uniform(size=self.dimensions, low=0, high=1)
 
-            # if self._all_real:
-            #     for c in candidates:
-            #         c.X = np.random.uniform(size=self.dimensions, low=self.lb, high=self.ub)
-            #
-            # else:
-            #
-            #     for c in candidates:
-            #         X: list[X_Content_Type] = list[X_Content_Type]([])
-            #         for var_name, (var_type, *var_options) in self.variables.items():
-            #             match var_type:
-            #                 case VariableType.REAL | VariableType.REAL_PERIODIC:
-            #                     X.append(np.random.uniform(low=var_options[0], high=var_options[1]))
-            #                 case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC | VariableType.CATEGORICAL:
-            #                     X.append(np.random.choice(var_options[0]))
-            #                 case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-            #                     X.append(np.random.randint(low=var_options[0], high=var_options[1]) + 1)
-            #                 case _:
-            #                     raise ValueError(f'Unknown variable type: {var_type}')
-            #         c.X = X
-
         elif self.sampler in 'halton sobol lhs'.split():
 
             for c in candidates:
                 R = self._sampler_method.random(n=1)[0]
                 c._R = R
-
-            # if self._all_real:
-            #     for c in candidates:
-            #         c.X = self.lb + self._sampler_method.random(n=1)[0] * (self.ub - self.lb)
-            #
-            # else:
-            #     for c in candidates:
-            #         X: list[X_Content_Type] = list[X_Content_Type]([])
-            #         R = self._sampler_method.random(n=1)[0]
-            #         for (var_name, (var_type, *var_options)), r in zip(self.variables.items(), R):
-            #             match var_type:
-            #                 case VariableType.REAL | VariableType.REAL_PERIODIC:
-            #                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
-            #                 case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-            #                     x = var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1.0)
-            #                     i = int(np.round(x))
-            #                     X.append(i)
-            #                 case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC | VariableType.CATEGORICAL:
-            #                     i = int(np.round(r * len(var_options[0]) - 0.5))
-            #                     X.append(var_options[0][i])
-            #                 case _:
-            #                     raise ValueError(f'Unknown variable type: {var_type}')
-            #         c.X = X
-
 
     def _randomize_categorical(self, candidates: list[Candidate]) -> None:
         """Private method for randomizing categorical variables in given candidates.
@@ -710,10 +666,9 @@ class Optimizer(Engine):
 
         for c in candidates:
             R = [None] * self.dimensions
-            for i_var in self._var_indices[indago.VariableType.CATEGORICAL]:
+            for i_var in self._var_indices[VariableType.CATEGORICAL]:
                 R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
             c._R = R
-
 
     def _evaluate_initial_candidates(self):
         """Private method for evaluating initial candidates. This method populates 
@@ -1483,21 +1438,17 @@ class Optimizer(Engine):
                     X = (self.ub[i] - self.history['X'][:, i]) / (self.ub[i] - self.lb[i])
                 else:
                     var_type, *var_options = self.variables[var_keys[i]]
-                    match var_type:
-                        case VariableType.REAL | VariableType.REAL_PERIODIC:
-                            X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
-                        case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
-                            # TODO implement/check
-                            X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
-                        case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-                            # TODO implement/check
-                            X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
-                        case VariableType.CATEGORICAL:
-                            # TODO implement/check
-                            cati = np.array([var_options[0].index(x) for x in self.history['X'][:, i]])
-                            X = (len(var_options[0]) - cati - 1) / (len(var_options[0]) - 1)
-                        case _:
-                            raise ValueError(f'Invalid variable type {var_type}')
+                    if var_type.is_real() and not var_type.is_discrete():
+                        X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
+                    elif var_type.is_real() and var_type.is_discrete():
+                        X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
+                    elif var_type.is_integer():
+                        X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
+                    elif var_type is VariableType.CATEGORICAL:
+                        cati = np.array([var_options[0].index(x) for x in self.history['X'][:, i]])
+                        X = (len(var_options[0]) - cati - 1) / (len(var_options[0]) - 1)
+                    else:
+                        raise ValueError(f'Invalid variable type {var_type}')
 
                 ax_x.plot(E, X, lw=lw, ls='-',
                           label=f'$x_{{{i + 1}}}$' if self.dimensions < 15 else None)

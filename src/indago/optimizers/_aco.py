@@ -124,12 +124,10 @@ class ACO(Optimizer):
         self._ph = []
 
         for _, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-            assert var_type in [VariableType.REAL_DISCRETE, VariableType.REAL_DISCRETE_PERIODIC,
-                                VariableType.INTEGER, VariableType.INTEGER_PERIODIC,
-                                VariableType.CATEGORICAL], \
+            assert var_type.is_discrete(), \
                 f'Variable {var_name} is not of discrete/integer/categorical type and as such cannot be used with ACO'
 
-            if var_type in [VariableType.INTEGER, VariableType.INTEGER_PERIODIC]:
+            if var_type.is_integer():
                 self._net.append([n for n in range(var_options[0], var_options[1] + 1)])
             else:
                 self._net.append(var_options[0])

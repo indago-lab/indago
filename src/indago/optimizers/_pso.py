@@ -278,25 +278,8 @@ class PSO(Optimizer):
 
         self._evaluate_initial_candidates()
         
-        # Bounds for position and velocity
-        # if self._all_real:
-        #     self._v_max = np.full(self.dimensions, 0.2)
-        # else:
-        #     v_max = []
-        #     for var_name, (var_type, *var_options) in self.variables.items():
-        #         match var_type:
-        #             case VariableType.REAL | VariableType.REAL_PERIODIC:
-        #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
-        #             case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-        #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
-        #             case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
-        #                 v_max.append(0.2 * (np.max(var_options[0]) - np.min(var_options[0])))
-        #             case VariableType.CATEGORICAL:
-        #                 v_max.append(0)
-        #             case _:
-        #                 raise ValueError(f'Unknown variable type: {var_type}')
-        #     self._v_max = np.asarray(v_max)
-        self._v_max = np.full(self.dimensions, 0.2)
+        # Bounds for velocity
+        self._v_max = np.full(self.dimensions, 0.2)  # setting velocity in R-space
 
         # Generate a swarm
         self._swarm: list[Particle] = [Particle(**self._candidate_init_info) for c in range(self.params['swarm_size'])]
@@ -493,11 +476,10 @@ class PSO(Optimizer):
                 self._randomize_categorical([particle])
 
                 for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
-                        if np.abs(particle.V[i_var]) > 0.5:
-                            # print(f'{particle.V[i_var]}', end=' ==> ')
-                            particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
-                            # print(f'{particle.V[i_var]}', )
+                    if var_type.is_periodic() and np.abs(particle.V[i_var]) > 0.5:
+                        # print(f'{particle.V[i_var]}', end=' ==> ')
+                        particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])
+                        # print(f'{particle.V[i_var]}', )
 
             # self.v_avg.append(np.sum([np.linalg.norm(particle.V) for p, particle in enumerate(self._swarm)]))
 

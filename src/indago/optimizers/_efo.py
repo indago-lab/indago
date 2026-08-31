@@ -191,10 +191,8 @@ class EFO(Optimizer):
                                 phi * force * (self._EM[l_pos]._R[d] - self._EM[l_neu]._R[d]) \
                                 - force * (self._EM[l_neg]._R[d] - self._EM[l_neu]._R[d])
 
-                if var_type not in \
-                        [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
-                    if not 0 < R[d] < 1:
-                        R[d] = np.random.uniform(0, 1)
+                if not var_type.is_periodic() and not 0 < R[d] < 1:
+                    R[d] = np.random.uniform(0, 1)
 
             if np.random.uniform(0,1) < R_rate:
                 R[RI] = np.random.uniform(0, 1)

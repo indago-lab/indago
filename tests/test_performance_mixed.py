@@ -8,11 +8,7 @@ A TEST FOR EVERY NEW METHOD/FEATURE PERFORMANCE SHOULD BE ADDED HERE
 
 # need this for local (non-pip) install only
 import sys
-
-import indago
-
 sys.path.append('..')
-sys.path.append('../indagobench')
 
 import numpy as np
 import math

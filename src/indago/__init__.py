@@ -31,9 +31,7 @@ from indago.optimizers._pso import PSO
 from indago.optimizers._fwa import FWA
 from indago.optimizers._ssa import SSA
 from indago.optimizers._de import DE
-# from indago.optimizers._ba import BA
 from indago.optimizers._efo import EFO
-# from indago.optimizers._mrfo import MRFO
 from indago.optimizers._abc import ABC
 from indago.optimizers._nm import NM
 # from indago.optimizers._msgd import MSGD
@@ -57,11 +55,3 @@ NelderMead = NM
 
 # Undocumented optimizers
 from indago.optimizers._eeeo import EEEO
-# from indago.optimizers._sa import SA
-# from indago.optimizers._gd import GD
-# from indago.optimizers._rbs import RBS
-# # from indago.optimizers._bo import BO
-# from indago.optimizers._esc import ESC
-# from indago.optimizers._ga import GA
-# from indago.optimizers._cmaes import CMAES
-# from indago.optimizers._dgs import DGS

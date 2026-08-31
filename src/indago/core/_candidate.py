@@ -97,15 +97,14 @@ class Candidate:
         X: list[X_Content_Type] = []
         type_count = {k: 0 for k in VariableType}
         for var_name, (var_type, *var_params) in variables.items():
-            match var_type:
-                case VariableType.REAL | VariableType.REAL_DISCRETE | VariableType.REAL_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
-                    X.append(np.nan)
-                case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-                    X.append(0)
-                case VariableType.CATEGORICAL:
-                    X.append('X')
-                case _:
-                    raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
+            if var_type.is_real():
+                X.append(np.nan)
+            elif var_type.is_integer():
+                X.append(0)
+            elif var_type is VariableType.CATEGORICAL:
+                X.append('X')
+            else:
+                raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
             type_count[var_type] += 1
 
         var_float = type_count[VariableType.REAL] + type_count[VariableType.REAL_DISCRETE] \
@@ -176,18 +175,20 @@ class Candidate:
         x_format: type = type(design)
         if x_format in [list, tuple, np.ndarray]:
             for i, (val, (var_name, (var_type, *_))) in enumerate(zip(design, self._variables.items())):
-                match var_type:
-                    case VariableType.REAL | VariableType.REAL_DISCRETE | VariableType.REAL_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
-                        assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                        X.append(float(val))
-                    case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-                        assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                        X.append(int(val))
-                    case VariableType.CATEGORICAL:
-                        assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
-                        X.append(str(val))
-                    case _:
-                        raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+                if var_type.is_real():
+                    assert isinstance(val, (float, np.floating)), \
+                        f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                    X.append(float(val))
+                elif var_type.is_integer():
+                    assert isinstance(val, (int, np.integer)), \
+                        f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                    X.append(int(val))
+                elif var_type is VariableType.CATEGORICAL:
+                    assert isinstance(val, (str, np.str_)), \
+                        f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
+                    X.append(str(val))
+                else:
+                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
 
         elif x_format == dict:
             for i, ((var_name, v), x) in enumerate(zip(design.items(), self._X)):
@@ -282,20 +283,18 @@ class Candidate:
 
         R = []
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
-            match var_type:
-                case VariableType.REAL | VariableType.REAL_PERIODIC:
-                    R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
-                case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
-                    # R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
-                    x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
-                    x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
-                    R.append((x - x_min) / (x_max - x_min))
-                case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
-                    R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
-                case VariableType.CATEGORICAL:
-                    R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
-                case _:
-                    raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
+            if var_type.is_real() and not var_type.is_discrete():
+                R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
+            elif var_type.is_real() and var_type.is_discrete():
+                x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
+                x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
+                R.append((x - x_min) / (x_max - x_min))
+            elif var_type.is_integer():
+                R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
+            elif var_type is VariableType.CATEGORICAL:
+                R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
+            else:
+                raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
         R = np.array(R)
         R.flags.writeable = False
         return R
@@ -321,21 +320,20 @@ class Candidate:
             R = np.full(len(self._variables), R, dtype=float)
 
         X: list[X_Content_Type] = []
-        # for i_var, (var_name, (var_type, *var_options)) in enumerate(self._variables.items()):
-        #     if var_type not in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
-        #         R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
             if r is None:
                 X.append(self._get_X_as_dict()[var_name])
                 continue
+
             if np.isnan(r):
                 r = np.random.rand()
-            if var_type in [VariableType.REAL, VariableType.REAL_DISCRETE, VariableType.INTEGER]:
-                r = np.clip(r, 0, 1)
-            elif var_type in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
+
+            if var_type.is_periodic():
                 r = r % 1.0
-            elif var_type == VariableType.CATEGORICAL:
+            elif var_type.is_real() or var_type.is_integer():
+                r = np.clip(r, 0, 1)
+            elif var_type is VariableType.CATEGORICAL:
                 if r < 0 or r > 1:
                     r = np.random.rand()
             else:
@@ -502,7 +500,7 @@ class Candidate:
 
         all_real = True
         for var_type in list(a._variables.values()) + list(b._variables.values()):
-            if var_type[0] != VariableType.REAL:
+            if var_type[0] is not VariableType.REAL:
                 all_real = False
                 break
 
@@ -684,7 +682,7 @@ class Candidate:
 
         all_real = True
         for var_type in self._variables.values():
-            if var_type[0] != VariableType.REAL:
+            if var_type[0] is not VariableType.REAL:
                 all_real = False
                 break
         if all_real:
@@ -697,20 +695,17 @@ class Candidate:
             r_alt = np.inf
             self_r = self._R[i]
 
-            match var_type:
-
-                case VariableType.REAL_PERIODIC | VariableType.INTEGER_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
-                    if r < 0.5:  # from left half to far right
-                        r_alt = r + 1
-                    else:  # from right half to far left
-                        r_alt = r - 1
-
-                case VariableType.CATEGORICAL:
-                    if other.X[i] == self.X[i]:
-                        delta_R.append(0)
-                    else:
-                        delta_R.append(np.nan)  # np.nan is good because it survives NumPy operations
-                    continue
+            if var_type.is_periodic():
+                if r < 0.5:  # from left half to far right
+                    r_alt = r + 1
+                else:  # from right half to far left
+                    r_alt = r - 1
+            elif var_type is VariableType.CATEGORICAL:
+                if other.X[i] == self.X[i]:
+                    delta_R.append(0)
+                else:
+                    delta_R.append(np.nan)  # np.nan is good because it survives NumPy operations
+                continue
 
             if abs(self_r - r) < abs(self_r - r_alt):
                 delta_R.append(self_r - r)

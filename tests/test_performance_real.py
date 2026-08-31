@@ -8,11 +8,7 @@ A TEST FOR EVERY NEW METHOD/FEATURE PERFORMANCE SHOULD BE ADDED HERE
 
 # need this for local (non-pip) install only
 import sys
-
-import indago
-
 sys.path.append('..')
-sys.path.append('../indagobench')
 
 import numpy as np
 from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, EEEO  # BA, MRFO, MSGD

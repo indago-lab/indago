@@ -18,6 +18,7 @@ Usage: from indago import Candidate
 
 from enum import Enum
 
+
 class VariableType(Enum):
     """Enum class for design variable types. Supported variable types are ``VariableType.REAL``,
     ``VariableType.REAL_DISCRETE``, ``VariableType.REAL_PERIODIC``, ``VariableType.REAL_DISCRETE_PERIODIC``,
@@ -30,6 +31,40 @@ class VariableType(Enum):
     INTEGER = 'I'
     INTEGER_PERIODIC = 'IP'
     CATEGORICAL = 'C'
+
+    def is_real(self) -> bool:
+        """Return whether this is a real-valued variable type."""
+
+        return self in (VariableType.REAL,
+                        VariableType.REAL_PERIODIC,
+                        VariableType.REAL_DISCRETE,
+                        VariableType.REAL_DISCRETE_PERIODIC,
+                        )
+
+    def is_integer(self) -> bool:
+        """Return whether this is an integer-valued variable type."""
+
+        return self in (VariableType.INTEGER,
+                        VariableType.INTEGER_PERIODIC,
+                        )
+
+    def is_discrete(self) -> bool:
+        """Return whether this is a discrete variable type."""
+
+        return self in (VariableType.REAL_DISCRETE,
+                        VariableType.REAL_DISCRETE_PERIODIC,
+                        VariableType.INTEGER,
+                        VariableType.INTEGER_PERIODIC,
+                        VariableType.CATEGORICAL,
+                        )
+
+    def is_periodic(self) -> bool:
+        """Return whether this is a periodic variable type."""
+
+        return self in (VariableType.REAL_PERIODIC,
+                        VariableType.REAL_DISCRETE_PERIODIC,
+                        VariableType.INTEGER_PERIODIC,
+                        )
 
     def __str__(self) -> str:
         """String representation for design variable type."""
