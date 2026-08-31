@@ -79,34 +79,38 @@ Indago supports several types of variables, namely: Real, RealPeriodic, RealDisc
 For more information on variable types, consult the **Variable types** section of the documentation. You can mix these variable types however you want. Note that some optimization methods will work better with them and some worse. If you want to use these variable types, you must explicitly declare them in a variables dictionary, given as `optimizer.variables`. Keep in mind that the evaluation function needs to take in variables in the exact order as they are given in the variables dict.
 
 Here's an example in which we will optimize a function with four variables of different types:
+
 ```python
 import math
 import numpy as np
 import indago
 
 # Optimization variables dictionary in the form of {name: (type, bounds | values)}
-VARS = {'type': (indago.VariableType.Categorical, ['up', 'down']),  # only strings allowed for Categorical variables
-	'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
-	'n': (indago.VariableType.Integer, 2, 5),  # for non-discrete types we must provide bounds...
-	'a': (indago.VariableType.Real, -3.3, 3.3)  # ...instead of allowed values
-	}
+VARS = {'type': (indago.VariableType.CATEGORICAL, ['up', 'down']),  # only strings allowed for Categorical variables
+        'base': (indago.VariableType.REAL_DISCRETE, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
+        'n': (indago.VariableType.INTEGER, 2, 5),  # for non-discrete types we must provide bounds...
+        'a': (indago.VariableType.REAL, -3.3, 3.3)  # ...instead of allowed values
+        }
+
 
 # Evaluation function
 def goalfun(x):
-	type, base, n, a = x  # x is a tuple
-	obj = base ** a + math.factorial(n) + a ** 2  # minimization objective
-	match type:
-		case 'up':
-			obj += math.factorial(n - 1)
-		case 'down':
-			obj -= 1
-		case _:
-			obj = np.nan
-	constr = base - n  # constraint base - n <= 0
-	return obj, constr
+    type, base, n, a = x  # x is a tuple
+    obj = base ** a + math.factorial(n) + a ** 2  # minimization objective
+    match type:
+        case 'up':
+            obj += math.factorial(n - 1)
+        case 'down':
+            obj -= 1
+        case _:
+            obj = np.nan
+    constr = base - n  # constraint base - n <= 0
+    return obj, constr
+
 
 # Initialize the chosen method
 from indago import FWA  # ...or any other Indago method
+
 optimizer = FWA()
 
 # Optimization variables settings

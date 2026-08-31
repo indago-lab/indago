@@ -20,7 +20,7 @@ Usage: from indago import PSO
 
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 from scipy.interpolate import make_interp_spline  # need this for akb_model
 
@@ -42,7 +42,7 @@ class Particle(Candidate):
     """
 
     def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
-                 x_format: XFormat = XFormat.Tuple) -> None:
+                 x_format: XFormat = XFormat.TUPLE) -> None:
         """Particle constructor.
 
         Parameters
@@ -270,7 +270,7 @@ class PSO(Optimizer):
         """
 
         if self._all_real:
-            self._x_format = XFormat.Ndarray
+            self._x_format = XFormat.NDARRAY
 
         if self.variant == 'TVAC' or self.params['inertia'] == 'anakatabatic':
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
@@ -285,13 +285,13 @@ class PSO(Optimizer):
         #     v_max = []
         #     for var_name, (var_type, *var_options) in self.variables.items():
         #         match var_type:
-        #             case VariableType.Real | VariableType.RealPeriodic:
+        #             case VariableType.REAL | VariableType.REAL_PERIODIC:
         #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
-        #             case VariableType.Integer | VariableType.IntegerPeriodic:
+        #             case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
         #                 v_max.append(0.2 * (var_options[1] - var_options[0]))
-        #             case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
+        #             case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
         #                 v_max.append(0.2 * (np.max(var_options[0]) - np.min(var_options[0])))
-        #             case VariableType.Categorical:
+        #             case VariableType.CATEGORICAL:
         #                 v_max.append(0)
         #             case _:
         #                 raise ValueError(f'Unknown variable type: {var_type}')
@@ -455,9 +455,9 @@ class PSO(Optimizer):
 
                 v_cog = self._pbests[p]._R - particle._R
                 v_soc = self._pbests[self._gbest_idx[p]]._R - particle._R
-                for i_var in (self._var_indices[VariableType.RealPeriodic] +
-                              self._var_indices[VariableType.RealDiscretePeriodic] +
-                              self._var_indices[VariableType.IntegerPeriodic]):
+                for i_var in (self._var_indices[VariableType.REAL_PERIODIC] +
+                              self._var_indices[VariableType.REAL_DISCRETE_PERIODIC] +
+                              self._var_indices[VariableType.INTEGER_PERIODIC]):
                     if np.abs(v_cog[i_var]) > 0.5:
                         v_cog[i_var] = v_cog[i_var] - np.sign(v_cog[i_var])
                     if np.abs(v_soc[i_var]) > 0.5:
@@ -493,7 +493,7 @@ class PSO(Optimizer):
                 self._randomize_categorical([particle])
 
                 for i_var, (var_name, (var_type, *var_options)) in enumerate(self.variables.items()):
-                    if var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                    if var_type in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
                         if np.abs(particle.V[i_var]) > 0.5:
                             # print(f'{particle.V[i_var]}', end=' ==> ')
                             particle.V[i_var] = particle.V[i_var] - np.sign(particle.V[i_var])

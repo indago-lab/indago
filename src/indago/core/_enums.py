@@ -19,17 +19,17 @@ Usage: from indago import Candidate
 from enum import Enum
 
 class VariableType(Enum):
-    """Enum class for design variable types. Supported variable types are ``VariableType.Real``,
-    ``VariableType.RealDiscrete``, ``VariableType.RealPeriodic``, ``VariableType.RealDiscretePeriodic``,
-    ``VariableType.Integer``, ``VariableType.IntegerPeriodic``, ``VariableType.Categorical``."""
+    """Enum class for design variable types. Supported variable types are ``VariableType.REAL``,
+    ``VariableType.REAL_DISCRETE``, ``VariableType.REAL_PERIODIC``, ``VariableType.REAL_DISCRETE_PERIODIC``,
+    ``VariableType.INTEGER``, ``VariableType.INTEGER_PERIODIC``, ``VariableType.CATEGORICAL``."""
 
-    Real = 'R'
-    RealPeriodic = 'RP'
-    RealDiscrete = 'RD'
-    RealDiscretePeriodic = 'RDP'
-    Integer = 'I'
-    IntegerPeriodic = 'IP'
-    Categorical = 'C'
+    REAL = 'R'
+    REAL_PERIODIC = 'RP'
+    REAL_DISCRETE = 'RD'
+    REAL_DISCRETE_PERIODIC = 'RDP'
+    INTEGER = 'I'
+    INTEGER_PERIODIC = 'IP'
+    CATEGORICAL = 'C'
 
     def __str__(self) -> str:
         """String representation for design variable type."""
@@ -40,11 +40,11 @@ class VariableType(Enum):
 class XFormat(Enum):
     """Enum class for the formats of the design vector Candidate.X."""
 
-    Tuple = 'tuple'
-    List = 'list'
-    Dict = 'dict'
-    Ndarray = 'ndarray'
-    Grouped = 'grouped'
+    TUPLE = 'tuple'
+    LIST = 'list'
+    DICT = 'dict'
+    NDARRAY = 'ndarray'
+    GROUPED = 'grouped'
 
     def __str__(self) -> str:
         """String representation for design vector format."""

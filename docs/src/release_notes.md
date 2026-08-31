@@ -19,6 +19,8 @@ Released on yyyy-mm-dd
 - Removed BA and MRFO due to uncompetitive performance <i class="fa-solid fa-triangle-exclamation"></i>
 - `Optimizer.evaluation_function` renamed to `Optimizer.evaluator` <i class="fa-solid fa-triangle-exclamation"></i>
 - For compatibility with mixed-variable optimization, `Candidate.X0` is now a `tuple` or a `list` of `tuple` instead of an `ndarray` (or `int`, as previously) <i class="fa-solid fa-triangle-exclamation"></i>
+- Members for `VariableType` and `XFormat` enums are now following PEP-8 naming conventions (CONSTANT_CASE)
+- Enum `Status` is renamed to `OptimizerStatus`
 ### Bug fixes
 
 ***

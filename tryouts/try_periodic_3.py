@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dims = 5
-vars_real = {f'x{i}': (indago.VariableType.Real, -100, 100) for i in range(dims)}
-vars_realperiodic = {f'x{i}': (indago.VariableType.RealPeriodic, -100, 100) for i in range(dims)}
+vars_real = {f'x{i}': (indago.VariableType.REAL, -100, 100) for i in range(dims)}
+vars_realperiodic = {f'x{i}': (indago.VariableType.REAL_PERIODIC, -100, 100) for i in range(dims)}
 
 def f(design):
     # return np.sum(np.asarray(design)**2)

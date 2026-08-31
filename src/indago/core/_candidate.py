@@ -74,7 +74,7 @@ class Candidate:
     """
 
     def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
-                 x_format: XFormat = XFormat.Tuple) -> None:
+                 x_format: XFormat = XFormat.TUPLE) -> None:
         """Candidate constructor.
 
         Parameters
@@ -98,33 +98,33 @@ class Candidate:
         type_count = {k: 0 for k in VariableType}
         for var_name, (var_type, *var_params) in variables.items():
             match var_type:
-                case VariableType.Real | VariableType.RealDiscrete | VariableType.RealPeriodic | VariableType.RealDiscretePeriodic:
+                case VariableType.REAL | VariableType.REAL_DISCRETE | VariableType.REAL_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
                     X.append(np.nan)
-                case VariableType.Integer | VariableType.IntegerPeriodic:
+                case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
                     X.append(0)
-                case VariableType.Categorical:
+                case VariableType.CATEGORICAL:
                     X.append('X')
                 case _:
                     raise ValueError(f'Unknown variable type {var_type} for variable {var_name}')
             type_count[var_type] += 1
 
-        var_float = type_count[VariableType.Real] + type_count[VariableType.RealDiscrete] \
-                    + type_count[VariableType.RealPeriodic] + type_count[VariableType.RealDiscretePeriodic]
-        var_int = type_count[VariableType.Integer] + type_count[VariableType.IntegerPeriodic]
-        var_str = type_count[VariableType.Categorical]
+        var_float = type_count[VariableType.REAL] + type_count[VariableType.REAL_DISCRETE] \
+                    + type_count[VariableType.REAL_PERIODIC] + type_count[VariableType.REAL_DISCRETE_PERIODIC]
+        var_int = type_count[VariableType.INTEGER] + type_count[VariableType.INTEGER_PERIODIC]
+        var_str = type_count[VariableType.CATEGORICAL]
         x_is_homogenous = np.sum(np.array([var_float, var_int, var_str]) > 0) == 1
 
         self._variables = variables
         self.X: X_Storage_Type = tuple[X_Content_Type](X)
 
         match x_format:
-            case XFormat.Tuple:
+            case XFormat.TUPLE:
                 self._get_x = self._get_X_as_tuple
-            case XFormat.List:
+            case XFormat.LIST:
                 self._get_x = self._get_X_as_list
-            case XFormat.Dict:
+            case XFormat.DICT:
                 self._get_x = self._get_X_as_dict
-            case XFormat.Ndarray:
+            case XFormat.NDARRAY:
                 assert x_is_homogenous, f'Cant use x_format {x_format} for heterogeneous variables'
                 self._get_x = self._get_X_as_ndarray
             case _:
@@ -177,13 +177,13 @@ class Candidate:
         if x_format in [list, tuple, np.ndarray]:
             for i, (val, (var_name, (var_type, *_))) in enumerate(zip(design, self._variables.items())):
                 match var_type:
-                    case VariableType.Real | VariableType.RealDiscrete | VariableType.RealPeriodic | VariableType.RealDiscretePeriodic:
+                    case VariableType.REAL | VariableType.REAL_DISCRETE | VariableType.REAL_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
                         assert isinstance(val, (float, np.floating)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                         X.append(float(val))
-                    case VariableType.Integer | VariableType.IntegerPeriodic:
+                    case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
                         assert isinstance(val, (int, np.integer)), f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                         X.append(int(val))
-                    case VariableType.Categorical:
+                    case VariableType.CATEGORICAL:
                         assert isinstance(val, (str, np.str_)),f'Invalid value type (value={val}, type={type(val)}) for X[{i}], expected {var_type}'
                         X.append(str(val))
                     case _:
@@ -235,8 +235,8 @@ class Candidate:
 
     def _get_X_as_ndarray(self) -> NDArray[np.float64]:
         """Utility function for getting a design vector X as a numpy.ndarray. It can be used only when all variables
-        are real (``VariableType.Real``, ``VariableType.RealDiscrete``, ``VariableType.RealPeriodic``,
-        or ``VariableType.RealDiscretePeriodic``).
+        are real (``VariableType.REAL``, ``VariableType.REAL_DISCRETE``, ``VariableType.REAL_PERIODIC``,
+        or ``VariableType.REAL_DISCRETE_PERIODIC``).
         TODO: this raises an error if called for mixed problems. Decide whether to remove/check/assert.
 
         Returns
@@ -283,16 +283,16 @@ class Candidate:
         R = []
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             match var_type:
-                case VariableType.Real | VariableType.RealPeriodic:
+                case VariableType.REAL | VariableType.REAL_PERIODIC:
                     R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
-                case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
+                case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
                     # R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
                     x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
                     x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
                     R.append((x - x_min) / (x_max - x_min))
-                case VariableType.Integer | VariableType.IntegerPeriodic:
+                case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
                     R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
-                case VariableType.Categorical:
+                case VariableType.CATEGORICAL:
                     R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
                 case _:
                     raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
@@ -322,7 +322,7 @@ class Candidate:
 
         X: list[X_Content_Type] = []
         # for i_var, (var_name, (var_type, *var_options)) in enumerate(self._variables.items()):
-        #     if var_type not in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+        #     if var_type not in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
         #         R[i_var] = np.clip(R[i_var], 0, 1)
 
         for (var_name, (var_type, *var_options)), r in zip(self._variables.items(), R):
@@ -331,51 +331,51 @@ class Candidate:
                 continue
             if np.isnan(r):
                 r = np.random.rand()
-            if var_type in [VariableType.Real, VariableType.RealDiscrete, VariableType.Integer]:
+            if var_type in [VariableType.REAL, VariableType.REAL_DISCRETE, VariableType.INTEGER]:
                 r = np.clip(r, 0, 1)
-            elif var_type in [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+            elif var_type in [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
                 r = r % 1.0
-            elif var_type == VariableType.Categorical:
+            elif var_type == VariableType.CATEGORICAL:
                 if r < 0 or r > 1:
                     r = np.random.rand()
             else:
                 raise NotImplementedError(f'Unknown variable type {var_type} for variable {var_name}')
 
             match var_type:
-                case VariableType.Real:
+                case VariableType.REAL:
                     lb, ub = var_options
                     r = np.clip(r, 0, 1)
                     X.append(lb + r * (ub - lb))
-                case VariableType.RealPeriodic:
+                case VariableType.REAL_PERIODIC:
                     lb, ub = var_options
                     r = r % 1.0
                     X.append(lb + r * (ub - lb))
-                case VariableType.RealDiscrete:
+                case VariableType.REAL_DISCRETE:
                     x_discrete = var_options[0]
                     x_min = x_discrete[0] - 0.5 * (x_discrete[1] - x_discrete[0])
                     x_max = x_discrete[-1] + 0.5 * (x_discrete[-1] - x_discrete[-2])
                     x = x_min + r * (x_max - x_min)
                     i = np.argmin(np.abs(np.asarray(var_options[0]) - x))
                     X.append(var_options[0][i])
-                case VariableType.RealDiscretePeriodic:
+                case VariableType.REAL_DISCRETE_PERIODIC:
                     x_discrete = var_options[0]
                     x_min = x_discrete[0]
                     x_max = x_discrete[-1]
                     x = x_min + r * (x_max - x_min)
                     i = np.argmin(np.abs(np.asarray(var_options[0]) - x))
                     X.append(var_options[0][i])
-                case VariableType.Integer:
+                case VariableType.INTEGER:
                     lb, ub = var_options
                     i = int(round(lb - 0.5 + r * (ub - lb + 1)))
                     # TODO: maybe do something smarter instead of the following fix for out-of-bound values
                     i = min(i, ub)
                     i = max(i, lb)
                     X.append(i)
-                case VariableType.IntegerPeriodic:
+                case VariableType.INTEGER_PERIODIC:
                     lb, ub = var_options
                     i = int(round(lb + r * (ub - lb)))
                     X.append(i)
-                case VariableType.Categorical:
+                case VariableType.CATEGORICAL:
                     i = int(round(r * len(var_options[0]) - 0.5))
                     i = min(i, len(var_options[0]) - 1)  # fix for r=1.0, e.g. round(1.5)=2
                     i = max(i, 0)  # just in case
@@ -502,7 +502,7 @@ class Candidate:
 
         all_real = True
         for var_type in list(a._variables.values()) + list(b._variables.values()):
-            if var_type[0] != VariableType.Real:
+            if var_type[0] != VariableType.REAL:
                 all_real = False
                 break
 
@@ -684,7 +684,7 @@ class Candidate:
 
         all_real = True
         for var_type in self._variables.values():
-            if var_type[0] != VariableType.Real:
+            if var_type[0] != VariableType.REAL:
                 all_real = False
                 break
         if all_real:
@@ -699,13 +699,13 @@ class Candidate:
 
             match var_type:
 
-                case VariableType.RealPeriodic | VariableType.IntegerPeriodic | VariableType.RealDiscretePeriodic:
+                case VariableType.REAL_PERIODIC | VariableType.INTEGER_PERIODIC | VariableType.REAL_DISCRETE_PERIODIC:
                     if r < 0.5:  # from left half to far right
                         r_alt = r + 1
                     else:  # from right half to far left
                         r_alt = r - 1
 
-                case VariableType.Categorical:
+                case VariableType.CATEGORICAL:
                     if other.X[i] == self.X[i]:
                         delta_R.append(0)
                     else:

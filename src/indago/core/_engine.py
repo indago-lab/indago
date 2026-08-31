@@ -113,7 +113,7 @@ class Engine:
         self.lb: NDArray | float | None  = None
         self.ub: NDArray | float | None  = None
 
-        self._x_format = indago.XFormat.Tuple
+        self._x_format = indago.XFormat.TUPLE
 
         self.objectives: int = 1
         self.objective_weights = None
@@ -137,7 +137,7 @@ class Engine:
     def _init_variables(self) -> None:
         """Private method for validating variables dictionary and initializing related attributes."""
 
-        self._all_real: bool = all([var_type == indago.VariableType.Real for var_name, (var_type, *_) \
+        self._all_real: bool = all([var_type == indago.VariableType.REAL for var_name, (var_type, *_) \
                                     in self.variables.items()])
 
         valid, log = validate_variables(self.variables)
@@ -202,7 +202,7 @@ class Engine:
 
         for i, (lb, ub) in enumerate(zip(self.lb, self.ub)):
             # TODO: What about RealPeriodic?
-            self.variables[f'x{i}'] = indago.VariableType.Real, lb, ub
+            self.variables[f'x{i}'] = indago.VariableType.REAL, lb, ub
 
     def _init_utils(self) -> None:
         """A private method for initializing some internal utility attributes."""

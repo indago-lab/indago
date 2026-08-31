@@ -20,7 +20,7 @@ Usage: from indago import DE
 
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 from scipy.stats import cauchy
 

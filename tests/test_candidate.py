@@ -14,7 +14,7 @@ def test_initialization():
 
 def test_list_X_format():
     print()
-    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.List)
+    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.LIST)
 
     print(candidate.X)
     print([type(x) for x in candidate.X])
@@ -24,7 +24,7 @@ def test_list_X_format():
 
 def test_ndarray_X_format():
     print()
-    candidate: indago.Candidate = indago.Candidate(variables=real_variables_10D, x_format=indago.XFormat.Ndarray)
+    candidate: indago.Candidate = indago.Candidate(variables=real_variables_10D, x_format=indago.XFormat.NDARRAY)
 
     print(candidate.X)
     print(type(candidate.X))
@@ -34,7 +34,7 @@ def test_ndarray_X_format():
 
 def test_x_assign():
     print()
-    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.Tuple)
+    candidate: indago.Candidate = indago.Candidate(variables=mixed_variables, x_format=indago.XFormat.TUPLE)
 
     candidate.X = [0.11, 0.22, 0.33, 1.5, 7, 'Material A']
     print(candidate.X)
@@ -61,7 +61,7 @@ def test_x_assign():
 
 def test_candidate_copy():
     # print()
-    # c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.Tuple)
+    # c1: indago.Candidate = indago.Candidate(variables=variables, x_format=indago.XFormat.TUPLE)
     # print(c1.X)
     # print(np.copy(c1.X))
     # c2: indago.Candidate = c1.copy()
@@ -98,16 +98,16 @@ def test_set_R():
     ub = []
     for var_name, (var_type, *var_options) in mixed_bounded_variables.items():
         match var_type:
-            case indago.VariableType.Real | indago.VariableType.RealPeriodic:
+            case indago.VariableType.REAL | indago.VariableType.REAL_PERIODIC:
                 lb.append(var_options[0])
                 ub.append(var_options[1])
-            case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
+            case indago.VariableType.REAL_DISCRETE | indago.VariableType.REAL_DISCRETE_PERIODIC:
                 lb.append(var_options[0][0])
                 ub.append(var_options[0][-1])
-            case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
+            case indago.VariableType.INTEGER | indago.VariableType.INTEGER_PERIODIC:
                 lb.append(var_options[0])
                 ub.append(var_options[1])
-            case indago.VariableType.Categorical:
+            case indago.VariableType.CATEGORICAL:
                 lb.append(var_options[0][0])
                 ub.append(var_options[0][-1])
             case _:
@@ -169,8 +169,8 @@ def test_R():
 
 def test_periodic_1():
 
-    variables = {'r': (indago.VariableType.Real, -100, 100),
-                 'phi': (indago.VariableType.RealPeriodic, 0, 1),}
+    variables = {'r': (indago.VariableType.REAL, -100, 100),
+                 'phi': (indago.VariableType.REAL_PERIODIC, 0, 1), }
     c = indago.Candidate(variables)
 
     c.X = [9.99, 0.9]

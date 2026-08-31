@@ -20,7 +20,7 @@ Usage: from indago import EEEO
 
 
 import numpy as np
-from indago.core._optimizer import Optimizer, Status
+from indago.core._optimizer import Optimizer, OptimizerStatus
 from indago.core._candidate import X_Content_Type
 from indago import Candidate, VariableType, VariableDictType, XFormat
 from indago import optimizers_dict

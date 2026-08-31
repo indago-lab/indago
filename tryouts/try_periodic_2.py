@@ -1,14 +1,14 @@
 import indago
 import numpy as np
 
-variables_real = {'r1': (indago.VariableType.Real, 0, 1),
-                  'r2': (indago.VariableType.Real, 0, 1),
-                  'phi1': (indago.VariableType.Real, 0, 2 * np.pi),
-                  'phi2': (indago.VariableType.Real, 0, 2 * np.pi)}
-variables_periodic = {'r1': (indago.VariableType.Real, 0, 1),
-                      'r2': (indago.VariableType.Real, 0, 1),
-                      'phi1': (indago.VariableType.RealPeriodic, 0, 2 * np.pi),
-                      'phi2': (indago.VariableType.RealPeriodic, 0, 2 * np.pi)}
+variables_real = {'r1': (indago.VariableType.REAL, 0, 1),
+                  'r2': (indago.VariableType.REAL, 0, 1),
+                  'phi1': (indago.VariableType.REAL, 0, 2 * np.pi),
+                  'phi2': (indago.VariableType.REAL, 0, 2 * np.pi)}
+variables_periodic = {'r1': (indago.VariableType.REAL, 0, 1),
+                      'r2': (indago.VariableType.REAL, 0, 1),
+                      'phi1': (indago.VariableType.REAL_PERIODIC, 0, 2 * np.pi),
+                      'phi2': (indago.VariableType.REAL_PERIODIC, 0, 2 * np.pi)}
 
 def f(design):
     r1, r2, phi1, phi2 = design

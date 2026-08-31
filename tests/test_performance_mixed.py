@@ -21,10 +21,10 @@ from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, EEEO  # B
 
 
 VARS = {
-    'fun_type': (indago.VariableType.Categorical, 'up down'.split()),
-    'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),
-    'factoree': (indago.VariableType.Integer, 2, 5),
-    'exponent': (indago.VariableType.Real, -3.3, 3.3)
+    'fun_type': (indago.VariableType.CATEGORICAL, 'up down'.split()),
+    'base': (indago.VariableType.REAL_DISCRETE, [0.1, 1.2, 2.3, 3.4]),
+    'factoree': (indago.VariableType.INTEGER, 2, 5),
+    'exponent': (indago.VariableType.REAL, -3.3, 3.3)
     }
 
 def F(x: tuple) -> float:

@@ -21,11 +21,11 @@ from indago import PSO, ACO
 
 
 VARS = {
-    'x1': (indago.VariableType.Integer, 0, 9),
-    'x2': (indago.VariableType.Integer, 0, 9),
-    'x3': (indago.VariableType.Integer, 0, 9),
-    'x4': (indago.VariableType.Integer, 0, 9),
-    'x5': (indago.VariableType.Integer, 0, 9),
+    'x1': (indago.VariableType.INTEGER, 0, 9),
+    'x2': (indago.VariableType.INTEGER, 0, 9),
+    'x3': (indago.VariableType.INTEGER, 0, 9),
+    'x4': (indago.VariableType.INTEGER, 0, 9),
+    'x5': (indago.VariableType.INTEGER, 0, 9),
     }
 
 def F(x: tuple) -> float:

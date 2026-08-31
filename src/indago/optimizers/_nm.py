@@ -19,7 +19,7 @@ Usage: from indago import NM
 """
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
@@ -116,7 +116,7 @@ class NM(Optimizer):
         """
 
         if self._all_real:
-            self._x_format = XFormat.Ndarray
+            self._x_format = XFormat.NDARRAY
 
         # Generate set of points
         self._candidates: list[Candidate] = [Candidate(**self._candidate_init_info) for _ in range(self.dimensions + 1)]

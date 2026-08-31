@@ -20,7 +20,7 @@ Usage: from indago import CRS
 
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
@@ -108,7 +108,7 @@ class CRS(Optimizer):
         """
 
         if self._all_real:
-            self._x_format = XFormat.Ndarray
+            self._x_format = XFormat.NDARRAY
 
         # Generate population
         pop_size = int(self.params['pop_scale'] * (self.dimensions + 1))

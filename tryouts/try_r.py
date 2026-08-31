@@ -3,18 +3,18 @@ import numpy as np
 from indago.core._optimizer import Optimizer
 
 mixed_variables: indago.VariableDictType = {
-             'var1': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
-             'var2': (indago.VariableType.Integer, 0, 4),  # Integer (both for optimizer and evaluator)
-             'var3': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
-             'var4': (indago.VariableType.RealDiscretePeriodic, [0.0, 0.25, 0.50, 0.75, 1.0]),
-             'var5': (indago.VariableType.IntegerPeriodic, 0, 4),
-             'var6': (indago.VariableType.RealDiscrete, [0, 2, 4, 8, 16]),
-             'var7': (indago.VariableType.IntegerPeriodic, 0, 1),
-             'var8': (indago.VariableType.IntegerPeriodic, 0, 2),
-             'var9': (indago.VariableType.IntegerPeriodic, 0, 3),
-             'var10': (indago.VariableType.IntegerPeriodic, 0, 4),
-             'var11': (indago.VariableType.Real, -10, 5),
-             'var12': (indago.VariableType.RealPeriodic, -24, 24),
+             'var1': (indago.VariableType.REAL_DISCRETE, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
+             'var2': (indago.VariableType.INTEGER, 0, 4),  # Integer (both for optimizer and evaluator)
+             'var3': (indago.VariableType.CATEGORICAL, ['A', 'B', 'C', 'D', 'E']),  # Category
+             'var4': (indago.VariableType.REAL_DISCRETE_PERIODIC, [0.0, 0.25, 0.50, 0.75, 1.0]),
+             'var5': (indago.VariableType.INTEGER_PERIODIC, 0, 4),
+             'var6': (indago.VariableType.REAL_DISCRETE, [0, 2, 4, 8, 16]),
+             'var7': (indago.VariableType.INTEGER_PERIODIC, 0, 1),
+             'var8': (indago.VariableType.INTEGER_PERIODIC, 0, 2),
+             'var9': (indago.VariableType.INTEGER_PERIODIC, 0, 3),
+             'var10': (indago.VariableType.INTEGER_PERIODIC, 0, 4),
+             'var11': (indago.VariableType.REAL, -10, 5),
+             'var12': (indago.VariableType.REAL_PERIODIC, -24, 24),
                    }
 
 def try_uniformity():
@@ -49,7 +49,7 @@ def try_uniformity():
     for i_var, (var_name, (var_type, *var_options)) in enumerate(mixed_variables.items()):
 
         print(f'{var_name=} {var_type} {var_options}')
-        if var_type not in [indago.VariableType.Real, indago.VariableType.RealPeriodic]:
+        if var_type not in [indago.VariableType.REAL, indago.VariableType.REAL_PERIODIC]:
             # print(XX)
             x = np.asarray([sample[i_var] for sample in XX])
             r = np.asarray([sample[i_var] for sample in RR])

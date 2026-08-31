@@ -20,7 +20,7 @@ Usage: from indago import EFO
 
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 from scipy.constants import golden_ratio as phi
 
@@ -192,7 +192,7 @@ class EFO(Optimizer):
                                 - force * (self._EM[l_neg]._R[d] - self._EM[l_neu]._R[d])
 
                 if var_type not in \
-                        [VariableType.RealPeriodic, VariableType.RealDiscretePeriodic, VariableType.IntegerPeriodic]:
+                        [VariableType.REAL_PERIODIC, VariableType.REAL_DISCRETE_PERIODIC, VariableType.INTEGER_PERIODIC]:
                     if not 0 < R[d] < 1:
                         R[d] = np.random.uniform(0, 1)
 

@@ -43,7 +43,7 @@ def test_minimize_old_style():
 
 def test_minimize_new_style():
     X, f = minimize(F,
-                    {f'var{i}': (indago.VariableType.Real, -100, 100) for i in range(0, 10)},  # variables dict
+                    {f'var{i}': (indago.VariableType.REAL, -100, 100) for i in range(0, 10)},  # variables dict
                     None,  # lb
                     None,  # ub
                     'PSO',

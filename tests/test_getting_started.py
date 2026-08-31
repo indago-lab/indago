@@ -78,10 +78,10 @@ def test_getting_started_mixed():
     import indago
 
     # Optimization variables dictionary in the form of {name: (type, bounds | values)}
-    VARS = {'type': (indago.VariableType.Categorical, ['up', 'down']),  # only strings allowed for Categorical variables
-            'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
-            'n': (indago.VariableType.Integer, 2, 5),  # for non-discrete types we must provide bounds...
-            'a': (indago.VariableType.Real, -3.3, 3.3)  # ...instead of allowed values
+    VARS = {'type': (indago.VariableType.CATEGORICAL, ['up', 'down']),  # only strings allowed for Categorical variables
+            'base': (indago.VariableType.REAL_DISCRETE, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
+            'n': (indago.VariableType.INTEGER, 2, 5),  # for non-discrete types we must provide bounds...
+            'a': (indago.VariableType.REAL, -3.3, 3.3)  # ...instead of allowed values
             }
 
     # Evaluation function
@@ -133,10 +133,10 @@ def test_getting_started_mixed_minimize():
     import indago
 
     # Optimization variables dictionary in the form of {name: (type, bounds | values)}
-    VARS = {'type': (indago.VariableType.Categorical, ['up', 'down']),  # only strings allowed for Categorical variables
-            'base': (indago.VariableType.RealDiscrete, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
-            'n': (indago.VariableType.Integer, 2, 5),  # for non-discrete types we must provide bounds...
-            'a': (indago.VariableType.Real, -3.3, 3.3)  # ...instead of allowed values
+    VARS = {'type': (indago.VariableType.CATEGORICAL, ['up', 'down']),  # only strings allowed for Categorical variables
+            'base': (indago.VariableType.REAL_DISCRETE, [0.1, 1.2, 2.3, 3.4]),  # we provide a list of allowed values
+            'n': (indago.VariableType.INTEGER, 2, 5),  # for non-discrete types we must provide bounds...
+            'a': (indago.VariableType.REAL, -3.3, 3.3)  # ...instead of allowed values
             }
 
     # Evaluation function

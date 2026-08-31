@@ -3,12 +3,12 @@ import numpy as np
 from copy import deepcopy
 
 dims = 10
-real: indago.VariableDictType = {f'var{i}': (indago.VariableType.Real, 0, 360) for i in range(0, dims)}
-real_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealPeriodic, 0, 360) for i in range(0, dims)}
-real_discrete: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscrete, [float(_) for _ in range(0, 361)]) for i in range (0, dims)}
-real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.RealDiscretePeriodic, [float(_) for _ in range(0, 361)]) for i in range (0, dims)}
-integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.Integer, 0, 360) for i in range(0, dims)}
-integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.IntegerPeriodic, 0, 360) for i in range(0, dims)}
+real: indago.VariableDictType = {f'var{i}': (indago.VariableType.REAL, 0, 360) for i in range(0, dims)}
+real_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.REAL_PERIODIC, 0, 360) for i in range(0, dims)}
+real_discrete: indago.VariableDictType = {f'var{i}': (indago.VariableType.REAL_DISCRETE, [float(_) for _ in range(0, 361)]) for i in range (0, dims)}
+real_discrete_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.REAL_DISCRETE_PERIODIC, [float(_) for _ in range(0, 361)]) for i in range (0, dims)}
+integer: indago.VariableDictType = {f'var{i}': (indago.VariableType.INTEGER, 0, 360) for i in range(0, dims)}
+integer_periodic: indago.VariableDictType = {f'var{i}': (indago.VariableType.INTEGER_PERIODIC, 0, 360) for i in range(0, dims)}
 
 optimizers = [indago.ABC,
               indago.CRS,

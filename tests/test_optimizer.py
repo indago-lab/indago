@@ -12,17 +12,17 @@ timeit_evals = 1_000
 
 def test_variables_initialization():
     optimizer = Optimizer()
-    optimizer.variables['a'] = indago.VariableType.Real, -1, 5
-    optimizer.variables['b'] = indago.VariableType.Real, 1, None
-    optimizer.variables['c'] = indago.VariableType.Real, None, 0
-    optimizer.variables['d'] = indago.VariableType.Real, None, None
+    optimizer.variables['a'] = indago.VariableType.REAL, -1, 5
+    optimizer.variables['b'] = indago.VariableType.REAL, 1, None
+    optimizer.variables['c'] = indago.VariableType.REAL, None, 0
+    optimizer.variables['d'] = indago.VariableType.REAL, None, None
     for i in range(10):
-        optimizer.variables[f'theta{1 + i}'] = indago.VariableType.Real, -20, 20
-    optimizer.variables['n1'] = indago.VariableType.Integer, 2, 10
-    optimizer.variables['n2'] = indago.VariableType.Integer, -2, 5
-    optimizer.variables['h'] = indago.VariableType.RealDiscrete, np.linspace(1, 2, 21)
-    optimizer.variables['s'] = indago.VariableType.RealDiscrete, np.linspace(0, 0.5, 51)
-    optimizer.variables['PumpType'] = indago.VariableType.Categorical, 'A B C'.split()
+        optimizer.variables[f'theta{1 + i}'] = indago.VariableType.REAL, -20, 20
+    optimizer.variables['n1'] = indago.VariableType.INTEGER, 2, 10
+    optimizer.variables['n2'] = indago.VariableType.INTEGER, -2, 5
+    optimizer.variables['h'] = indago.VariableType.REAL_DISCRETE, np.linspace(1, 2, 21)
+    optimizer.variables['s'] = indago.VariableType.REAL_DISCRETE, np.linspace(0, 0.5, 51)
+    optimizer.variables['PumpType'] = indago.VariableType.CATEGORICAL, 'A B C'.split()
 
     candidate = indago.Candidate(optimizer.variables)
     print(candidate.X)
@@ -33,7 +33,7 @@ def test_real_rs():
 
     optimizer = indago.RS()
     for i in range(8):
-        optimizer.variables['r{i+1}'] = indago.VariableType.Real, 0, 5
+        optimizer.variables['r{i+1}'] = indago.VariableType.REAL, 0, 5
     optimizer.evaluator = f
     # optimizer.max_evaluations = 10_000
     optimizer.optimize()
@@ -43,14 +43,14 @@ def test_mixed_rs():
     f = lambda x: 0.0
 
     optimizer = indago.RS()
-    optimizer.variables['r1'] = indago.VariableType.Real, -1.1, 5
-    optimizer.variables['r2'] = indago.VariableType.Real, -1.2, 51.01
-    optimizer.variables['r3'] = indago.VariableType.Real, -1.3, 5.4
-    optimizer.variables['i1'] = indago.VariableType.Integer, -5, 0
-    optimizer.variables['i2'] = indago.VariableType.Integer, 10, 20
-    optimizer.variables['d1'] = indago.VariableType.RealDiscrete, np.linspace(0, 5, 51)
-    optimizer.variables['d2'] = indago.VariableType.RealDiscrete, np.linspace(0, 5, 51)
-    optimizer.variables['c'] = indago.VariableType.Categorical, ['A', 'B', 'C']
+    optimizer.variables['r1'] = indago.VariableType.REAL, -1.1, 5
+    optimizer.variables['r2'] = indago.VariableType.REAL, -1.2, 51.01
+    optimizer.variables['r3'] = indago.VariableType.REAL, -1.3, 5.4
+    optimizer.variables['i1'] = indago.VariableType.INTEGER, -5, 0
+    optimizer.variables['i2'] = indago.VariableType.INTEGER, 10, 20
+    optimizer.variables['d1'] = indago.VariableType.REAL_DISCRETE, np.linspace(0, 5, 51)
+    optimizer.variables['d2'] = indago.VariableType.REAL_DISCRETE, np.linspace(0, 5, 51)
+    optimizer.variables['c'] = indago.VariableType.CATEGORICAL, ['A', 'B', 'C']
 
     optimizer.evaluator = f
     # optimizer.max_evaluations = 10_000
@@ -108,18 +108,18 @@ def test_bounds_api():
 
 
 mixed_variables_set_2: indago.VariableDictType = {
-             'var1': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
-             'var2': (indago.VariableType.Integer, 0, 4),  # Integer (both for optimizer and evaluator)
-             'var3': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
-             'var4': (indago.VariableType.RealDiscretePeriodic, [0.0, 0.25, 0.50, 0.75, 1.0]),
-             'var5': (indago.VariableType.IntegerPeriodic, 0, 4),
-             'var6': (indago.VariableType.RealDiscrete, [0, 1, 4, 8, 16]),
-             'var7': (indago.VariableType.IntegerPeriodic, 0, 1),
-             'var8': (indago.VariableType.IntegerPeriodic, 0, 2),
-             'var9': (indago.VariableType.IntegerPeriodic, 0, 3),
-             'var10': (indago.VariableType.IntegerPeriodic, 0, 4),
-             'var11': (indago.VariableType.Real, -10, 5),
-             'var12': (indago.VariableType.RealPeriodic, -24, 24),
+             'var1': (indago.VariableType.REAL_DISCRETE, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
+             'var2': (indago.VariableType.INTEGER, 0, 4),  # Integer (both for optimizer and evaluator)
+             'var3': (indago.VariableType.CATEGORICAL, ['A', 'B', 'C', 'D', 'E']),  # Category
+             'var4': (indago.VariableType.REAL_DISCRETE_PERIODIC, [0.0, 0.25, 0.50, 0.75, 1.0]),
+             'var5': (indago.VariableType.INTEGER_PERIODIC, 0, 4),
+             'var6': (indago.VariableType.REAL_DISCRETE, [0, 1, 4, 8, 16]),
+             'var7': (indago.VariableType.INTEGER_PERIODIC, 0, 1),
+             'var8': (indago.VariableType.INTEGER_PERIODIC, 0, 2),
+             'var9': (indago.VariableType.INTEGER_PERIODIC, 0, 3),
+             'var10': (indago.VariableType.INTEGER_PERIODIC, 0, 4),
+             'var11': (indago.VariableType.REAL, -10, 5),
+             'var12': (indago.VariableType.REAL_PERIODIC, -24, 24),
                    }
 
 def test_uniformity():
@@ -161,7 +161,7 @@ def uniformity_test(sampler):
     for i_var, (var_name, (var_type, *var_options)) in enumerate(mixed_variables_set_2.items()):
 
         print(f'{var_name=} {var_type} {var_options}')
-        if var_type not in [indago.VariableType.Real, indago.VariableType.RealPeriodic]:
+        if var_type not in [indago.VariableType.REAL, indago.VariableType.REAL_PERIODIC]:
             # print(XX)
             x = np.asarray([sample[i_var] for sample in XX])
             r = np.asarray([sample[i_var] for sample in RR])
@@ -172,14 +172,14 @@ def uniformity_test(sampler):
 
             cnt_sammples_x = {}
             cnt_sammples_r = {}
-            if var_type == indago.VariableType.RealDiscrete:
+            if var_type == indago.VariableType.REAL_DISCRETE:
                 discrete_values = np.array(var_options[0])
                 x_min = discrete_values[0] - 0.5 * (discrete_values[1] - discrete_values[0])
                 x_max = discrete_values[-1] + 0.5 * (discrete_values[-1] - discrete_values[-2])
                 x_mid = 0.5 * (discrete_values[1:] + discrete_values[:-1])
                 x_bins = np.hstack([x_min, x_mid, x_max])
                 x_density = x_bins[1:] - x_bins[:-1]
-            elif var_type == indago.VariableType.RealDiscretePeriodic:
+            elif var_type == indago.VariableType.REAL_DISCRETE_PERIODIC:
                 discrete_values = np.array(var_options[0])
                 x_min = discrete_values[0]
                 x_max = discrete_values[-1]
@@ -187,7 +187,7 @@ def uniformity_test(sampler):
                 # print(f'{x_mid=}')
                 x_bins = np.hstack([x_min, x_mid, x_max])
                 x_density = x_bins[1:] - x_bins[:-1]
-            elif var_type == indago.VariableType.IntegerPeriodic:
+            elif var_type == indago.VariableType.INTEGER_PERIODIC:
                 x_density = [0.5] + [1] * (var_options[1] - var_options[0] - 1) + [0.5]
 
             else:

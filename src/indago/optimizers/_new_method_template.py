@@ -20,7 +20,7 @@ Usage: from indago import MNM
 
 
 import numpy as np
-from indago import Optimizer, Candidate, Status
+from indago import Optimizer, Candidate, OptimizerStatus
 from indago import VariableType, VariableDictType, XFormat, X_Content_Type
 
 
@@ -46,7 +46,7 @@ class MyCandidate(Candidate):
     """
 
     def __init__(self, variables: VariableDictType, n_objectives: int = 1, n_constraints: int = 0,
-                 x_format: XFormat = XFormat.Tuple) -> None:
+                 x_format: XFormat = XFormat.TUPLE) -> None:
 
         super().__init__(variables, n_objectives, n_constraints, x_format)
 

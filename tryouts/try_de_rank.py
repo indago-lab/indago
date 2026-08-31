@@ -31,7 +31,7 @@ def mixed_function(x):
     return f
 
 def run_real(rank=False):
-    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(14)}
+    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.REAL, -100, 100) for i in range(14)}
     print(real_variables_10D)
 
     optimizer = indago.DE()
@@ -51,12 +51,12 @@ def run_real(rank=False):
     print(f'f: {optimizer.best.f}')
 
 def run_mixed_num(rank=False):
-    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(10)}
+    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.REAL, -100, 100) for i in range(10)}
     numerical_variables_10D = copy.deepcopy(real_variables_10D)
-    numerical_variables_10D['x11'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 2001)
-    numerical_variables_10D['x12'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 1001)
-    numerical_variables_10D['x13'] = indago.VariableType.Integer, -100, 100
-    numerical_variables_10D['x14'] = indago.VariableType.Integer, -50, 150
+    numerical_variables_10D['x11'] = indago.VariableType.REAL_DISCRETE, np.linspace(-100, 100, 2001)
+    numerical_variables_10D['x12'] = indago.VariableType.REAL_DISCRETE, np.linspace(-100, 100, 1001)
+    numerical_variables_10D['x13'] = indago.VariableType.INTEGER, -100, 100
+    numerical_variables_10D['x14'] = indago.VariableType.INTEGER, -50, 150
     print(numerical_variables_10D)
 
     optimizer = indago.DE()
@@ -76,13 +76,13 @@ def run_mixed_num(rank=False):
     print(f'f: {optimizer.best.f}')
 
 def run_mixed(rank=False):
-    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(10)}
+    real_variables_10D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.REAL, -100, 100) for i in range(10)}
     numerical_variables_10D = copy.deepcopy(real_variables_10D)
-    numerical_variables_10D['x11'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 2001)
-    numerical_variables_10D['x12'] = indago.VariableType.RealDiscrete, np.linspace(-100, 100, 1001)
-    numerical_variables_10D['x13'] = indago.VariableType.Integer, -100, 100
-    numerical_variables_10D['x14'] = indago.VariableType.Integer, -50, 150
-    numerical_variables_10D['x15'] = indago.VariableType.Categorical, 'A B C'.split()
+    numerical_variables_10D['x11'] = indago.VariableType.REAL_DISCRETE, np.linspace(-100, 100, 2001)
+    numerical_variables_10D['x12'] = indago.VariableType.REAL_DISCRETE, np.linspace(-100, 100, 1001)
+    numerical_variables_10D['x13'] = indago.VariableType.INTEGER, -100, 100
+    numerical_variables_10D['x14'] = indago.VariableType.INTEGER, -50, 150
+    numerical_variables_10D['x15'] = indago.VariableType.CATEGORICAL, 'A B C'.split()
     print(numerical_variables_10D)
 
     optimizer = indago.DE()

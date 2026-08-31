@@ -49,7 +49,7 @@ from ._enums import VariableType, XFormat
 from ._engine import Engine
 
 
-class Status(Enum):
+class OptimizerStatus(Enum):
     """Enum class for optimization status tracking."""
 
     NOT_STARTED = 'Optimization not started'
@@ -109,7 +109,7 @@ class Optimizer(Engine):
         Private sampler object used for generating starting points.
     _seed : int or None
         Private integer for seeding random number generation.
-    status : Status
+    status : OptimizerStatus
         Optimizer status (Enum).
     _err_msg : str or None
         Private string for storing error message. When an error message is generated, 
@@ -208,7 +208,7 @@ class Optimizer(Engine):
         self._seed = None
         self._sampler_method = None
 
-        self.status = Status.NOT_STARTED
+        self.status = OptimizerStatus.NOT_STARTED
         self._err_msg = None
         self.history = None
         self.monitoring = None
@@ -357,7 +357,7 @@ class Optimizer(Engine):
             self._init_from_bounds()
 
         if self._all_real:
-            self._x_format = XFormat.Ndarray
+            self._x_format = XFormat.NDARRAY
 
         # Create candidate initialization arguments dict
         self._candidate_init_info = {'variables': self.variables, 'n_objectives': self.objectives,
@@ -653,11 +653,11 @@ class Optimizer(Engine):
             #         X: list[X_Content_Type] = list[X_Content_Type]([])
             #         for var_name, (var_type, *var_options) in self.variables.items():
             #             match var_type:
-            #                 case VariableType.Real | VariableType.RealPeriodic:
+            #                 case VariableType.REAL | VariableType.REAL_PERIODIC:
             #                     X.append(np.random.uniform(low=var_options[0], high=var_options[1]))
-            #                 case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic | VariableType.Categorical:
+            #                 case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC | VariableType.CATEGORICAL:
             #                     X.append(np.random.choice(var_options[0]))
-            #                 case VariableType.Integer | VariableType.IntegerPeriodic:
+            #                 case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
             #                     X.append(np.random.randint(low=var_options[0], high=var_options[1]) + 1)
             #                 case _:
             #                     raise ValueError(f'Unknown variable type: {var_type}')
@@ -679,13 +679,13 @@ class Optimizer(Engine):
             #         R = self._sampler_method.random(n=1)[0]
             #         for (var_name, (var_type, *var_options)), r in zip(self.variables.items(), R):
             #             match var_type:
-            #                 case VariableType.Real | VariableType.RealPeriodic:
+            #                 case VariableType.REAL | VariableType.REAL_PERIODIC:
             #                     X.append(var_options[0] + r * (var_options[1] - var_options[0]))
-            #                 case VariableType.Integer | VariableType.IntegerPeriodic:
+            #                 case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
             #                     x = var_options[0] - 0.5 + r * (var_options[1] - var_options[0] + 1.0)
             #                     i = int(np.round(x))
             #                     X.append(i)
-            #                 case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic | VariableType.Categorical:
+            #                 case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC | VariableType.CATEGORICAL:
             #                     i = int(np.round(r * len(var_options[0]) - 0.5))
             #                     X.append(var_options[0][i])
             #                 case _:
@@ -710,7 +710,7 @@ class Optimizer(Engine):
 
         for c in candidates:
             R = [None] * self.dimensions
-            for i_var in self._var_indices[indago.VariableType.Categorical]:
+            for i_var in self._var_indices[indago.VariableType.CATEGORICAL]:
                 R[i_var] = self.best._R[i_var] if np.random.rand() < self._progress_factor() else np.random.uniform()
             c._R = R
 
@@ -858,7 +858,7 @@ class Optimizer(Engine):
             if var in ['history']:
                 continue
             if not var.startswith('_'):
-                if isinstance(value, (int, float, str, bool, Status)):
+                if isinstance(value, (int, float, str, bool, OptimizerStatus)):
                     table.add_row(var, str(value))
                 if isinstance(value, (list, dict)) and len(value) > 0:
                     table.add_row(var, str(value))
@@ -1002,7 +1002,7 @@ class Optimizer(Engine):
             self._initial_candidates = None
             self._evaluated_candidates = []
 
-            self.status = Status.RUNNING
+            self.status = OptimizerStatus.RUNNING
             self._err_msg = None
             self.history = None
 
@@ -1026,7 +1026,7 @@ class Optimizer(Engine):
         else:  # Resume
             self._log(f'Optimization resumed at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
             self._log('')
-            self.status = Status.RESUMED
+            self.status = OptimizerStatus.RESUMED
 
             # For EEEO
             if inject:
@@ -1068,7 +1068,7 @@ class Optimizer(Engine):
 
         """
 
-        if self.status == Status.RESUMED:
+        if self.status == OptimizerStatus.RESUMED:
             # TODO inspect why this is necessary for resume to work:
             self.it += 1
             return True
@@ -1092,22 +1092,22 @@ class Optimizer(Engine):
         # Stop if maximum number of iterations reached
         if self.max_iterations:
             if self.it >= self.max_iterations:
-                self.status = Status.FINISHED
-                status_str = f'{Status.FINISHED.value}: maximum number of iterations reached ({self.max_iterations}).'
+                self.status = OptimizerStatus.FINISHED
+                status_str = f'{OptimizerStatus.FINISHED.value}: maximum number of iterations reached ({self.max_iterations}).'
                 stop = True
 
         # Stop if maximum number of evaluations surpassed
         if self.max_evaluations:
             if self.eval >= self.max_evaluations:
-                self.status = Status.FINISHED
-                status_str = f'{Status.FINISHED.value}: maximum number of evaluations reached ({self.eval}).'
+                self.status = OptimizerStatus.FINISHED
+                status_str = f'{OptimizerStatus.FINISHED.value}: maximum number of evaluations reached ({self.eval}).'
                 stop = True
 
         # Stop if fitness threshold achieved
         if self.target_fitness:
             if self.best.f < self.target_fitness and np.all(self.best.C <= 0):
-                self.status = Status.FINISHED
-                status_str = f'{Status.FINISHED.value}: target fitness achieved ({self.best.f:.6e}).'
+                self.status = OptimizerStatus.FINISHED
+                status_str = f'{OptimizerStatus.FINISHED.value}: target fitness achieved ({self.best.f:.6e}).'
                 stop = True
 
         # Stop if maximum number of stalled iterations surpassed
@@ -1116,8 +1116,8 @@ class Optimizer(Engine):
             # f_hist = np.array([r[2].f for r in self.results.cHistory])
             self._stalled_it = np.size(np.where(f_hist == f_hist[-1])) - 1
             if self._stalled_it >= self.max_stalled_iterations:
-                self.status = Status.FINISHED
-                status_str = f'{Status.FINISHED.value}: maximum stalled iterations reached ({self._stalled_it:d}).'
+                self.status = OptimizerStatus.FINISHED
+                status_str = f'{OptimizerStatus.FINISHED.value}: maximum stalled iterations reached ({self._stalled_it:d}).'
                 stop = True
 
         # Stop if maximum number of stalled evaluations surpassed
@@ -1134,15 +1134,15 @@ class Optimizer(Engine):
             # self.stalled_eval = self.eval - self.results.cHistory[-stalled_it][1]
             # print(f'old: {self.stalled_eval=}')
             if self._stalled_eval >= self.max_stalled_evaluations:
-                self.status = Status.FINISHED
-                status_str = f'{Status.FINISHED.value}: maximum stalled evaluations reached ({self._stalled_eval:d}).'
+                self.status = OptimizerStatus.FINISHED
+                status_str = f'{OptimizerStatus.FINISHED.value}: maximum stalled evaluations reached ({self._stalled_eval:d}).'
                 stop = True
 
         # Stop if maximum elapsed time reached
         if self.max_elapsed_time:
             if self.elapsed_time >= self.max_elapsed_time:
-                self.status = Status.FINISHED
-                status_str = (f'{Status.FINISHED.value}: maximum elapsed time reached '
+                self.status = OptimizerStatus.FINISHED
+                status_str = (f'{OptimizerStatus.FINISHED.value}: maximum elapsed time reached '
                               f'({timedelta(seconds=self.max_elapsed_time)} s).')
                 stop = True
 
@@ -1171,8 +1171,8 @@ class Optimizer(Engine):
         """
 
         if self._err_msg is not None:
-            self.status = Status.ERROR
-            status_str = f'{Status.ERROR.value}: {self._err_msg}'
+            self.status = OptimizerStatus.ERROR
+            status_str = f'{OptimizerStatus.ERROR.value}: {self._err_msg}'
             self._log(status_str)
             assert False, \
                 f'{self._err_msg}. OPTIMIZATION ABORTED'
@@ -1484,15 +1484,15 @@ class Optimizer(Engine):
                 else:
                     var_type, *var_options = self.variables[var_keys[i]]
                     match var_type:
-                        case VariableType.Real | VariableType.RealPeriodic:
+                        case VariableType.REAL | VariableType.REAL_PERIODIC:
                             X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
-                        case VariableType.RealDiscrete | VariableType.RealDiscretePeriodic:
+                        case VariableType.REAL_DISCRETE | VariableType.REAL_DISCRETE_PERIODIC:
                             # TODO implement/check
                             X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
-                        case VariableType.Integer | VariableType.IntegerPeriodic:
+                        case VariableType.INTEGER | VariableType.INTEGER_PERIODIC:
                             # TODO implement/check
                             X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
-                        case VariableType.Categorical:
+                        case VariableType.CATEGORICAL:
                             # TODO implement/check
                             cati = np.array([var_options[0].index(x) for x in self.history['X'][:, i]])
                             X = (len(var_options[0]) - cati - 1) / (len(var_options[0]) - 1)

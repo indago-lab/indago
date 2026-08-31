@@ -2,41 +2,41 @@ import indago
 import numpy as np
 from copy import deepcopy
 
-mixed_variables: indago.VariableDictType = {'var1': (indago.VariableType.Real, -100, 100),  # Real (continuous) bounded
-             'var2': (indago.VariableType.Real, 0, np.inf),  # Real (continuous) semi-bounded
-             'var3': (indago.VariableType.Real, -np.inf, np.inf),  # Real (continuous) unbounded
-             'var4': (indago.VariableType.RealDiscrete, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
-             'var5': (indago.VariableType.Integer, 0, 10),  # Integer (both for optimizer and evaluator)
-             'var6': (indago.VariableType.Categorical, ['A', 'B', 'C', 'D', 'E']),  # Category
-                   }
+mixed_variables: indago.VariableDictType = {'var1': (indago.VariableType.REAL, -100, 100),  # Real (continuous) bounded
+             'var2': (indago.VariableType.REAL, 0, np.inf),  # Real (continuous) semi-bounded
+             'var3': (indago.VariableType.REAL, -np.inf, np.inf),  # Real (continuous) unbounded
+             'var4': (indago.VariableType.REAL_DISCRETE, [1.1, 1.2, 1.3, 1.4, 1.5]),  # Discrete (float for evaluator, int for optimizer)
+             'var5': (indago.VariableType.INTEGER, 0, 10),  # Integer (both for optimizer and evaluator)
+             'var6': (indago.VariableType.CATEGORICAL, ['A', 'B', 'C', 'D', 'E']),  # Category
+                                            }
 
 mixed_bounded_variables = deepcopy(mixed_variables)
 mixed_bounded_variables.pop('var2')
 mixed_bounded_variables.pop('var3')
 
-real_variables_10D = {f'x{i}': (indago.VariableType.Real, -100, 100) for i in range (10)}
+real_variables_10D = {f'x{i}': (indago.VariableType.REAL, -100, 100) for i in range (10)}
 
 def generate_variables_dict(kind, dims):
     variables_dict = {}
     if kind == 'real':
         for i in range(dims):
-            variables_dict[f'x{i+1}'] = indago.VariableType.Real, -20, 20
+            variables_dict[f'x{i+1}'] = indago.VariableType.REAL, -20, 20
 
     elif kind == 'mixed' or kind == 'numeric':
         for i in range(dims):
             var_type = np.random.choice(indago.VariableType)
             if kind == 'numeric':
-                while var_type == indago.VariableType.Categorical:
+                while var_type == indago.VariableType.CATEGORICAL:
                     var_type = np.random.choice(indago.VariableType)
             match var_type:
-                case indago.VariableType.Real | indago.VariableType.RealPeriodic:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Real, -20, 20
-                case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Integer, -20, 20
-                case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.RealDiscrete, np.linspace(0, 5, 51)
-                case indago.VariableType.Categorical:
-                    variables_dict[f'x{i+1}'] = indago.VariableType.Categorical, 'A B C D E F'.split()
+                case indago.VariableType.REAL | indago.VariableType.REAL_PERIODIC:
+                    variables_dict[f'x{i+1}'] = indago.VariableType.REAL, -20, 20
+                case indago.VariableType.INTEGER | indago.VariableType.INTEGER_PERIODIC:
+                    variables_dict[f'x{i+1}'] = indago.VariableType.INTEGER, -20, 20
+                case indago.VariableType.REAL_DISCRETE | indago.VariableType.REAL_DISCRETE_PERIODIC:
+                    variables_dict[f'x{i+1}'] = indago.VariableType.REAL_DISCRETE, np.linspace(0, 5, 51)
+                case indago.VariableType.CATEGORICAL:
+                    variables_dict[f'x{i+1}'] = indago.VariableType.CATEGORICAL, 'A B C D E F'.split()
 
     else:
         raise ValueError(f'Unknown kind {kind}')

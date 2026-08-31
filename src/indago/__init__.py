@@ -22,7 +22,7 @@ Usage: import indago
 __version__ = '0.7.0'
 
 from indago.core._candidate import Candidate, VariableType, VariableDictType, XFormat, X_Content_Type
-from indago.core._optimizer import Optimizer, Status
+from indago.core._optimizer import Optimizer, OptimizerStatus
 
 from indago.utils._minimize import minimize
 

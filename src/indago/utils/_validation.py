@@ -49,10 +49,10 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                 (TypeError, f'Variable type {var_type} for variable {var_name} is not an indago.VariableType'))
 
             match var_type:
-                case indago.VariableType.Real | indago.VariableType.RealPeriodic:
+                case indago.VariableType.REAL | indago.VariableType.REAL_PERIODIC:
                     if len(var_options) != 2:
                         validation_log.append((ValueError, f'Definition of real variable {var_name} needs to be a tuple '
-                                                           f'with exactly three items (indago.VariableType.Real | indago.VariableType.RealPeriodic, lb, ub)'))
+                                                           f'with exactly three items (indago.VariableType.REAL | indago.VariableType.REAL_PERIODIC, lb, ub)'))
                     else:
                         lb, ub = var_options
                         if not isinstance(lb, Real): validation_log.append((TypeError, f'Unsupported lb type ({type(lb)}) for {var_name}'))
@@ -67,11 +67,11 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                                 validation_log.append((ValueError, f'Lower bound of real variable {var_name} ({lb}) should '
                                                                    f'be strictly lower than upper bound ({ub})'))
 
-                case indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic:
+                case indago.VariableType.REAL_DISCRETE | indago.VariableType.REAL_DISCRETE_PERIODIC:
                     if len(var_options) != 1:
                         validation_log.append((ValueError, f'Definition of real discrete variable {var_name} needs to '
                                                            f'be a tuple with exactly two items '
-                                                           f'(indago.VariableType.RealDiscrete | indago.VariableType.RealDiscretePeriodic, list_of_discrete_values)'))
+                                                           f'(indago.VariableType.REAL_DISCRETE | indago.VariableType.REAL_DISCRETE_PERIODIC, list_of_discrete_values)'))
                     elif not isinstance(var_options[0], (list, tuple, np.ndarray)):
                         validation_log.append((TypeError, f'Discrete values {var_options[0]} for {var_name} should be a list, tuple, or numpy array'))
                     else:
@@ -92,10 +92,10 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                         else:
                             validation_log.append((TypeError, f'Discrete values {discrete_values} for {var_name} should be a list, tuple, or numpy array'))
 
-                case indago.VariableType.Integer | indago.VariableType.IntegerPeriodic:
+                case indago.VariableType.INTEGER | indago.VariableType.INTEGER_PERIODIC:
                     if len(var_options) != 2:
                         validation_log.append((ValueError, f'Definition of integer variable {var_name} needs to be a tuple '
-                                                           f'with exactly three items (indago.VariableType.Integer | indago.VariableType.IntegerPeriodic, lb, ub)'))
+                                                           f'with exactly three items (indago.VariableType.INTEGER | indago.VariableType.INTEGER_PERIODIC, lb, ub)'))
                     else:
                         lb, ub = var_options
                         if not isinstance(lb, (int, np.integer)): validation_log.append((TypeError, f'Unsupported lb type ({type(lb)}) for {var_name}'))
@@ -106,10 +106,10 @@ def validate_variables(variables: indago.VariableDictType) -> tuple[bool, list[t
                                 validation_log.append((ValueError, f'Lower bound of real variable {var_name} ({lb}) should '
                                                                    f'be strictly lower than upper bound ({ub})'))
 
-                case indago.VariableType.Categorical:
+                case indago.VariableType.CATEGORICAL:
                     if len(var_options) != 1:
                         validation_log.append((ValueError, f'Definition of categorical variable {var_name} needs to be '
-                                                           f'a tuple with exactly two items (indago.VariableType.Categorical, '
+                                                           f'a tuple with exactly two items (indago.VariableType.CATEGORICAL, '
                                                            f'list_of_string_values)'))
                     else:
                         str_values = var_options[0]

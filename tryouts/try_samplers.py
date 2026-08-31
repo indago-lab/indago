@@ -17,7 +17,7 @@ SAMPLER = 'random halton sobol lhs'.split()
 
 for sampler in SAMPLER:
 
-    real_variables_2D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.Real, -100, 100) for i in range(2)}
+    real_variables_2D: dict[str, Any] = {f'x{i + 1}': (indago.VariableType.REAL, -100, 100) for i in range(2)}
 
     optimizer = indago.PSO()
     optimizer.params = {'swarm_size': 100}
