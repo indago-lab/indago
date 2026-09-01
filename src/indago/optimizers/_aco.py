@@ -185,43 +185,43 @@ class ACO(Optimizer):
 
         while True:
 
-            # print('Pheromone:', self._ph)
-
             # apply pheromone based on the best candidate
-            for i, var in enumerate(self._net):
-                for j, val in enumerate(var):
-                    if val == self.best.X[i]: # alternatively: if val == self._pop[0].X[i] (with sorted _pop)
+            for i, (var_list, (_, (var_type, *__))) in enumerate(zip(self._net, self.variables.items())):
+                for j, val in enumerate(var_list):
+                    if val == self.best.X[i]:  # alternatively: if val == self._pop[0].X[i] (with sorted _pop)
                         self._ph[i][j] += 1
 
                         if self.variant == 'Spillover':
-                            if j == 0:
-                                if var[0] == var[-1]:  # periodic variable
-                                    self._ph[i][-2] += self.params['so_rate']
-                                self._ph[i][j+1] += self.params['so_rate']
-                            elif j == len(var) - 1:
-                                self._ph[i][j-1] += self.params['so_rate']
-                                if var[0] == var[-1]:  # periodic variable
-                                    self._ph[i][1] += self.params['so_rate']
-                            elif type(val) is not str:  # non-periodic, non-Categorical variable
-                                if j - 1 >= 0:
-                                    self._ph[i][j-1] += self.params['so_rate']
-                                if j + 1 <= len(var) - 1:
+                            if var_type is not VariableType.CATEGORICAL:
+                                if j == 0:
+                                    if var_type.is_periodic():
+                                        self._ph[i][-2] += self.params['so_rate']
                                     self._ph[i][j+1] += self.params['so_rate']
+                                elif j == len(var_list) - 1:
+                                    self._ph[i][j-1] += self.params['so_rate']
+                                    if var_type.is_periodic():
+                                        self._ph[i][1] += self.params['so_rate']
+                                else:
+                                    if j - 1 >= 0:
+                                        self._ph[i][j-1] += self.params['so_rate']
+                                    if j + 1 <= len(var_list) - 1:
+                                        self._ph[i][j+1] += self.params['so_rate']
 
-                if var[0] == var[-1]:  # equalize boundary values for periodic variables
+                # equalize boundary values for periodic variables
+                if var_type.is_periodic():
                     self._ph[i][0] = max(self._ph[i][0], self._ph[i][-1])
                     self._ph[i][-1] = self._ph[i][0]
 
             # evaporation
-            for i, var in enumerate(self._net):
-                for j, val in enumerate(var):
+            for i, var_list in enumerate(self._net):
+                for j, val in enumerate(var_list):
                     self._ph[i][j] *= (1 - self.params['evap_rate'])
 
             # prepare new generation
             for c in self._pop:
                 newX = []
-                for i, var in enumerate(self._net):
-                    newX.append(random.choices(var, weights=self._ph[i])[0])
+                for i, var_list in enumerate(self._net):
+                    newX.append(random.choices(var_list, weights=self._ph[i])[0])
                 c.X = tuple(newX)
 
             # When you prepare the list of candidates which must be evaluated
