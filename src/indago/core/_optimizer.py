@@ -18,13 +18,11 @@ Usage: from indago import Optimizer, Candidate
 
 """
 
-
 import copy
 import os.path
 
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.ma.core import shape
 from scipy.stats.qmc import Halton, Sobol, LatinHypercube
 from datetime import timedelta, datetime
 import time
@@ -32,10 +30,9 @@ import multiprocessing
 import string
 from enum import Enum
 
-from rich.console import Console
-
 import indago
 
+from rich.console import Console
 try:
     from rich.console import Group
 except:
@@ -186,18 +183,18 @@ class Optimizer(Engine):
     params : dict
         Method parameters, in the form of parameter name (dict key as str), parameter value (dict value).
         Defaults specific to the optimization method used.
-    
+
     Returns
     -------
     Optimizer
         Optimizer instance
-        
+
     """
 
     def __init__(self):
 
         super().__init__()
-        
+
         self.variant = None
 
         # stopping criteria
@@ -240,19 +237,18 @@ class Optimizer(Engine):
         # for EEEO
         self._inject = None
 
-
     def _progress_factor(self):
         """Private method for calculating progress factor ranging from zero to one,
         based on iterations or evaluations (whichever is running out faster).
         Used in optimization methods which adapt their behavior during the optimization process
         based on the time passed.
-        
+
         Returns
         -------
         progress_factor : float
-            A number between zero and one, representing the procedural progress 
+            A number between zero and one, representing the procedural progress
             of the optimization process.
-            
+
         """
 
         if self.it <= 1:
@@ -270,20 +266,20 @@ class Optimizer(Engine):
 
     def _evaluator_safe(self, X, s=None):
         """Private method for wrapping evaluation function in try-except.
-        
+
         Parameters
         ----------
         X : np.array
             Design vector.
         s : str
             Unique string.
-            
+
         Returns
         -------
         fitness : float
-            Fitness value as computed by evaluation function, 
+            Fitness value as computed by evaluation function,
             or ``np.nan`` if failed to compute evaluation function.
-            
+
         """
 
         try:
@@ -299,15 +295,15 @@ class Optimizer(Engine):
 
     def _init_optimizer(self):
         """Private method for Optimizer initialization performed just prior to
-        starting the optimization. Checks the types and values of user defined 
-        Optimizer attributes. Automatically sets optional Optimizer-level 
+        starting the optimization. Checks the types and values of user defined
+        Optimizer attributes. Automatically sets optional Optimizer-level
         parameters to default values if they are not provided.
 
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         # check for deprecated optimizer attributes
@@ -325,28 +321,27 @@ class Optimizer(Engine):
         for attr in dir(self):
             if not attr.startswith('_'):
                 assert attr in \
-                    'variant variables dimensions evaluator evaluator processes \
-                    objectives objective_weights objective_labels constraints \
-                    constraint_labels max_iterations max_evaluations \
-                    max_stalled_iterations max_stalled_evaluations target_fitness \
-                    max_elapsed_time lb ub best X0 sampler history monitoring \
-                    convergence_log_file evals_db forward_unique_str \
-                    post_iteration_processing safe_evaluation eval_fail_count \
-                    eval_fail_behavior eval_retry_attempts eval_retry_recede \
-                    it eval elapsed_time params status \
-                    methods \
-                    optimize plot_history copy'.split(' '), \
-                        f"Unknown optimizer attribute '{attr}'"
+                       'variant variables dimensions evaluator evaluator processes \
+                       objectives objective_weights objective_labels constraints \
+                       constraint_labels max_iterations max_evaluations \
+                       max_stalled_iterations max_stalled_evaluations target_fitness \
+                       max_elapsed_time lb ub best X0 sampler history monitoring \
+                       convergence_log_file evals_db forward_unique_str \
+                       post_iteration_processing safe_evaluation eval_fail_count \
+                       eval_fail_behavior eval_retry_attempts eval_retry_recede \
+                       it eval elapsed_time params status \
+                       methods \
+                       optimize plot_history copy'.split(' '), \
+                    f"Unknown optimizer attribute '{attr}'"
 
         # check if some missing attributes are available in evaluator
-        for attr in 'dimensions lb ub objective_weights objective_labels constraint_labels'.split(' '):
+        for attr in 'objective_weights objective_labels constraint_labels'.split(' '):
             if getattr(self, attr) is None and hasattr(self.evaluator, attr):
                 setattr(self, attr, getattr(self.evaluator, attr))
-
-        if self.objectives == 1 and hasattr(self.evaluator, 'objectives'):
-            self.objectives = self.evaluator.objectives
-        if self.constraints == 0 and hasattr(self.evaluator, 'constraints'):
-            self.constraints = self.evaluator.constraints
+        if not len(self.variables) > 0:
+            for attr in 'dimensions lb ub'.split(' '):
+                if getattr(self, attr) is None and hasattr(self.evaluator, attr):
+                    setattr(self, attr, getattr(self.evaluator, attr))
 
         # Initialize lb, ub, and dimensions
         if len(self.variables) > 0:
@@ -358,6 +353,11 @@ class Optimizer(Engine):
 
         if self._all_real:
             self._x_format = XFormat.NDARRAY
+
+        if self.objectives == 1 and hasattr(self.evaluator, 'objectives'):
+            self.objectives = self.evaluator.objectives
+        if self.constraints == 0 and hasattr(self.evaluator, 'constraints'):
+            self.constraints = self.evaluator.constraints
 
         # Create candidate initialization arguments dict
         self._candidate_init_info = {'variables': self.variables, 'n_objectives': self.objectives,
@@ -499,28 +499,28 @@ class Optimizer(Engine):
                 "Remaining:",
                 TimeRemainingColumn(),
                 # expand=True,
-                )
+            )
 
             self._progress_bar_tasks = []
 
             if self.max_iterations:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Iterations:",
-                                                                              total=self.max_iterations))
+                                                                            total=self.max_iterations))
             if self.max_stalled_iterations:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Stalled iterations:",
-                                                                              total=self.max_stalled_iterations))
+                                                                            total=self.max_stalled_iterations))
             if self.max_evaluations:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Evaluations:",
-                                                                              total=self.max_evaluations))
+                                                                            total=self.max_evaluations))
             if self.max_stalled_evaluations:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Stalled evaluations:",
-                                                                              total=self.max_stalled_evaluations))
+                                                                            total=self.max_stalled_evaluations))
             if self.target_fitness:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Target fitness:", total=1))
 
             if self.max_elapsed_time:
                 self._progress_bar_tasks.append(self._progress_bar.add_task("Elapsed time:",
-                                                                              total=self.max_elapsed_time))
+                                                                            total=self.max_elapsed_time))
 
             self._live = Live(self._update_progress_bar())
 
@@ -538,7 +538,6 @@ class Optimizer(Engine):
                         'f': np.empty([0, 1]),
                         }
         self._init_convergence_log()
-
 
     def _update_progress_bar(self):
         """
@@ -575,11 +574,6 @@ class Optimizer(Engine):
 
         if self.target_fitness and self.best:
             f0 = None
-            # for h in self.results.cHistory:
-            #     if np.all(h[2].C <= 0):
-            #         f0 = h[2].f
-            #         break
-            # print(f'{f0=}')
             for i in range(self.it + 1):
                 if np.all(self.history['C'][i, :] <= 0):
                     f0 = self.history['f'][i, 0]
@@ -671,7 +665,7 @@ class Optimizer(Engine):
             c._R = R
 
     def _evaluate_initial_candidates(self):
-        """Private method for evaluating initial candidates. This method populates 
+        """Private method for evaluating initial candidates. This method populates
         and evaluates private list of initial candidates (Optimizer._initial_candidates)
         according to provided initial points Optimizer.X0.
 
@@ -721,7 +715,7 @@ class Optimizer(Engine):
         -------
         None
             Nothing
-            
+
         """
 
         # Initialize convergence log file
@@ -768,7 +762,7 @@ class Optimizer(Engine):
 
     def _check_params(self, mandatory_params, optional_params, defined_params):
         """Private method which checks if optimizer parameters are defined in Optimizer.params dict.
-        Should be called in initializations of derived Optimizer classes. It asserts if any of 
+        Should be called in initializations of derived Optimizer classes. It asserts if any of
         mandatory parameters is missing and prints a warning if unknown/excessive parameter is provided.
 
         Parameters
@@ -784,7 +778,7 @@ class Optimizer(Engine):
         -------
         None
             Nothing
-            
+
         """
 
         for param in mandatory_params:
@@ -795,13 +789,13 @@ class Optimizer(Engine):
                 f'Warning: Excessive parameter {param}'
 
     def __str__(self):
-        """Method for a useful printout of optimizer properties. 
-        
+        """Method for a useful printout of optimizer properties.
+
         Returns
         -------
         printout : str
             String of the fancy table of optimizer properties.
-            
+
         """
 
         table = Table(title=f'Indago {type(self).__name__} Optimizer')
@@ -838,12 +832,12 @@ class Optimizer(Engine):
             Message to be displayed in the output.
         indent : int
             Number of characters used for indentation of the message. Default is 0.
-        
+
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         if self.monitoring == 'basic':
@@ -855,16 +849,16 @@ class Optimizer(Engine):
 
     def _progress_log(self):
         """Private method used to produce and print a line for each iteration.
-        
+
         Returns
         -------
         None
             Nothing
-            
+
         """
-        
+
         if self.monitoring == 'basic':
-            
+
             line = f'iter: {self.it:10d}'
             if self.max_iterations:
                 line += f'/{self.max_iterations}'
@@ -883,14 +877,14 @@ class Optimizer(Engine):
             # self._log(line)
 
     def _convergence_log_line(self):
-        """Private method used to produce and write a line to 
+        """Private method used to produce and write a line to
         convergence log file for each iteration.
-        
+
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         if not self.convergence_log_file:
@@ -912,15 +906,15 @@ class Optimizer(Engine):
 
     def _gen_unique_str(self):
         """Private method for generating a unique string of 16 characters.
-        This string is then used when forwarding a unique string to the 
-        evaluation function is enabled (Optimizer.forward_unique_str = True). 
+        This string is then used when forwarding a unique string to the
+        evaluation function is enabled (Optimizer.forward_unique_str = True).
         The generated string is guaranteed to be unique within an optimizer.
 
         Returns
         -------
         s : str
             A unique string.
-            
+
         """
 
         while True:
@@ -930,7 +924,7 @@ class Optimizer(Engine):
                 return _s
 
     def optimize(self, resume=False, inject=None, seed=None):
-        """Method which starts the optimization. The method wraps ``_run`` method 
+        """Method which starts the optimization. The method wraps ``_run`` method
         of the optimizer's subclass.
 
         Parameters
@@ -941,14 +935,14 @@ class Optimizer(Engine):
         inject : Candidate or its subclass
             Candidate solution to be injected into the optimizer population.
         seed : int or None
-            Random seed. Provide the same value for reproducing identical 
+            Random seed. Provide the same value for reproducing identical
             stochastic procedures.
 
         Returns
         -------
         optimum : Candidate
             The best solution found in the optimization.
-            
+
         """
 
         if not resume:
@@ -1038,9 +1032,9 @@ class Optimizer(Engine):
         -------
         stop : bool
             ``True`` or ``False``, whether the optimization should stop.
-            
+
         """
-        
+
         stop = False
         status_str = ''
 
@@ -1115,14 +1109,14 @@ class Optimizer(Engine):
         return stop
 
     def _finalize_iteration(self):
-        """Private method used to perform all administrative tasks at the end 
+        """Private method used to perform all administrative tasks at the end
         of a method's iteration.
-    
+
         Returns
         -------
         stop : bool
             ``True`` or ``False``, whether the optimization should stop or not.
-            
+
         """
 
         if self._err_msg is not None:
@@ -1167,20 +1161,20 @@ class Optimizer(Engine):
             return False
 
     def _multiprocess_evaluate(self, candidates: list[Candidate]):
-        """Private method used for calling parallel evaluation of multiple candidates. 
-        It relies on multiprocessing pool using map and starmap methods. The objectives, 
+        """Private method used for calling parallel evaluation of multiple candidates.
+        It relies on multiprocessing pool using map and starmap methods. The objectives,
         constraints and fitness of candidates in the list are updated after the evaluation.
 
         Parameters
         ----------
         candidates : list of Candidate
             A list of candidates to be evaluated.
-            
+
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         if self.forward_unique_str:
@@ -1214,7 +1208,7 @@ class Optimizer(Engine):
                 for p in nans_index:
                     for i in range(self.eval_retry_attempts):
                         self._log(f'evaluation function failed, attempting retry #{i + 1}')
-                        
+
                         if self.best:
                             goodR = self.best._R
                         else:
@@ -1233,7 +1227,7 @@ class Optimizer(Engine):
                             break
                         else:
                             self.eval_fail_count += 1
-                    
+
                     else:
                         if self.eval_retry_attempts > 0:
                             # report to log retrying exhausted
@@ -1257,20 +1251,20 @@ class Optimizer(Engine):
 
     def _collective_evaluation(self, candidates: list[Candidate]):
         """Private function used for evaluation of multiple candidates that
-        automatically conducts parallel or serial evaluation and forwards 
-        a unique string to the evaluation function. Evaluation is performed 
+        automatically conducts parallel or serial evaluation and forwards
+        a unique string to the evaluation function. Evaluation is performed
         in-place and the candidates provided as argument are updated.
 
         Parameters
         ----------
         candidates : list of Candidate or its subclass
             A list of candidates to be evaluated.
-            
+
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         n = len(candidates)
@@ -1317,7 +1311,7 @@ class Optimizer(Engine):
                     elif self.eval_fail_behavior == 'retry':
                         for i in range(self.eval_retry_attempts):
                             self._log(f'evaluation function failed, attempting retry #{i + 1}')
-                            
+
                             if self.best:
                                 goodR = self.best._R
                             else:
@@ -1345,7 +1339,7 @@ class Optimizer(Engine):
                                 break
                             else:
                                 self.eval_fail_count += 1
-            
+
                         else:
                             if self.eval_retry_attempts > 0:
                                 # report to log retrying exhausted
@@ -1366,7 +1360,8 @@ class Optimizer(Engine):
             candidates_best = np.sort(candidates, kind='stable')[0]
             if candidates_best.f == self.best.f:
                 if np.any(candidates_best.X != self.best.X):
-                    self._log(f'Warning: nonunique optimum; multiple best candidates with same fitness but different X: [{candidates_best.X}]')
+                    self._log(
+                        f'Warning: nonunique optimum; multiple best candidates with same fitness but different X: [{candidates_best.X}]')
             if candidates_best <= self.best:
                 self.best = candidates_best.copy()
 
@@ -1377,14 +1372,14 @@ class Optimizer(Engine):
             self._live.update(self._update_progress_bar())
 
     def _update_history(self):
-        """Private method that updates Optimizer.history dict entries according 
+        """Private method that updates Optimizer.history dict entries according
         to current Optimizer.best Candidate.
 
         Returns
         -------
         None
             Nothing
-            
+
         """
 
         if self.history['eval'].size < self.it + 1:
@@ -1409,7 +1404,7 @@ class Optimizer(Engine):
             Saves the convergence figure according to provided filename and closes the figure.
         title : str or None
             Optional title of the figure. If None (default), the title is automatically generated.
-        
+
         Returns
         -------
         None or (fig, axes)
@@ -1420,7 +1415,8 @@ class Optimizer(Engine):
         if title is None:
             title = f'Indago {self.__class__.__name__} optimization convergence'
 
-        fig, axes = plt.subplots(figsize=(12, 10), nrows=4 if self.constraints > 0 else 3, constrained_layout=True, sharex=True)
+        fig, axes = plt.subplots(figsize=(12, 10), nrows=4 if self.constraints > 0 else 3, constrained_layout=True,
+                                 sharex=True)
         if self.constraints > 0:
             ax_x, ax_o, ax_c, ax_f = axes
         else:
@@ -1441,7 +1437,8 @@ class Optimizer(Engine):
                     if var_type.is_real() and not var_type.is_discrete():
                         X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
                     elif var_type.is_real() and var_type.is_discrete():
-                        X = (np.max(var_options[0]) - self.history['X'][:, i]) / (np.max(var_options[0]) - np.min(var_options[0]))
+                        X = (np.max(var_options[0]) - self.history['X'][:, i]) / (
+                                    np.max(var_options[0]) - np.min(var_options[0]))
                     elif var_type.is_integer():
                         X = (var_options[1] - self.history['X'][:, i]) / (var_options[1] - var_options[0])
                     elif var_type is VariableType.CATEGORICAL:
@@ -1463,8 +1460,8 @@ class Optimizer(Engine):
 
             if self.dimensions <= 10:
                 legend = ax_x.legend(ncol=12, fontsize='small',
-                                     loc = 'upper center',
-                                     bbox_to_anchor = (0.5, 1.15),
+                                     loc='upper center',
+                                     bbox_to_anchor=(0.5, 1.15),
                                      )
                 frame = legend.get_frame()
                 frame.set_facecolor('none')
@@ -1489,13 +1486,12 @@ class Optimizer(Engine):
 
             if self.objectives <= 10:
                 legend = ax_o.legend(ncol=10, fontsize='small',
-                                     loc = 'upper center',
-                                     bbox_to_anchor = (0.5, 1.15),
+                                     loc='upper center',
+                                     bbox_to_anchor=(0.5, 1.15),
                                      )
                 frame = legend.get_frame()
                 frame.set_facecolor('none')
                 frame.set_edgecolor('none')
-
 
         # Plot constraints
         if ax_c:
@@ -1510,7 +1506,7 @@ class Optimizer(Engine):
                         break
 
                 ax_c.plot(E, C, lw=1, ls='-', label=self.constraint_labels[ic])
-                ax_c.plot(E[:i_feasible], C[:i_feasible], ls='-', dashes=(1.5, 0.8), lw=2, c='orangered',ms=3)
+                ax_c.plot(E[:i_feasible], C[:i_feasible], ls='-', dashes=(1.5, 0.8), lw=2, c='orangered', ms=3)
 
             ax_c.plot([], [], ls=':', lw=2, c='r', label='Unfeasible')
             ax_c.set_ylabel(r'$\mathbf{Constraints}$\n(sym log scale)')
@@ -1522,7 +1518,7 @@ class Optimizer(Engine):
                 ord = 10 ** np.ceil(np.log10(c_max))
             else:
                 ord = 1
-            ax_c.set_yscale('symlog', linthresh=1e-3*ord)
+            ax_c.set_yscale('symlog', linthresh=1e-3 * ord)
             ax_c.set_facecolor("snow")
             ax_c.spines['right left'.split()].set_visible(False)
             ax_c.spines['top bottom'.split()].set_linewidth(0.5)
@@ -1531,8 +1527,8 @@ class Optimizer(Engine):
 
             if self.constraints <= 10:
                 legend = ax_c.legend(ncol=11, fontsize='small',
-                                     loc = 'upper center',
-                                     bbox_to_anchor = (0.5, 1.15),
+                                     loc='upper center',
+                                     bbox_to_anchor=(0.5, 1.15),
                                      )
                 frame = legend.get_frame()
                 frame.set_facecolor('none')
@@ -1554,7 +1550,7 @@ class Optimizer(Engine):
             if f_max > f_min:
                 Flin = 99 * (F - f_min) / (f_max - f_min) + 1
             else:
-                Flin = np.zeros_like (F)
+                Flin = np.zeros_like(F)
 
             ax_f.plot(E, Flin, lw=1.5, c='k', label='Fitness')
 
@@ -1570,7 +1566,7 @@ class Optimizer(Engine):
                         i_feasible = i
                         break
 
-                alpha = 0.1 + 0.5/self.constraints
+                alpha = 0.1 + 0.5 / self.constraints
                 ax_f.fill_between(E[:i_feasible], f_lim[0], f_lim[1],
                                   color='red', alpha=alpha,
                                   edgecolors='none', label='Unfeasible' if ic == 0 else None)
@@ -1596,8 +1592,8 @@ class Optimizer(Engine):
                               ha='center',
                               textcoords='offset points',
                               fontsize='x-small',
-                              weight = 'bold' if e == E.max() else 'normal',
-                              c='k', # if e < E.max() else 'g',
+                              weight='bold' if e == E.max() else 'normal',
+                              c='k',  # if e < E.max() else 'g',
                               bbox=props,
                               arrowprops=dict(
                                   arrowstyle='-', connectionstyle="arc3,rad=0.05",
@@ -1610,8 +1606,8 @@ class Optimizer(Engine):
             ax_f.set_yticks([])
 
             legend = ax_f.legend(ncol=2, fontsize='small',
-                                 loc = 'upper center',
-                                 bbox_to_anchor = (0.5, 1.15),
+                                 loc='upper center',
+                                 bbox_to_anchor=(0.5, 1.15),
                                  )
             frame = legend.get_frame()
             frame.set_facecolor('none')
@@ -1633,21 +1629,21 @@ class Optimizer(Engine):
             plt.close(fig)
         else:
             return fig, axes
-    
+
     def copy(self):
-        """Method for creating a true (deep) copy of the Optimizer. 
-        
+        """Method for creating a true (deep) copy of the Optimizer.
+
         Returns
         -------
         opt
             Optimizer instance.
-            
+
         """
 
         opt = copy.deepcopy(self)
         opt._pool = copy.deepcopy(self._pool)
         return opt
-    
+
     # these two functions are needed for multiprocessing to work when using monitoring
     def __getstate__(self):
         self_dict = self.__dict__.copy()
@@ -1656,6 +1652,7 @@ class Optimizer(Engine):
             if attr in self_dict:
                 del self_dict[attr]
         return self_dict
+
     def __setstate__(self, state):
         self.__dict__.update(state)
 

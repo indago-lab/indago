@@ -32,7 +32,7 @@ class EEEO(Optimizer):
     Elite-Exchanging Ensemble Optimization (EEEO) runs a selection of optimizers in
     parallel and after each iteration injects the overall-best found solution into
     the employed optimizers.
-    
+
     Attributes
     ----------
     variant : str
@@ -43,18 +43,18 @@ class EEEO(Optimizer):
         corresponding default variant and params.
     _optimizers : list of Optimizer subclass objects
         Private list of optimizers used in EEEO.
-        
+
     Returns
     -------
     optimizer : EEEO
         EEEO optimizer instance.
+
     """
 
     def __init__(self):
         super().__init__()
 
         self.methods = None
-
 
     def _check_params(self):
         """Private method which performs some EEEO-specific parameter checks
@@ -64,6 +64,7 @@ class EEEO(Optimizer):
         -------
         None
             Nothing
+
         """
 
         if not self.variant:
@@ -79,7 +80,7 @@ class EEEO(Optimizer):
         for method in self.methods:
             assert method in 'ABC DE NM FWA GWO PSO RS HBO CRS EFO SSA'.split(), \
                 'EEEO does not support {method} at this time'
-        
+
         defined_params = list(self.params.keys())
         mandatory_params, optional_params = [], []
 
@@ -91,14 +92,14 @@ class EEEO(Optimizer):
 
         Optimizer._check_params(self, mandatory_params, optional_params, defined_params)
 
-
     def _init_method(self):
         """Private method for initializing the EEEO optimizer instance.
-        
+
         Returns
         -------
         None
             Nothing
+
         """
 
         # Prepare optimizers
@@ -115,8 +116,9 @@ class EEEO(Optimizer):
 
             # pass parameters
             opt.evaluator = self.evaluator
-            if self.variables:
+            if len(self.variables) > 0:
                 opt.variables = self.variables
+                opt.lb, opt.ub = None, None
             else:
                 opt.lb, opt.ub = self.lb, self.ub
             opt.dimensions = self.dimensions
@@ -134,7 +136,6 @@ class EEEO(Optimizer):
         # Initialize EEEO best
         self.best = None
 
-
     def _run(self):
         """Main loop of EEEO method.
 
@@ -142,7 +143,7 @@ class EEEO(Optimizer):
         -------
         optimum: Candidate
             Best solution found during the EEEO optimization.
-            
+
         """
 
         self._check_params()
@@ -158,6 +159,8 @@ class EEEO(Optimizer):
             bests = []
             for i, opt in enumerate(self._optimizers):
                 opt.max_iterations = self.it + 1
+                if len(opt.variables) > 0:
+                    opt.lb, opt.ub = None, None
                 opt.optimize(resume=resume,
                              inject=self.best if not self.best == opt.best else None,
                              seed=self._seed)
