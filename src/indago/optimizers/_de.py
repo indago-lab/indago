@@ -61,7 +61,7 @@ class DE(Optimizer):
     Attributes
     ----------
     variant : str
-        Name of the DE variant (``SHADE`` or ``LSHADE``). Default: ``LSHADE``.
+        Name of the DE variant (``SHADE``, ``LSHADE``, ``RankLSHADE``). Default: ``LSHADE``.
     params : dict
         A dictionary of DE parameters.
     _Pop : list
@@ -110,7 +110,7 @@ class DE(Optimizer):
         if 'hist_size' in self.params:
             self.params['hist_size'] = int(self.params['hist_size'])
 
-        if self.variant == 'SHADE':
+        if self.variant in 'SHADE LSHADE RankLSHADE'.split():
             mandatory_params = 'pop_init f_archive hist_size p_mutation'.split()
             if 'pop_init' not in self.params:
                 self.params['pop_init'] = max(30, self.dimensions * 5)
@@ -123,34 +123,12 @@ class DE(Optimizer):
                 defined_params += 'hist_size'.split()
             if 'p_mutation' not in self.params:
                 self.params['p_mutation'] = 0.11
-                defined_params += 'p_mutation'.split()    
-            optional_params = 'rank_enabled'.split()
-            if 'rank_enabled' not in self.params:
-                self.params['rank_enabled'] = False  # Rank-based variant off by default
-                defined_params += 'rank_enabled'.split()  
-        elif self.variant == 'LSHADE':
-            mandatory_params = 'pop_init f_archive hist_size p_mutation'.split()
-            if 'pop_init' not in self.params:
-                self.params['pop_init'] = max(30, self.dimensions * 5)
-                defined_params += 'pop_init'.split()
-            if 'f_archive' not in self.params:
-                self.params['f_archive'] = 2.6
-                defined_params += 'f_archive'.split()
-            if 'hist_size' not in self.params:  # aka H
-                self.params['hist_size'] = 6
-                defined_params += 'hist_size'.split()
-            if 'p_mutation' not in self.params:
-                self.params['p_mutation'] = 0.11
-                defined_params += 'p_mutation'.split()  
-            optional_params = 'rank_enabled'.split()
-            if 'rank_enabled' not in self.params:
-                self.params['rank_enabled'] = False  # Rank-based variant off by default
-                defined_params += 'rank_enabled'.split()
+                defined_params += 'p_mutation'.split()
         else:
             assert False, f'Unknown variant! {self.variant}'
         
-        if not self.params['rank_enabled'] and self.constraints > 0:
-            assert False, 'DE does not support constraints by default! Set param rank_enabled=True to enable it.'
+        if self.constraints > 0 and self.variant != 'RankLSHADE':
+            assert False, "Base DE variants do not support constraints! Use 'RankLSHADE' variant for this."
         
         assert isinstance(self.params['pop_init'], int) \
             and self.params['pop_init'] > 0, \
@@ -174,7 +152,7 @@ class DE(Optimizer):
             
         """
 
-        if self.variant == 'LSHADE':
+        if self.variant in 'LSHADE RankLSHADE'.split():
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
                 'Error: optimizer.max_iteration, optimizer.max_evaluations, or self.max_elapsed_time should be provided for this method/variant'
 
@@ -282,7 +260,7 @@ class DE(Optimizer):
             # Survival for next generation...
 
             # standard fitness-based algorithm
-            if not self.params['rank_enabled']:
+            if self.variant != 'RankLSHADE':
                 for p, t in zip(self._Pop, self._Trials):
                     if t < p:
 
@@ -300,7 +278,7 @@ class DE(Optimizer):
                         p.f = t.f
                         p.O, p.C = np.copy(t.O), np.copy(t.C)  # formally copying, natively not supporting constraints
             
-            # rank-based variant - very poor performance!
+            # rank-based variant
             else:
                 ranking = np.argsort(self._Pop + self._Trials)
                 p_ranking = ranking[0:len(self._Pop)]
@@ -317,7 +295,7 @@ class DE(Optimizer):
 
                         S_CR = np.append(S_CR, t.CR) 
                         S_F = np.append(S_F, t.F)
-                        df = (p_rank - t_rank) #/ max(np.mean(p_ranking) - np.mean(t_ranking), 1)
+                        df = (p_rank - t_rank)  #/ max(np.mean(p_ranking) - np.mean(t_ranking), 1)
                         df = max(df, 1/2)
                         S_df = np.append(S_df, df)
 
@@ -339,7 +317,7 @@ class DE(Optimizer):
                     self._k = 0
                     
             # Linear Population Size Reduction (LPSR)
-            if self.variant == 'LSHADE':
+            if self.variant in 'LSHADE RankLSHADE'.split():
                 N_init = self.params['pop_init']
                 N_new = round((4 - N_init) * self._progress_factor() + N_init)
                 if N_new < len(self._Pop):

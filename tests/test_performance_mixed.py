@@ -285,7 +285,17 @@ def test_DE_defaults():
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_DE_LSHADE_defaults():
+def test_DE_RankLSHADE_defaults():
+    description = 'DE RankLSHADE defaults'
+    optimizer = DE()
+    optimizer.variant = 'RankLSHADE'
+    expected_result = 0.24860986540417535
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_DE_SHADE_defaults():
     description = 'DE SHADE defaults'
     optimizer = DE()
     optimizer.variant = 'SHADE'
@@ -547,7 +557,8 @@ if __name__ == '__main__':
     test_SSA_custom_parameters()
     test_SSA_custom_additional_parameters()
     test_DE_defaults()
-    test_DE_LSHADE_defaults()
+    test_DE_RankLSHADE_defaults()
+    test_DE_SHADE_defaults()
     test_DE_LSHADE_custom_parameters()
     # test_BA_defaults()
     test_EFO_defaults()

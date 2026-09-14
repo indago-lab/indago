@@ -12,6 +12,7 @@ Released on yyyy-mm-dd
 
 ### New features
 - **Variable types and mixed-variable support**
+- New DE variant `'RankLSHADE'` which supports constraints
 - New anakatabatic model for PSO: `'DoubleSummit'`
 - Utility functions `inspect`, `inspect_optimizers` and `minimize_exhaustive` have been removed for the time being <i class="fa-solid fa-triangle-exclamation"></i>
 ### Improvements

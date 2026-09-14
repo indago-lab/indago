@@ -165,7 +165,7 @@ These methods are available through a unified API, which was designed to be as a
 
 ### Particle Swarm Optimization
 
-Let's use PSO as a primary step-by-step example. First, we need to import NumPy and Indago PSO, and then initialize an optimizer object:
+Let's use PSO as a primary step-by-step example on a single-objective problem without constraints. First, we need to import NumPy and Indago PSO, and then initialize an optimizer object:
 ```python
 import numpy as np
 from indago import PSO
@@ -203,7 +203,7 @@ and then we need to also specify the anakatabatic model:
 ```python
 pso.params['akb_model'] = 'Languid'  # other options explained below
 ```
-Apart from `'Languid'` [15, 16], we can use `'DoubleSummit'`, `'TipsySpider'`, `'FlyingStork'` or `'MessyTie'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'Languid'` and `'DoubleSummit'`.
+Apart from `'Languid'` [15, 16], we can use `'DoubleSummit'`, `'TipsySpider'`, `'FlyingStork'` or `'MessyTie'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'TipsySpider'` and `'DoubleSummit'`.
 
 We can enable reporting during the optimization process by providing the monitoring argument:
 ```python
@@ -267,18 +267,19 @@ If we want to use DE [4], we initialize it in the same way as with the other met
 from indago import DE
 de = DE()
 ```
-There are two DE variants implemented, namely SHADE and LSHADE. Say we want to use SHADE:
+There are three DE variants implemented, namely *SHADE*, *LSHADE* and *RankLSHADE*. Say we want to use *SHADE*:
 ```python
-de.variant = 'SHADE'  # default variant='LSHADE'
+de.variant = 'SHADE'  # other available options are 'LSHADE' and 'RankLSHADE', default variant='LSHADE'
 ```
-Both DE variants use the following parameters:
+When dealing with constraints, you must use the *RankLSHADE* variant.
+
+All DE variants use the following parameters:
 ```python
 de.params['pop_init'] = 200  # initial population size; default pop_init=max(30, 5*dimensions)
 de.params['f_archive'] = 3  # external archive size factor; default f_archive=2.6
 de.params['hist_size'] = 4  # historical memory size; default hist_size=6
 de.params['p_mutation'] = 0.2  # default p_mutation=0.11
 ```
-DE implementation does not (yet) support using constraints.
 
 ### Electromagnetic Field Optimization 
 
