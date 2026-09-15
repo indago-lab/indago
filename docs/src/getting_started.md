@@ -300,7 +300,7 @@ efo.params['Ps_rate'] = 0.25  # should range from 0.1 to 0.4; default Ps_rate=0.
 efo.params['P_field'] = 0.075  # should range from 0.05 to 0.1; default P_field=0.075
 efo.params['N_field'] = 0.45  # should range from 0.4 to 0.5; default N_field=0.45
 ```
-Currently, parallelization in EFO is not allowed due to it being entirely ineffective for this method.
+Currently, parallelization in EFO is not allowed due to it being entirely ineffective for this method. Also, note that EFO is significantly slower than other methods.
 
 ### Artificial Bee Colony 
 
@@ -367,6 +367,7 @@ and only one parameter:
 ```python
 crs.params['pop_scale'] = 5  # default pop_scale=10
 ```
+Note that CRS is significantly slower than most other methods.
 
 ### Nelder-Mead
 
