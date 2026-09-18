@@ -203,7 +203,7 @@ and then we need to also specify the anakatabatic model:
 ```python
 pso.params['akb_model'] = 'Languid'  # other options explained below
 ```
-Apart from `'Languid'` [15, 16], we can use `'DoubleSummit'`, `'TipsySpider'`, `'FlyingStork'` or `'MessyTie'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'TipsySpider'` and `'DoubleSummit'`.
+Apart from `'Languid'` [15, 16], we can use `'TipsySpider'`, `'FlyingStork'` or `'DoubleSummit'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO.
 
 We can enable reporting during the optimization process by providing the monitoring argument:
 ```python

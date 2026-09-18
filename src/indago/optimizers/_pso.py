@@ -193,7 +193,7 @@ class PSO(Optimizer):
             if 'akb_model' in defined_params:
 
                 if self.params['akb_model'] in \
-                        ['DoubleSummit', 'FlyingStork', 'MessyTie', 'TipsySpider', 'RightwardPeaks', 'OrigamiSnake']:
+                        ['DoubleSummit', 'FlyingStork', 'TipsySpider', 'RightwardPeaks', 'OrigamiSnake']:
 
                     match self.params['akb_model']:
                         case 'DoubleSummit':
@@ -206,11 +206,6 @@ class PSO(Optimizer):
                             w_stop = [-0.81, -0.35, -0.26, 0.64, 0.60]
                             if self.variant != 'Vanilla':
                                 self._log('Warning: akb_model \'FlyingStork\' was designed for Vanilla PSO')
-                        case 'MessyTie':
-                            w_start = [-0.62, 0.18, 0.65, 0.32, 0.77]
-                            w_stop = [0.36, 0.73, -0.62, 0.40, 1.09]
-                            if self.variant != 'Vanilla':
-                                self._log('Warning: akb_model \'MessyTie\' was designed for Vanilla PSO')
                         case 'TipsySpider':
                             w_start = [-0.32, 0.10, -0.81, 1.19, 0.55]
                             w_stop = [0.34, 0.36, 0.28, 0.75, 0.08]
