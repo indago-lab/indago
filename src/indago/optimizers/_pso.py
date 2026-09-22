@@ -90,7 +90,7 @@ class PSO(Optimizer):
     Attributes
     ----------
     variant : str
-        Name of the PSO variant (``Vanilla``, ``TVAC``, or ``Chaotic``). Default: ``Vanilla``.
+        Name of the PSO variant (``Flagship``, ``Vanilla``, ``TVAC``, or ``Chaotic``). Default: ``Flagship``.
     params : dict
         A dictionary of PSO parameters.
     _v_max : ndarray
@@ -129,7 +129,7 @@ class PSO(Optimizer):
         """
 
         if not self.variant:
-            self.variant = 'Vanilla'
+            self.variant = 'Flagship'
 
         defined_params = list(self.params.keys())
         mandatory_params, optional_params = [], []
@@ -137,56 +137,74 @@ class PSO(Optimizer):
         if 'swarm_size' in self.params:
             self.params['swarm_size'] = int(self.params['swarm_size'])
 
-        if self.variant == 'Vanilla':
-            mandatory_params = 'swarm_size inertia cognitive_rate social_rate'.split()
-            if 'swarm_size' not in self.params:
-                self.params['swarm_size'] = max(10, self.dimensions)
-                defined_params += 'swarm_size'.split()
-            if 'inertia' not in self.params:
-                self.params['inertia'] = 0.72
-                defined_params += 'inertia'.split()
-            if 'cognitive_rate' not in self.params:
-                self.params['cognitive_rate'] = 1.0
-                defined_params += 'cognitive_rate'.split()
-            if 'social_rate' not in self.params:
-                self.params['social_rate'] = 1.0
-                defined_params += 'social_rate'.split()
-            optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
-        
-        elif self.variant == 'TVAC':
-            mandatory_params = 'swarm_size inertia'.split()
-            if 'swarm_size' not in self.params:
-                self.params['swarm_size'] = max(10, self.dimensions)
-                defined_params += 'swarm_size'.split()
-            if 'inertia' not in self.params:
-                self.params['inertia'] = 0.72
-                defined_params += 'inertia'.split()
-            optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+        match self.variant:
 
-        elif self.variant == 'Chaotic':
-            mandatory_params = 'swarm_size inertia cognitive_rate social_rate max_cls_it chaotic_elite'.split()
-            if 'swarm_size' not in self.params:
-                self.params['swarm_size'] = max(10, self.dimensions)
-                defined_params += 'swarm_size'.split()
-            if 'inertia' not in self.params:
-                self.params['inertia'] = 0.72
-                defined_params += 'inertia'.split()
-            if 'cognitive_rate' not in self.params:
-                self.params['cognitive_rate'] = 1.0
-                defined_params += 'cognitive_rate'.split()
-            if 'social_rate' not in self.params:
-                self.params['social_rate'] = 1.0
-                defined_params += 'social_rate'.split()
-            if 'max_cls_it' not in self.params:
-                self.params['max_cls_it'] = 10
-                defined_params += 'max_cls_it'.split()
-            if 'chaotic_elite' not in self.params:
-                self.params['chaotic_elite'] = 0.2
-                defined_params += 'chaotic_elite'.split()
-            optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
-        
-        else:
-            assert False, f'Unknown variant! {self.variant}'
+            case 'Flagship':
+                mandatory_params = 'swarm_size inertia cognitive_rate social_rate'.split()
+                if 'swarm_size' not in self.params:
+                    self.params['swarm_size'] = max(10, self.dimensions)
+                    defined_params += 'swarm_size'.split()
+                self.params['inertia'] = 'anakatabatic'
+                self.params['akb_model'] = 'TipsySpider'
+                defined_params += 'inertia akb_model'.split()
+                optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+                if 'cognitive_rate' not in self.params:
+                    self.params['cognitive_rate'] = 1.0
+                    defined_params += 'cognitive_rate'.split()
+                if 'social_rate' not in self.params:
+                    self.params['social_rate'] = 1.0
+                    defined_params += 'social_rate'.split()
+
+            case 'Vanilla':
+                mandatory_params = 'swarm_size inertia cognitive_rate social_rate'.split()
+                if 'swarm_size' not in self.params:
+                    self.params['swarm_size'] = max(10, self.dimensions)
+                    defined_params += 'swarm_size'.split()
+                if 'inertia' not in self.params:
+                    self.params['inertia'] = 0.72
+                    defined_params += 'inertia'.split()
+                if 'cognitive_rate' not in self.params:
+                    self.params['cognitive_rate'] = 1.0
+                    defined_params += 'cognitive_rate'.split()
+                if 'social_rate' not in self.params:
+                    self.params['social_rate'] = 1.0
+                    defined_params += 'social_rate'.split()
+                optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+
+            case 'TVAC':
+                mandatory_params = 'swarm_size inertia'.split()
+                if 'swarm_size' not in self.params:
+                    self.params['swarm_size'] = max(10, self.dimensions)
+                    defined_params += 'swarm_size'.split()
+                if 'inertia' not in self.params:
+                    self.params['inertia'] = 0.72
+                    defined_params += 'inertia'.split()
+                optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+
+            case 'Chaotic':
+                mandatory_params = 'swarm_size inertia cognitive_rate social_rate max_cls_it chaotic_elite'.split()
+                if 'swarm_size' not in self.params:
+                    self.params['swarm_size'] = max(10, self.dimensions)
+                    defined_params += 'swarm_size'.split()
+                if 'inertia' not in self.params:
+                    self.params['inertia'] = 0.72
+                    defined_params += 'inertia'.split()
+                if 'cognitive_rate' not in self.params:
+                    self.params['cognitive_rate'] = 1.0
+                    defined_params += 'cognitive_rate'.split()
+                if 'social_rate' not in self.params:
+                    self.params['social_rate'] = 1.0
+                    defined_params += 'social_rate'.split()
+                if 'max_cls_it' not in self.params:
+                    self.params['max_cls_it'] = 10
+                    defined_params += 'max_cls_it'.split()
+                if 'chaotic_elite' not in self.params:
+                    self.params['chaotic_elite'] = 0.2
+                    defined_params += 'chaotic_elite'.split()
+                optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+
+            case _:
+                assert False, f'Unknown variant! {self.variant}'
 
         if self.params['inertia'] == 'anakatabatic':
 

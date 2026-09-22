@@ -2,9 +2,10 @@ import indago
 import numpy as np
 
 
-real_example_result_x = np.array((-1.3688474354012214e-08, 2.0544380419096342e-08, 2.6509004769081912e-08,
-                                -1.961297968477993e-08, 7.529059331545795e-08, -5.1880164164685993e-08,
-                                2.9547390312245625e-08, 3.158914019252279e-08))
+real_example_result_x = np.array((7.723175361462609e-05, 0.007620010335907423, 0.00038955064126255934,
+                                  8.731740586043202e-05, -0.000518793586882893, -0.0010262722272678104,
+                                  0.00015557814002775672, 0.0001289463897400367)
+)
 
 def test_getting_started_real():
 
@@ -44,7 +45,7 @@ def test_getting_started_real():
     print(result.f)  # minimum of obj with constr1 and constr2 satisfied
     print(result.X)  # design vector at minimum (as tuple)
 
-    assert np.isclose(result.f, 5.042330734013275e-14, atol=1e-10, rtol=0)
+    assert np.isclose(result.f, 5.959310949391016e-05, atol=1e-10, rtol=0)
     assert np.isclose(np.array(result.X), real_example_result_x, atol=1e-10, rtol=0).all()
 
 
@@ -56,7 +57,7 @@ def test_getting_started_real_minimize():
     def goalfun(x):
         obj = np.sum(x ** 2)  # minimization objective
         constr1 = x[0] - x[1]  # constraint x_0 - x_1 <= 0
-        constr2 = - np.sum(x)  # constraint sum x_i >= 0
+        constr2 = -np.sum(x)  # constraint sum x_i >= 0
         return obj, constr1, constr2
 
     from indago import minimize
@@ -65,7 +66,7 @@ def test_getting_started_real_minimize():
                           constraints=2, constraint_labels=['Constraint 1', 'Constraint 2'],
                           seed=0)
 
-    assert np.isclose(f, 5.042330734013275e-14, atol=1e-10, rtol=0)
+    assert np.isclose(f, 5.959310949391016e-05, atol=1e-10, rtol=0)
     assert np.isclose(np.array(X), real_example_result_x, atol=1e-10, rtol=0).all()
 
 

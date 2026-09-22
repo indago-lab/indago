@@ -53,7 +53,7 @@ def run(optimizer):
 def test_PSO_defaults() -> None:
     description = 'PSO defaults'
     optimizer = PSO()
-    expected_result = 0.24858894247697266
+    expected_result = 0.24858656082645753
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -64,7 +64,7 @@ def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
     description = 'PSO defaults, multiprocessing on 4 processors'
     optimizer = PSO()
     optimizer.processes = 4
-    expected_result = 0.24858894247697266
+    expected_result = 0.24858656082645753
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -74,7 +74,7 @@ def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
     optimizer.X0 = ('up', 0.1, 2, 2.2)
-    expected_result = 0.1921303723592867
+    expected_result = 0.19221591941589475
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -84,7 +84,7 @@ def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
     optimizer.X0 = [('up', 0.1, 2, 2.2), ('up', 2.3, 3, 2.2), ('down', 3.4, 5, 0.101)]
-    expected_result = 0.19213037796114987
+    expected_result = 0.19213336690578825
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -117,6 +117,7 @@ def test_PSO_TVAC_defaults() -> None:
 def test_PSO_Vanilla_LDIW() -> None:
     description = 'PSO Vanilla LDIW'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'LDIW'
     expected_result = 0.19213057211511358
     tolerance = TOL
@@ -127,6 +128,7 @@ def test_PSO_Vanilla_LDIW() -> None:
 def test_PSO_Vanilla_HSIW() -> None:
     description = 'PSO Vanilla HSIW'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'HSIW'
     expected_result = 0.24858641560290107
     tolerance = TOL
@@ -137,6 +139,7 @@ def test_PSO_Vanilla_HSIW() -> None:
 def test_PSO_Vanilla_anakatabatic_defaults() -> None:
     description = 'PSO Vanilla anakatabatic defaults'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     expected_result = 0.24858656082645753
     tolerance = TOL
@@ -147,6 +150,7 @@ def test_PSO_Vanilla_anakatabatic_defaults() -> None:
 def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     description = 'PSO Vanilla anakatabatic FlyingStork'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
     expected_result = 0.24858664728073365
@@ -158,6 +162,7 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
 def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     description = 'PSO Vanilla anakatabatic TipsySpider'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
     expected_result = 0.24858656082645753
@@ -169,6 +174,7 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
 def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
     description = 'PSO anakatabatic DoubleSummit'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'DoubleSummit'
     expected_result = 0.19214056062101437
@@ -237,7 +243,7 @@ def test_PSO_defaults_halton_initializer() -> None:
     description = 'PSO defaults, halton initializer'
     optimizer = PSO()
     optimizer.sampler = 'halton'
-    expected_result = 0.2485865921150194
+    expected_result = 0.19213033841312493
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -505,7 +511,7 @@ def test_CRS_custom_parameters_2():
 def test_EEEO_defaults():
     description = 'EEEO defaults'
     optimizer = EEEO()
-    expected_result = 0.19213568522747068
+    expected_result = 0.24858764105634965
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

@@ -38,7 +38,8 @@ def run(optimizer):
 def test_PSO_defaults() -> None:
     description = 'PSO defaults'
     optimizer = PSO()
-    expected_result = 2.5793297920299136
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 3.9111847131244133
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -48,7 +49,7 @@ def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
     optimizer.X0 = tuple(np.ones(DIM))
-    expected_result = 2.517708163727869
+    expected_result = 2.337381752822694
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -58,7 +59,7 @@ def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
     optimizer.X0 = [tuple(1*np.ones(DIM)), tuple(2*np.ones(DIM)), tuple(3*np.ones(DIM))]
-    expected_result = 0.37301715942874253
+    expected_result = 2.1132470402088344
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -68,7 +69,7 @@ def test_PSO_defaults_int_X0() -> None:
     description = 'PSO defaults, int X0'
     optimizer = PSO()
     optimizer.X0 = 25
-    expected_result = 2.6704917369893884
+    expected_result = 3.8974647357203964
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -101,6 +102,7 @@ def test_PSO_TVAC_defaults() -> None:
 def test_PSO_Vanilla_LDIW() -> None:
     description = 'PSO Vanilla LDIW'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'LDIW'
     expected_result = 3.304806494663155
     tolerance = TOL
@@ -111,6 +113,7 @@ def test_PSO_Vanilla_LDIW() -> None:
 def test_PSO_Vanilla_HSIW() -> None:
     description = 'PSO Vanilla HSIW'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'HSIW'
     expected_result = 2.5417401479737785
     tolerance = TOL
@@ -121,6 +124,7 @@ def test_PSO_Vanilla_HSIW() -> None:
 def test_PSO_Vanilla_anakatabatic_defaults() -> None:
     description = 'PSO Vanilla anakatabatic defaults'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
     expected_result = 3.9111847131244133
@@ -132,6 +136,7 @@ def test_PSO_Vanilla_anakatabatic_defaults() -> None:
 def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     description = 'PSO Vanilla anakatabatic FlyingStork'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'FlyingStork'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
@@ -144,6 +149,7 @@ def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
 def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     description = 'PSO Vanilla anakatabatic TipsySpider'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'TipsySpider'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
@@ -156,6 +162,7 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
 def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
     description = 'PSO Vanilla anakatabatic DoubleSummit'
     optimizer = PSO()
+    optimizer.variant = 'Vanilla'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'DoubleSummit'
     optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
@@ -207,7 +214,7 @@ def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
     description = 'PSO defaults, multiprocessing on 4 processors'
     optimizer = PSO()
     optimizer.processes = 4
-    expected_result = 2.5793297920299136
+    expected_result = 3.3754146242909053
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -218,7 +225,7 @@ def test_PSO_defaults_multiprocessing_on_maximum_processors() -> None:
     description = 'PSO defaults, multiprocessing on maximum processors'
     optimizer = PSO()
     optimizer.processes = 'max'
-    expected_result = 2.5793297920299136
+    expected_result = 3.3754146242909053
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -249,7 +256,7 @@ def test_PSO_defaults_halton_initializer() -> None:
     description = 'PSO defaults, halton initializer'
     optimizer = PSO()
     optimizer.sampler = 'halton'
-    expected_result = 2.842724403296825
+    expected_result = 3.7209150808655758
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -517,7 +524,7 @@ def test_CRS_custom_parameters_2():
 def test_EEEO_defaults():
     description = 'EEEO defaults'
     optimizer = EEEO()
-    expected_result = 2.6947257800965403
+    expected_result = 2.875115019539572
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
