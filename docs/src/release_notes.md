@@ -13,7 +13,8 @@ Released on yyyy-mm-dd
 ### New features
 - **Variable types and mixed-variable support**
 - New DE variant `'RankLSHADE'` supporting constraints
-- Changes in available anakatabatic models for PSO: `'DoubleSummit'` added, `'MessyTie'` removed <i class="fa-solid fa-triangle-exclamation"></i>
+- Changes in available anakatabatic models for Vanilla PSO: `'DoubleSummit'` added, `'MessyTie'` removed <i class="fa-solid fa-triangle-exclamation"></i>
+- New default anakatabatic models for PSO: `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO <i class="fa-solid fa-triangle-exclamation"></i>
 - Utility functions `inspect`, `inspect_optimizers` and `minimize_exhaustive` have been removed for the time being <i class="fa-solid fa-triangle-exclamation"></i>
 ### Improvements
 - **Significant code refactoring, making Indago ready for future extensions**

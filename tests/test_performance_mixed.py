@@ -134,6 +134,16 @@ def test_PSO_Vanilla_HSIW() -> None:
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
+def test_PSO_Vanilla_anakatabatic_defaults() -> None:
+    description = 'PSO Vanilla anakatabatic defaults'
+    optimizer = PSO()
+    optimizer.params['inertia'] = 'anakatabatic'
+    expected_result = 0.24858656082645753
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
 def test_PSO_Vanilla_anakatabatic_FlyingStork() -> None:
     description = 'PSO Vanilla anakatabatic FlyingStork'
     optimizer = PSO()
@@ -156,8 +166,30 @@ def test_PSO_Vanilla_anakatabatic_TipsySpider() -> None:
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
-    description = 'PSO Vanilla anakatabatic OrigamiSnake'
+def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
+    description = 'PSO anakatabatic DoubleSummit'
+    optimizer = PSO()
+    optimizer.params['inertia'] = 'anakatabatic'
+    optimizer.params['akb_model'] = 'DoubleSummit'
+    expected_result = 0.19214056062101437
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_PSO_TVAC_anakatabatic_defaults() -> None:
+    description = 'PSO TVAC anakatabatic defaults'
+    optimizer = PSO()
+    optimizer.variant = 'TVAC'
+    optimizer.params['inertia'] = 'anakatabatic'
+    expected_result = 0.24858637814888834
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_PSO_TVAC_anakatabatic_OrigamiSnake() -> None:
+    description = 'PSO TVAC anakatabatic OrigamiSnake'
     optimizer = PSO()
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
@@ -168,25 +200,13 @@ def test_PSO_Vanilla_anakatabatic_OrigamiSnake() -> None:
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_PSO_Vanilla_anakatabatic_Languid() -> None:
+def test_PSO_TVAC_anakatabatic_Languid() -> None:
     description = 'PSO TVAC anakatabatic Languid'
     optimizer = PSO()
     optimizer.variant = 'TVAC'
     optimizer.params['inertia'] = 'anakatabatic'
     optimizer.params['akb_model'] = 'Languid'
     expected_result = 0.19213972800333917
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_PSO_Vanilla_anakatabatic_DoubleSummit() -> None:
-    description = 'PSO TVAC anakatabatic DoubleSummit'
-    optimizer = PSO()
-    optimizer.variant = 'TVAC'
-    optimizer.params['inertia'] = 'anakatabatic'
-    optimizer.params['akb_model'] = 'DoubleSummit'
-    expected_result = 0.27148609889163
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -202,8 +222,8 @@ def test_PSO_Chaotic_defaults() -> None:
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_PSO_Chaotic_anakatabatic_Languid() -> None:
-    description = 'PSO Chaotic anakatabatic Languid'
+def test_PSO_Chaotic_anakatabatic_defaults() -> None:
+    description = 'PSO Chaotic anakatabatic defaults'
     optimizer = PSO()
     optimizer.variant = 'Chaotic'
     optimizer.params['inertia'] = 'anakatabatic'
@@ -316,16 +336,7 @@ def test_DE_LSHADE_custom_parameters():
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
-def test_BA_defaults():
-    description = 'BA defaults'
-    optimizer = BA()
-    expected_result = 4.213229947486668
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_EFO_defaults():
     description = 'EFO defaults'
     optimizer = EFO()
@@ -334,16 +345,7 @@ def test_EFO_defaults():
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
-def test_MRFO_defaults():
-    description = 'MRFO defaults'
-    optimizer = MRFO()
-    expected_result = 3.265045494474331
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_ABC_defaults():
     description = 'ABC defaults'
     optimizer = ABC()
@@ -393,16 +395,7 @@ def test_GWO_HSA_defaults():
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
-"""
-def test_MSGD_defaults():
-    description = 'MSGD defaults'
-    optimizer = MSGD()
-    expected_result = -1e300
-    tolerance = 1e290
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-"""
+
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
@@ -544,12 +537,14 @@ if __name__ == '__main__':
     test_PSO_TVAC_defaults()
     test_PSO_Vanilla_LDIW()
     test_PSO_Vanilla_HSIW()
+    test_PSO_Vanilla_anakatabatic_defaults()
     test_PSO_Vanilla_anakatabatic_FlyingStork()
     test_PSO_Vanilla_anakatabatic_TipsySpider()
-    test_PSO_Vanilla_anakatabatic_OrigamiSnake()
-    test_PSO_Vanilla_anakatabatic_Languid()
+    test_PSO_TVAC_anakatabatic_defaults()
+    test_PSO_TVAC_anakatabatic_OrigamiSnake()
+    test_PSO_TVAC_anakatabatic_Languid()
     test_PSO_Chaotic_defaults()
-    test_PSO_Chaotic_anakatabatic_Languid()
+    test_PSO_Chaotic_anakatabatic_defaults()
     test_PSO_defaults_halton_initializer()
     test_FWA_defaults()
     test_FWA_custom_parameters()
@@ -560,15 +555,12 @@ if __name__ == '__main__':
     test_DE_RankLSHADE_defaults()
     test_DE_SHADE_defaults()
     test_DE_LSHADE_custom_parameters()
-    # test_BA_defaults()
     test_EFO_defaults()
-    # test_MRFO_defaults()
     test_ABC_defaults()
     test_ABC_FullyEmployed_defaults()
     test_ABC_Vanilla_custom_parameters()
     test_GWO_defaults()
     test_GWO_HSA_defaults()
-    # test_MSGD_defaults()
     test_NM_defaults()
     test_NM_Vanilla_defaults()
     test_RS_defaults()

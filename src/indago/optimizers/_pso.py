@@ -189,67 +189,79 @@ class PSO(Optimizer):
             assert False, f'Unknown variant! {self.variant}'
 
         if self.params['inertia'] == 'anakatabatic':
-            
-            if 'akb_model' in defined_params:
 
-                if self.params['akb_model'] in \
-                        ['DoubleSummit', 'FlyingStork', 'TipsySpider', 'RightwardPeaks', 'OrigamiSnake']:
+            # no akb_model, custom akb functions
+            if 'akb_fun_start' in defined_params and 'akb_fun_stop' in defined_params:
+                self.params['akb_model'] = 'none'
+                defined_params += 'akb_model'.split()
 
-                    match self.params['akb_model']:
-                        case 'DoubleSummit':
-                            w_start = [0.41, -0.01, 1.57, -1.5, -0.34]
-                            w_stop = [-0.71, 0.9, 1.71, -0.11, 0.85]
-                            if self.variant != 'Vanilla':
-                                self._log('Warning: akb_model \'DoubleSummit\' was designed for Vanilla PSO')
-                        case 'FlyingStork':
-                            w_start = [-0.86, 0.24, -1.10, 0.75, 0.72]
-                            w_stop = [-0.81, -0.35, -0.26, 0.64, 0.60]
-                            if self.variant != 'Vanilla':
-                                self._log('Warning: akb_model \'FlyingStork\' was designed for Vanilla PSO')
-                        case 'TipsySpider':
-                            w_start = [-0.32, 0.10, -0.81, 1.19, 0.55]
-                            w_stop = [0.34, 0.36, 0.28, 0.75, 0.08]
-                            if self.variant != 'Vanilla':
-                                self._log('Warning: akb_model \'TipsySpider\' was designed for Vanilla PSO')
-                        case 'RightwardPeaks':
-                            w_start = [-1.79, -0.33, 2.00, -0.67, 1.30]
-                            w_stop = [-0.91, -0.88, -0.84, 0.67, -0.36]
-                            if self.variant != 'TVAC':
-                                self._log('Warning: akb_model \'RightwardPeaks\' was designed for TVAC PSO')
-                        case 'OrigamiSnake':
-                            w_start = [-1.36, 2.00, 1.00, -0.60, 1.22]
-                            w_stop = [0.30, 1.03, -0.21, 0.40, 0.06]
-                            if self.variant != 'TVAC':
-                                self._log('Warning: akb_model \'OrigamiSnake\' was designed for TVAC PSO')
+            # no akb_model, set default
+            if 'akb_model' not in self.params:
+                self.params['akb_model'] = None
 
-                    # code shared for all w-list-based named akb_models
-                    Th = np.linspace(np.pi/4, 5*np.pi/4, 5)
-                    self.params['akb_fun_start'] = \
-                                        make_interp_spline(Th, w_start, k=1)
-                    self.params['akb_fun_stop'] = \
-                                        make_interp_spline(Th, w_stop, k=1)
-
-                elif self.params['akb_model'] not in 'Languid none'.split():
-                    self._log('Warning: Unknown akb_model. Defaulting to \'Languid\'')
-                    self.params['akb_model'] = 'Languid'
-
-            else:  # no akb_model given
-                if 'akb_fun_start' in defined_params and 'akb_fun_stop' in defined_params:
-                    self.params['akb_model'] = 'none'
+            if self.params['akb_model'] not in \
+                        'DoubleSummit FlyingStork TipsySpider RightwardPeaks OrigamiSnake Languid none'.split():
+                match self.variant:
+                    case 'Vanilla':
+                        self._log('Warning: Unknown akb_model. Defaulting to \'TipsySpider\' for Vanilla PSO')
+                        self.params['akb_model'] = 'TipsySpider'
+                    case 'TVAC':
+                        self._log('Warning: Unknown akb_model. Defaulting to \'OrigamiSnake\' for TVAC PSO')
+                        self.params['akb_model'] = 'OrigamiSnake'
+                    case 'Chaotic':
+                        self._log('Warning: Unknown akb_model. Defaulting to \'Languid\' for Chaotic PSO')
+                        self.params['akb_model'] = 'Languid'
+                if 'akb_model' not in defined_params:
                     defined_params += 'akb_model'.split()
-                else:
-                    self.params['akb_model'] = 'Languid'
-                    defined_params += 'akb_model'.split()
-                
-            if self.params['akb_model'] == 'Languid':
+
+            # setup akb functions
+            if self.params['akb_model'] in \
+                    'DoubleSummit FlyingStork TipsySpider RightwardPeaks OrigamiSnake'.split():
+
+                match self.params['akb_model']:
+
+                    case 'DoubleSummit':
+                        w_start = [0.41, -0.01, 1.57, -1.5, -0.34]
+                        w_stop = [-0.71, 0.9, 1.71, -0.11, 0.85]
+                        if self.variant != 'Vanilla':
+                            self._log('Warning: akb_model \'DoubleSummit\' was designed for Vanilla PSO')
+                    case 'FlyingStork':
+                        w_start = [-0.86, 0.24, -1.10, 0.75, 0.72]
+                        w_stop = [-0.81, -0.35, -0.26, 0.64, 0.60]
+                        if self.variant != 'Vanilla':
+                            self._log('Warning: akb_model \'FlyingStork\' was designed for Vanilla PSO')
+                    case 'TipsySpider':
+                        w_start = [-0.32, 0.10, -0.81, 1.19, 0.55]
+                        w_stop = [0.34, 0.36, 0.28, 0.75, 0.08]
+                        if self.variant != 'Vanilla':
+                            self._log('Warning: akb_model \'TipsySpider\' was designed for Vanilla PSO')
+                    case 'RightwardPeaks':
+                        w_start = [-1.79, -0.33, 2.00, -0.67, 1.30]
+                        w_stop = [-0.91, -0.88, -0.84, 0.67, -0.36]
+                        if self.variant != 'TVAC':
+                            self._log('Warning: akb_model \'RightwardPeaks\' was designed for TVAC PSO')
+                    case 'OrigamiSnake':
+                        w_start = [-1.36, 2.00, 1.00, -0.60, 1.22]
+                        w_stop = [0.30, 1.03, -0.21, 0.40, 0.06]
+                        if self.variant != 'TVAC':
+                            self._log('Warning: akb_model \'OrigamiSnake\' was designed for TVAC PSO')
+
+                # code shared for all w-list-based named akb_models
+                Th = np.linspace(np.pi/4, 5*np.pi/4, 5)
+                self.params['akb_fun_start'] = \
+                                    make_interp_spline(Th, w_start, k=1)
+                self.params['akb_fun_stop'] = \
+                                    make_interp_spline(Th, w_stop, k=1)
+
+            elif self.params['akb_model'] == 'Languid':
                 def akb_fun_languid(Th):
                     w = (0.72 + 0.05) * np.ones_like(Th)
                     for i, th in enumerate(Th):
-                        if th < 4*np.pi/4: 
+                        if th < 4*np.pi/4:
                             w[i] = 0
                     return w
                 self.params['akb_fun_start'] = akb_fun_languid
-                self.params['akb_fun_stop'] = akb_fun_languid 
+                self.params['akb_fun_stop'] = akb_fun_languid
 
         Optimizer._check_params(self, mandatory_params, optional_params, defined_params)
 
