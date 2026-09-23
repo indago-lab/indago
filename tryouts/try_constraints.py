@@ -5,19 +5,13 @@ testing performance of Indago optimizers on constrained problems
 """
 
 import sys
-sys.path.append('..')
+sys.path.append('../src')
 import indago
 import numpy as np
 
 
 RUNS = 30
 
-def f2(X):
-    return np.array([np.sum(X**2), 
-                     12 + np.sum(np.sin(X)),
-                     7 - np.average(X),
-                     ])
-f2.constraints = 2
 
 def f1_1(X):
     return np.array([np.sum(X**2),
@@ -31,12 +25,23 @@ def f1_2(X):
                      ])
 f1_2.constraints = 1
 
+def f2(X):
+    return np.array([np.sum(X**2),
+                     12 + np.sum(np.sin(X)),
+                     7 - np.average(X),
+                     ])
+f2.constraints = 2
+
 
 for f in [f1_1, f1_2,f2]:
 
     print(f'testing on {f.__name__}...')
 
     for optimizer in indago.optimizers:
+
+        # skip some optimizers
+        if optimizer in [indago.ACO]:
+            continue
 
         res = []
         for _ in range(RUNS):
@@ -52,9 +57,8 @@ for f in [f1_1, f1_2,f2]:
             opt.constraints = f.constraints
             opt.max_evaluations = 30000
 
-            if optimizer == indago.DE:
-                opt.variant = 'LSHADE'
-                opt.params['rank_enabled'] = True
+            if optimizer is indago.DE:
+                opt.variant = 'RankLSHADE'
 
             c = opt.optimize()
 
@@ -63,4 +67,4 @@ for f in [f1_1, f1_2,f2]:
             else:
                 res.append(np.inf)
 
-        print(f'   {optimizer.__name__}... {np.median(res):.2e}')
+        print(f'   {opt.variant} {optimizer.__name__}... {np.median(res):.2e}')

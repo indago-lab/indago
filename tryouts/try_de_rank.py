@@ -1,11 +1,9 @@
-# import sys
-# sys.path.append('../tests/')
-# from test_utils import *
-
 import copy
 import timeit
 from typing import Any
 
+import sys
+sys.path.append('../src')
 import indago
 import numpy as np
 

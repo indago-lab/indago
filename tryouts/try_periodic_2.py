@@ -1,3 +1,5 @@
+ikmport sys
+sys.path.append('../src')
 import indago
 import numpy as np
 

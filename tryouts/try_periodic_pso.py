@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
-
+import sys
+sys.path.append('../src')
 import indago
 import numpy as np
 from copy import deepcopy

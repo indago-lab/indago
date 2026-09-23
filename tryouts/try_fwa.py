@@ -6,6 +6,8 @@ import copy
 import timeit
 from typing import Any
 
+import sys
+sys.path.append('../src')
 import indago
 import numpy as np
 

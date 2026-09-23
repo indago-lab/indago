@@ -1,5 +1,6 @@
 from random import seed
-
+import sys
+sys.path.append('../src')
 import indago
 import numpy as np
 import matplotlib.pyplot as plt

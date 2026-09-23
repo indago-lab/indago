@@ -1,8 +1,10 @@
 # import sys
 # sys.path.append('../tests/')
 # from test_utils import *
-from typing import Any
 
+from typing import Any
+import sys
+sys.path.append('../src')
 import indago
 import numpy as np
 import matplotlib.pyplot as plt
