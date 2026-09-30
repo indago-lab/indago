@@ -153,7 +153,7 @@ class NM(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._candidates)
+            self._synco_inject(self._candidates)
 
         self._check_params()
 

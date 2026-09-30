@@ -54,4 +54,4 @@ as key, and optimizer class (type: Optimizer) as value."""
 NelderMead = NM
 
 # Undocumented optimizers
-from indago.optimizers._eeeo import EEEO
+from indago.optimizers._synco import SynCO

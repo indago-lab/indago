@@ -234,7 +234,7 @@ class Optimizer(Engine):
         self.elapsed_time = 0
         self._clock_start = None
 
-        # for EEEO
+        # for SynCO
         self._inject = None
 
     def _progress_factor(self):
@@ -977,7 +977,7 @@ class Optimizer(Engine):
             self._log('')
             self.status = OptimizerStatus.RESUMED
 
-            # For EEEO
+            # For SynCO
             if inject:
                 assert hasattr(inject, 'X') and hasattr(inject, 'O') \
                        and hasattr(inject, 'C') and hasattr(inject, 'f'), \
@@ -1656,8 +1656,8 @@ class Optimizer(Engine):
     def __setstate__(self, state):
         self.__dict__.update(state)
 
-    def _eeeo_inject(self, population: list[Candidate]) -> list[Candidate]:
-        """Method for injecting external solutions into a population, as per EEEO.
+    def _synco_inject(self, population: list[Candidate]) -> list[Candidate]:
+        """Method for injecting external solutions into a population, as per SynCO.
 
         Parameters
         ----------

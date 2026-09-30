@@ -175,7 +175,7 @@ class ABC(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._hive_em)
+            self._synco_inject(self._hive_em)
 
         self._check_params()
 

@@ -153,7 +153,7 @@ class FWA(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._sparks)
+            self._synco_inject(self._sparks)
 
         self._check_params()
 

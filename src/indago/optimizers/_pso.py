@@ -400,7 +400,7 @@ class PSO(Optimizer):
 
         if self._inject:
             # PSO specific
-            new = self._eeeo_inject(self._swarm)
+            new = self._synco_inject(self._swarm)
             new._dF = 0
             self._find_neighborhood_best()
 

@@ -173,7 +173,7 @@ class ACO(Optimizer):
         """
 
         if self._inject:
-            new = self._eeeo_inject(self._pop)
+            new = self._synco_inject(self._pop)
             if new < self.best:
                 self.best = new
 

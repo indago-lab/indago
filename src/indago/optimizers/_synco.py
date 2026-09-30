@@ -13,8 +13,8 @@ Authors: Stefan Ivić, Siniša Družeta, Luka Grbčić
 Contact: stefan.ivic@riteh.uniri.hr
 License: MIT
 
-File content: Definition of Elite-Exchanging Ensemble Optimization (EEEO) optimizer.
-Usage: from indago import EEEO
+File content: Definition of Synchronous Cooperation of Optimizers (SynCO) optimizer.
+Usage: from indago import SynCO
 
 """
 
@@ -26,28 +26,28 @@ from indago import Candidate, VariableType, VariableDictType, XFormat
 from indago import optimizers_dict
 
 
-class EEEO(Optimizer):
-    """Elite-Exchanging Ensemble Optimization method class.
+class SynCO(Optimizer):
+    """Synchronous Cooperation of Optimizers method class.
 
-    Elite-Exchanging Ensemble Optimization (EEEO) runs a selection of optimizers in
+    Synchronous Cooperation of Optimizers (SynCO) runs a selection of optimizers in
     parallel and after each iteration injects the overall-best found solution into
     the employed optimizers.
 
     Attributes
     ----------
     variant : str
-        Name of the EEEO variant. Default: ``Vanilla``.
+        Name of the SynCO variant. Default: ``Vanilla``.
     methods : dict or None
         Indago methods (variant, params) to use. Default: ``{'PSO': (None, None),
         'FWA': (None, None)}``. ``None`` values for variant and params will activate the
         corresponding default variant and params.
     _optimizers : list of Optimizer subclass objects
-        Private list of optimizers used in EEEO.
+        Private list of optimizers used in SynCO.
 
     Returns
     -------
-    optimizer : EEEO
-        EEEO optimizer instance.
+    optimizer : SynCO
+        SynCO optimizer instance.
 
     """
 
@@ -57,7 +57,7 @@ class EEEO(Optimizer):
         self.methods = None
 
     def _check_params(self):
-        """Private method which performs some EEEO-specific parameter checks
+        """Private method which performs some SynCO-specific parameter checks
         and prepares the parameters to be validated by Optimizer._check_params.
 
         Returns
@@ -79,7 +79,7 @@ class EEEO(Optimizer):
 
         for method in self.methods:
             assert method in 'ABC DE NM FWA GWO PSO RS HBO CRS EFO SSA'.split(), \
-                'EEEO does not support {method} at this time'
+                'SynCO does not support {method} at this time'
 
         defined_params = list(self.params.keys())
         mandatory_params, optional_params = [], []
@@ -93,7 +93,7 @@ class EEEO(Optimizer):
         Optimizer._check_params(self, mandatory_params, optional_params, defined_params)
 
     def _init_method(self):
-        """Private method for initializing the EEEO optimizer instance.
+        """Private method for initializing the SynCO optimizer instance.
 
         Returns
         -------
@@ -133,16 +133,16 @@ class EEEO(Optimizer):
 
             self._optimizers.append(opt)
 
-        # Initialize EEEO best
+        # Initialize SynCO best
         self.best = None
 
     def _run(self):
-        """Main loop of EEEO method.
+        """Main loop of SynCO method.
 
         Returns
         -------
         optimum: Candidate
-            Best solution found during the EEEO optimization.
+            Best solution found during the SynCO optimization.
 
         """
 

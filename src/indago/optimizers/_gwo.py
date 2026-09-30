@@ -131,7 +131,7 @@ class GWO(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._wolves)
+            self._synco_inject(self._wolves)
 
         self._check_params()
 

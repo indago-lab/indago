@@ -11,7 +11,7 @@ import sys
 sys.path.append('..')
 
 import numpy as np
-from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, EEEO  # BA, MRFO, MSGD
+from indago import PSO, FWA, EFO, RS, NM, CRS, HBO, ABC, DE, GWO, SSA, SynCO  # BA, MRFO, MSGD
 
 
 def F(x):
@@ -521,18 +521,18 @@ def test_CRS_custom_parameters_2():
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_EEEO_defaults():
-    description = 'EEEO defaults'
-    optimizer = EEEO()
+def test_SynCO_defaults():
+    description = 'SynCO defaults'
+    optimizer = SynCO()
     expected_result = 2.875115019539572
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_EEEO_custom_parameters():
-    description = 'EEEO custom parameters'
-    optimizer = EEEO()
+def test_SynCO_custom_parameters():
+    description = 'SynCO custom parameters'
+    optimizer = SynCO()
     optimizer.methods = {'DE': ('LSHADE', {'pop_init': 30}),
                          'GWO': ('Vanilla', {'pop_size': 20})}
     expected_result = 3.5935775313818827
@@ -594,5 +594,5 @@ if __name__ == '__main__':
     test_CRS_defaults()
     test_CRS_custom_parameters_1()
     test_CRS_custom_parameters_2()
-    test_EEEO_defaults()
-    test_EEEO_custom_parameters()
+    test_SynCO_defaults()
+    test_SynCO_custom_parameters()

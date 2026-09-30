@@ -156,7 +156,7 @@ class EFO(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._EM)
+            self._synco_inject(self._EM)
 
         self._check_params()
 

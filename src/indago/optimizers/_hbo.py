@@ -179,7 +179,7 @@ class HBO(Optimizer):
         """
 
         if self._inject:
-            self._eeeo_inject(self._pop)
+            self._synco_inject(self._pop)
             # HBO specific
             self._pop = sorted(self._pop)
 

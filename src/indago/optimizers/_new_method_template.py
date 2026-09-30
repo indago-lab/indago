@@ -187,10 +187,10 @@ class MNM(Optimizer):
             
         """
 
-        # If your method supports EEEO-hybridization, use the following code, otherwise remove this if intermittent
+        # If your method supports SynCO-hybridization, use the following code, otherwise remove this if intermittent
         # injecting of an externally generated candidate into the population would strongly disrupt the method
         if self._inject:
-            new = self._eeeo_inject(self._pop)
+            new = self._synco_inject(self._pop)
             # if you need to do something special with the newly injected solution (new), do it here
             ...
 
