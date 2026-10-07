@@ -152,6 +152,8 @@ class SynCO(Optimizer):
 
         evals = [0] * len(self.methods)
 
+        prev_bests = []
+
         while True:
 
             resume = True if self.it > 0 else False
@@ -162,13 +164,15 @@ class SynCO(Optimizer):
                 if len(opt.variables) > 0:
                     opt.lb, opt.ub = None, None
                 opt.optimize(resume=resume,
-                             inject=self.best if not self.best == opt.best else None,
+                             inject=[c for c in prev_bests if c < opt.best] if prev_bests else None,
                              seed=self._seed)
                 bests.append(opt.best)
                 self.eval += opt.eval - evals[i]
                 evals[i] = opt.eval
 
             self.best = np.min(bests)
+            prev_bests = [c for c in bests]
+
             self._update_history()
 
             if self._finalize_iteration():

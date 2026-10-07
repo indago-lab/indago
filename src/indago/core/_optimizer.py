@@ -923,7 +923,7 @@ class Optimizer(Engine):
                 self._unique_str_list.append(_s)
                 return _s
 
-    def optimize(self, resume=False, inject=None, seed=None):
+    def optimize(self, resume=False, inject: list[Candidate]|None=None, seed=None):
         """Method which starts the optimization. The method wraps ``_run`` method
         of the optimizer's subclass.
 
@@ -979,9 +979,6 @@ class Optimizer(Engine):
 
             # For SynCO
             if inject:
-                assert hasattr(inject, 'X') and hasattr(inject, 'O') \
-                       and hasattr(inject, 'C') and hasattr(inject, 'f'), \
-                    'Object given in inject appears not of Candidate (sub)class'
                 self._inject = inject
 
         if self.monitoring == 'dashboard':
@@ -1671,10 +1668,15 @@ class Optimizer(Engine):
 
         """
 
-        worst = np.max(population)
-        worst.X = self._inject.X
-        worst.O = np.copy(self._inject.O)
-        worst.C = np.copy(self._inject.C)
-        worst.f = self._inject.f
+        n_inject = min(len(population), len(self._inject))
+
+        worst = sorted(population, reverse=True)[:n_inject]
+        self._inject = self._inject[:n_inject]
+
+        for old, new in zip(worst, self._inject):
+            old.X = new.X
+            old.O = np.copy(new.O)
+            old.C = np.copy(new.C)
+            old.f = new.f
 
         return worst
