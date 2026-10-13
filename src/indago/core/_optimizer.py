@@ -972,14 +972,17 @@ class Optimizer(Engine):
             self._init_optimizer()
             self._init_utils()
 
+            # for SynCO
+            self._inject = None
+
         else:  # Resume
             self._log(f'Optimization resumed at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
             self._log('')
             self.status = OptimizerStatus.RESUMED
 
-            # For SynCO
+            # for SynCO
             if inject:
-                self._inject = inject
+                self._inject = inject if inject else None
 
         if self.monitoring == 'dashboard':
             with self._live:

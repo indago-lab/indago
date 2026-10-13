@@ -165,7 +165,7 @@ class SynCO(Optimizer):
                     opt.lb, opt.ub = None, None
                 opt.optimize(resume=resume,
                              inject=[c for c in prev_bests if c < opt.best] if prev_bests else None,
-                             seed=self._seed)
+                             seed=None if self._seed is None else self._seed + i)
                 bests.append(opt.best)
                 self.eval += opt.eval - evals[i]
                 evals[i] = opt.eval
