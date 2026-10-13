@@ -246,7 +246,7 @@ class ABC(Optimizer):
             """scout bee phase"""
             for p, bee in enumerate(self._hive_em):
                 if self._trials_em[p] > self.params['trial_limit']:
-                    bee._R = np.random.uniform(0, 1)
+                    bee._R = np.random.uniform(0, 1, self.dimensions)
                     self._trials_em[p] = 0
             
             if not self.variant == 'FullyEmployed':
