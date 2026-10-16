@@ -213,7 +213,7 @@ class Optimizer(Engine):
         self.evals_db = None
 
         self.forward_unique_str = False
-        self.post_iteration_processing = None
+        self.post_iteration_processing: callable | None = None
         self._unique_str_list = []
 
         self.safe_evaluation = None
@@ -1133,7 +1133,7 @@ class Optimizer(Engine):
 
         if self.evals_db:
             cols = self.dimensions + self.objectives + self.constraints + 1
-            M = np.full([self._evaluated_candidates.size, cols], np.nan)
+            M = np.full([len(self._evaluated_candidates), cols], np.nan)
             for i, c in enumerate(self._evaluated_candidates):
                 M[i, :] = np.hstack([c.X, c.O, c.C, c.f])
 
