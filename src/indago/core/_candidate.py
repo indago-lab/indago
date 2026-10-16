@@ -285,12 +285,18 @@ class Candidate:
         for (var_name, (var_type, *var_options)), x in zip(self._variables.items(), self._X):
             if var_type.is_real() and not var_type.is_discrete():
                 R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
-            elif var_type.is_real() and var_type.is_discrete():
+            elif var_type.is_real() and var_type.is_discrete() and not var_type.is_periodic():
                 x_min = var_options[0][0] - 0.5 * (var_options[0][1] - var_options[0][0])
                 x_max = var_options[0][-1] + 0.5 * (var_options[0][-1] - var_options[0][-2])
                 R.append((x - x_min) / (x_max - x_min))
-            elif var_type.is_integer():
+            elif var_type.is_real() and var_type.is_discrete() and var_type.is_periodic():
+                # The first and the last value are the same state (as in the setter)
+                R.append((x - var_options[0][0]) / (var_options[0][-1] - var_options[0][0]))
+            elif var_type.is_integer() and not var_type.is_periodic():
                 R.append((x - var_options[0] + 0.5) / (var_options[1] - var_options[0] + 1))
+            elif var_type.is_integer() and var_type.is_periodic():
+                # The lower and the upper bound are the same state (as in the setter)
+                R.append((x - var_options[0]) / (var_options[1] - var_options[0]))
             elif var_type is VariableType.CATEGORICAL:
                 R.append((var_options[0].index(x) + 0.5) / len(var_options[0]))
             else:
