@@ -39,8 +39,9 @@ from indago.optimizers._gwo import GWO
 from indago.optimizers._hbo import HBO
 from indago.optimizers._crs import CRS
 from indago.optimizers._aco import ACO
+from indago.optimizers._cmaes import CMAES
 
-optimizers: list[Optimizer] = [RS, PSO, FWA, SSA, DE, EFO, ABC, NM, GWO, HBO, CRS, ACO]
+optimizers: list[Optimizer] = [RS, PSO, FWA, SSA, DE, EFO, ABC, NM, GWO, HBO, CRS, ACO, CMAES]
 """A list of all available Indago optimizer classes."""
 
 optimizers_name_list: list[str] = [o.__name__ for o in optimizers]
