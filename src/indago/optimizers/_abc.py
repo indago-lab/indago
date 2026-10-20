@@ -252,7 +252,7 @@ class ABC(Optimizer):
             if not self.variant == 'FullyEmployed':
                 for p, bee in enumerate(self._hive_on):
                     if self._trials_on[p] > self.params['trial_limit']:
-                        bee._R = np.random.uniform(0, 1)
+                        bee._R = np.random.uniform(0, 1, self.dimensions)
                         self._trials_on[p] = 0
             
             if self._finalize_iteration():
