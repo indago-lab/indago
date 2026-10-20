@@ -540,7 +540,7 @@ def test_CMAES_IPOP():
 def test_SynCO_defaults():
     description = 'SynCO defaults'
     optimizer = SynCO()
-    expected_result = 0.19214720531260054
+    expected_result = 0.1921399312943868
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -563,7 +563,7 @@ def test_SynCO_3_custom_methods():
     optimizer.methods = {'PSO': ('Vanilla', None),
                          'FWA': (None, None),
                          'ABC': (None, None)}
-    expected_result = 0.19269335509904978
+    expected_result = 0.19917062785513032
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

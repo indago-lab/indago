@@ -981,8 +981,7 @@ class Optimizer(Engine):
             self.status = OptimizerStatus.RESUMED
 
             # for SynCO
-            if inject:
-                self._inject = inject if inject else None
+            self._inject = inject if inject else None
 
         if self.monitoring == 'dashboard':
             with self._live:
