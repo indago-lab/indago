@@ -199,6 +199,7 @@ class CMAES(Optimizer):
         CMA-ES optimizer instance.
     """
 
+
     def __init__(self):
         super().__init__()
 
@@ -230,9 +231,10 @@ class CMAES(Optimizer):
             else:
                 # Default CMA-ES population size, based on the number of (non-categorical) variables handled by CMA-ES,
                 # increased if discrete variables are present (as in Hansen's cma package)
-                n = self.dimensions - len(self._var_indices[VariableType.CATEGORICAL])
-                n_discrete = sum([len(self._var_indices[var_type]) for var_type in VariableType
-                                  if var_type.is_discrete() and var_type is not VariableType.CATEGORICAL])
+                cma_var_types = [var_type for var_type, *_ in self.variables.values()
+                                 if var_type is not VariableType.CATEGORICAL]
+                n = len(cma_var_types)
+                n_discrete = sum([var_type.is_discrete() for var_type in cma_var_types])
                 if n_discrete == 0:
                     self.params['pop_size'] = 4 + int(3 * np.log(max(n, 1)))
                 else:
@@ -264,20 +266,7 @@ class CMAES(Optimizer):
 
         """
 
-        # CMA-ES search distribution handles all non-categorical variables
-        self._cma_indices = [i for i in range(self.dimensions)
-                             if i not in self._var_indices[VariableType.CATEGORICAL]]
-        assert len(self._cma_indices) > 0, \
-            'CMA-ES needs at least one non-categorical variable'
-
-        # Categorical variables are randomized by self._randomize_categorical, which uses self._progress_factor()
-        if self._var_indices[VariableType.CATEGORICAL]:
-            assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
-                'optimizer.max_iteration, optimizer.max_evaluations, or optimizer.max_elapsed_time should be ' \
-                'provided for this method when using categorical variables'
-
         # Properties of the variables handled by CMA-ES
-        var_definitions = list(self.variables.values())
         self._periodic = np.array([var_definitions[i][0].is_periodic() for i in self._cma_indices])
         self._discrete = np.array([var_definitions[i][0].is_discrete() for i in self._cma_indices])
 
@@ -443,8 +432,8 @@ class CMAES(Optimizer):
             R[self._cma_indices] = r_cma
             offspring._R = R
 
-        # Treat categorical variables as in other Indago methods
-        if self._var_indices[VariableType.CATEGORICAL]:
+        # Treat categorical variables (variables not handled by CMA-ES) as in other Indago methods
+        if len(self._cma_indices) < self.dimensions:
             self._randomize_categorical(self._pop)
 
 
