@@ -46,6 +46,8 @@ class EFO(Optimizer):
         A dictionary of EFO parameters.
     _EM : list
         Solution candidates (emParticles).
+    _RI : int
+        Index of the current variable index for resetting.
     _emNew : Candidate
         Test solution.
         
@@ -123,6 +125,9 @@ class EFO(Optimizer):
         # Generate a population
         self._EM = [Candidate(**self._candidate_init_info) for _ in range(self.params['pop_size'])]
 
+        # Initial current variable index
+        self._RI = 0
+
         # Initialize
         n0 = 0 if self._initial_candidates is None else self._initial_candidates.size
         
@@ -166,9 +171,8 @@ class EFO(Optimizer):
         Ps_rate = self.params['Ps_rate']
         R_rate = self.params['R_rate']
 
-        self._resuming()
-                        
-        RI = 0
+        if not self._resuming():
+            self._RI = 0
 
         emNew = Candidate(**self._candidate_init_info)
         self._initialize_X([emNew])
@@ -195,10 +199,10 @@ class EFO(Optimizer):
                     R[d] = np.random.uniform(0, 1)
 
             if np.random.uniform(0,1) < R_rate:
-                R[RI] = np.random.uniform(0, 1)
-                RI += 1
-                if RI > self.dimensions - 1:
-                    RI = 0
+                R[self._RI] = np.random.uniform(0, 1)
+                self._RI += 1
+                if self._RI > self.dimensions - 1:
+                    self._RI = 0
 
             emNew._R = R
 
