@@ -120,6 +120,9 @@ optimizer.evaluator = goalfun
 optimizer.objectives = 1  # number of objectives (optional parameter, default objectives=1), this is obj in evaluation function
 optimizer.constraints = 1  # number of constraints (optional parameter, default constraints=0), this is constr in evaluation function
 
+# Stopping criteria
+optimizer.max_evaluations = 1000
+
 # Print optimizer parameters
 print(optimizer)  # not necessary, but useful for checking the setup of the optimizer
 
@@ -134,7 +137,7 @@ Again, you can alternatively use the shorthand one-line solution:
 ```python
 from indago import minimize
 X, f, O, C = minimize(goalfun, VARS, None, None, 'FWA', 
-                      objectives=1, constraints=1)
+                      objectives=1, constraints=1, max_evaluations=1000)
 ```
 This way, instead of the lower/upper bounds (note the `None, None`), we have provided the variables dictionary (`VARS`) as the second argument.
 

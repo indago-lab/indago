@@ -70,7 +70,7 @@ def test_getting_started_real_minimize():
     assert np.isclose(np.array(X), real_example_result_x, atol=1e-10, rtol=0).all()
 
 
-mixed_example_result_x = ('down', 0.1, 2, 0.4583560838020153)
+mixed_example_result_x = ('down', 0.1, 2, 0.4328862338660797)
 
 def test_getting_started_mixed():
 
@@ -113,6 +113,9 @@ def test_getting_started_mixed():
     optimizer.objectives = 1  # number of objectives (optional parameter, default objectives=1), this is obj in evaluation function
     optimizer.constraints = 1  # number of constraints (optional parameter, default constraints=0), this is constr in evaluation function
 
+    # Stopping criteria
+    optimizer.max_evaluations = 1000
+
     # Print optimizer parameters
     print(optimizer)  # not necessary, but useful for checking the setup of the optimizer
 
@@ -123,7 +126,7 @@ def test_getting_started_mixed():
     print(result.f)  # minimum of obj with constr satisfied
     print(result.X)  # design vector at minimum (as tuple)
 
-    assert np.isclose(result.f, 1.5581421252669752, atol=1e-10, rtol=0)
+    assert np.isclose(result.f, 1.5564647586729317, atol=1e-10, rtol=0)
     assert result.X == mixed_example_result_x
 
 
@@ -156,8 +159,8 @@ def test_getting_started_mixed_minimize():
 
     from indago import minimize
     X, f, O, C = minimize(goalfun, VARS, None, None, 'FWA',
-                          objectives=1, constraints=1,
+                          objectives=1, constraints=1, max_evaluations=1000,
                           seed=0)
 
-    assert np.isclose(f, 1.5581421252669752, atol=1e-10, rtol=0)
+    assert np.isclose(f, 1.5564647586729317, atol=1e-10, rtol=0)
     assert X == mixed_example_result_x

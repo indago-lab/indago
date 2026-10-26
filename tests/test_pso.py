@@ -74,6 +74,7 @@ def test_pso_mixed():
     optimizer = indago.PSO()
     optimizer.variables = numerical_variables_10D
     optimizer.evaluator = mixed_function
+    optimizer.max_evaluations = 1000
     # optimizer.monitoring = 'basic'
     optimizer.optimize()
 

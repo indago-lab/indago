@@ -53,7 +53,7 @@ def test_mixed_rs():
     optimizer.variables['c'] = indago.VariableType.CATEGORICAL, ['A', 'B', 'C']
 
     optimizer.evaluator = f
-    # optimizer.max_evaluations = 10_000
+    optimizer.max_evaluations = 10_000
     optimizer.optimize()
     assert optimizer.eval == optimizer.max_evaluations
 
@@ -131,6 +131,7 @@ def uniformity_test(sampler):
     optimizer = Optimizer()
     optimizer.variables = mixed_variables_set_2
     optimizer.evaluator = lambda x: x
+    optimizer.max_evaluations = 1000
     optimizer.sampler = 'random'
     optimizer._init_optimizer()
     print(f'{sampler=}')
@@ -218,7 +219,6 @@ def uniformity_test(sampler):
             cnt = cnt / np.sum(cnt)
             print(cnt)
             assert np.max(np.abs(cnt - 1/9)) < eps, 'Nonuniform distribution detected!'
-
 
         # print(RR[-3:])
         print()

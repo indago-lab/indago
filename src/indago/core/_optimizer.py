@@ -251,10 +251,6 @@ class Optimizer(Engine):
 
         """
 
-        if self.it <= 1:
-            assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
-                'optimizer.max_iteration, optimizer.max_evaluations, or self.max_elapsed_time should be provided for this method/variant'
-
         prog = []
         if self.max_iterations:
             prog.append(self.it / self.max_iterations)
@@ -353,6 +349,16 @@ class Optimizer(Engine):
 
         if self._all_real:
             self._x_format = XFormat.NDARRAY
+
+        # Check prerequisites regarding Categorical variables
+        non_categoricals = [i for i, (var_type, *_) in enumerate(self.variables.values())
+                             if var_type is not VariableType.CATEGORICAL]
+        assert len(non_categoricals) > 0, \
+            'Indago optimizers need at least one non-categorical variable'
+        if len(non_categoricals) < self.dimensions:
+            assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
+                'optimizer.max_iteration, optimizer.max_evaluations, or optimizer.max_elapsed_time should be ' \
+                'provided for when using categorical variables'
 
         if self.objectives == 1 and hasattr(self.evaluator, 'objectives'):
             self.objectives = self.evaluator.objectives

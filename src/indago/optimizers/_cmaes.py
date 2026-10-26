@@ -266,6 +266,10 @@ class CMAES(Optimizer):
 
         """
 
+        var_definitions = list(self.variables.values())
+        self._cma_indices = [i for i, (var_type, *_) in enumerate(var_definitions)
+                             if var_type is not VariableType.CATEGORICAL]
+
         # Properties of the variables handled by CMA-ES
         self._periodic = np.array([var_definitions[i][0].is_periodic() for i in self._cma_indices])
         self._discrete = np.array([var_definitions[i][0].is_discrete() for i in self._cma_indices])
