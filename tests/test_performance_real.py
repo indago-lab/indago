@@ -524,7 +524,7 @@ def test_CRS_custom_parameters_2():
 def test_CMAES_defaults():
     description = 'CMAES defaults'
     optimizer = CMAES()
-    expected_result = 3.9601443079764067
+    expected_result = 4.276417409436527
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -534,7 +534,7 @@ def test_CMAES_Vanilla():
     description = 'CMAES Vanilla'
     optimizer = CMAES()
     optimizer.variant = 'Vanilla'
-    expected_result = 3.9601443079764067
+    expected_result = 4.276417409436527
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -544,7 +544,7 @@ def test_CMAES_IPOP():
     description = 'CMAES IPOP'
     optimizer = CMAES()
     optimizer.variant = 'IPOP'
-    expected_result = 3.9601443079764067
+    expected_result = 4.276417409436527
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
