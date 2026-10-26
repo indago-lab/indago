@@ -8,29 +8,31 @@ Method parameters are listed and explained here.
 
 Available methods and their variants are summarized in the following table.
 
-| Method                                       | Variant                                       | Supports constraints                       | Remarks                                                                                                                                |
-|----------------------------------------------|-----------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| **Particle Swarm Optimization (PSO)**        | 'Flagship' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-|                                              | 'Vanilla'                                     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
-|                                              | 'TVAC'                                        | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-|                                              | 'Chaotic'                                     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
-| **Fireworks Algorithm (FWA)**                | 'Vanilla'                                     | <i class="fa-solid fa-xmark"></i>          |                                                                                                                                        |
-|                                              | 'Rank' <i class="fa-regular fa-star"></i>     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
-| **Squirrel Search Algorithm (SSA)**          | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
-| **Differential Evolution (DE)**              | 'SHADE'                                       | <i class="fa-solid fa-xmark"></i>          |                                                                                                                                        |
-|                                              | 'LSHADE' <i class="fa-regular fa-star"></i>   | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-|                                              | 'RankLSHADE'                                  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-| **Electromagnetic Field Optimization (EFO)** | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Significantly slower than other methods. Does not support parallel evaluation. Does not work efficiently with Periodic variable types. |
-| **Artificial Bee Colony (ABC)**              | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
-|                                              | 'FullyEmployed'                               | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
-| **Grey Wolf Optimizer (GWO)**                | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-| **Heap-Based Optimizer (HBO)**               | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-|                                              | 'Dynamic'                                     | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
-| **Controlled Random Search (CRS)**           | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Slower than other methods. Does not support parallel evaluation.                                                                       |
-| **Nelder-Mead (NM)**                         | 'Vanilla'                                     | <i class="fa-regular fa-circle-check"></i> | Does not work efficiently with Periodic variable types.                                                                                |
-|                                              | 'GaoHan' <i class="fa-regular fa-star"></i>   | <i class="fa-regular fa-circle-check"></i> | Does not work efficiently with Periodic variable types.                                                                                |
-| **Multi-Scale Grid Descent (MSGD)**          | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Does not support unbound optimization.                                                                                                 |
-| **Random Search (RS)**                       | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound optimization.                                                                                      |
+| Method                                                      | Variant                                       | Supports constraints                       | Remarks                                                                                                                                |
+|-------------------------------------------------------------|-----------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| **Particle Swarm Optimization (PSO)**                       | 'Vanilla'                                     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+|                                                             | 'TVAC'                                        | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+|                                                             | 'Chaotic'                                     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+|                                                             | 'Flagship' <i class="fa-regular fa-star"></i> | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+| **Fireworks Algorithm (FWA)**                               | 'Vanilla'                                     | <i class="fa-solid fa-xmark"></i>          |                                                                                                                                        |
+|                                                             | 'Rank' <i class="fa-regular fa-star"></i>     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+| **Squirrel Search Algorithm (SSA)**                         | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
+| **Differential Evolution (DE)**                             | 'SHADE'                                       | <i class="fa-solid fa-xmark"></i>          |                                                                                                                                        |
+|                                                             | 'LSHADE' <i class="fa-regular fa-star"></i>   | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+|                                                             | 'RankLSHADE'                                  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+| **Electromagnetic Field Optimization (EFO)**                | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Significantly slower than other methods. Does not support parallel evaluation. Does not work efficiently with Periodic variable types. |
+| **Artificial Bee Colony (ABC)**                             | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
+|                                                             | 'FullyEmployed'                               | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
+| **Grey Wolf Optimizer (GWO)**                               | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+| **Heap-Based Optimizer (HBO)**                              | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+|                                                             | 'Dynamic'                                     | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+| **Controlled Random Search (CRS)**                          | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Slower than other methods. Does not support parallel evaluation.                                                                       |
+| **Covariance Matrix Adaptation Evolution Strategy (CMAES)** | 'Vanilla'                                     | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+|                                                             | 'IPOP'                                        | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+|                                                             | 'BIPOP' <i class="fa-regular fa-star"></i>    | <i class="fa-regular fa-circle-check"></i> |                                                                                                                                        |
+| **Random Search (RS)**                                      | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound optimization.                                                                                      |
+| **Nelder-Mead (NM)**                                        | 'Vanilla'                                     | <i class="fa-regular fa-circle-check"></i> | Does not work efficiently with Periodic variable types.                                                                                |
+|                                                             | 'GaoHan' <i class="fa-regular fa-star"></i>   | <i class="fa-regular fa-circle-check"></i> | Does not work efficiently with Periodic variable types.                                                                                |
 
 Legend: <i class="fa-regular fa-star"></i> Default variant, <i class="fa-regular fa-circle-check"></i> Constraints supported, <i class="fa-solid fa-xmark"></i> Constraints not supported
 
@@ -75,12 +77,12 @@ Specific parameters for each of the available methods and their variants are lis
 
 ## Differential Evolution (DE)
 
-| Variant | Parameter  | Allowed values | Range      | Default                   | Description                  |
-|---------|------------|----------------|------------|---------------------------|------------------------------|
-| **all** | pop_init   | (int)          | [1, -]     | max(30, 5 * *dimensions*) | Initial population size      |
-|         | f_archive  | (float)        | [0.0, -]   | 2.6                       | External archive size factor |
-|         | hist_size  | (int)          | [1, -]     | 6                         | Size of historical memory    |
-|         | p_mutation | (float)        | [0.0, 1.0] | 0.11                      | Mutation probability         |
+| Variant | Parameter  | Allowed values | Range      | Default                    | Description                  |
+|---------|------------|----------------|------------|----------------------------|------------------------------|
+| **all** | pop_init   | (int)          | [1, -]     | max (30, 5 * *dimensions*) | Initial population size      |
+|         | f_archive  | (float)        | [0.0, -]   | 2.6                        | External archive size factor |
+|         | hist_size  | (int)          | [1, -]     | 6                          | Size of historical memory    |
+|         | p_mutation | (float)        | [0.0, 1.0] | 0.11                       | Mutation probability         |
 
 ## Electromagnetic Field Optimization (EFO)
 
@@ -118,6 +120,19 @@ Specific parameters for each of the available methods and their variants are lis
 |---------------|-----------|----------------|--------|---------|-----------------------------------------------------------------------------------|
 | **'Vanilla'** | pop_scale | (float)        | [1, -] | 10      | Population scale. Population size iz computed as *pop_scale* * (*dimensions* + 1) |
 
+## Covariance Matrix Adaptation Evolution Strategy (CMAES)
+
+| Variant | Parameter | Allowed values | Range  | Default                       | Description                                                                        |
+|---------|-----------|----------------|--------|-------------------------------|------------------------------------------------------------------------------------|
+| **all** | pop_size  | (int)          | [2, -] | 4 + int (3 * log (max (*n*, 1))) or 6 + int (3 * (log (*n*) + log (*n_discrete*)))   | Population size. Default depends on the number of non-categorical variables (*n*) and the number of discrete variables (*n_discrete*)                                                               |
+|         | init_step | (float)        | [0, -] | 0.25 | Initial step size |
+
+## Random Search (RS)
+
+| Variant       | Parameter  | Allowed values | Range    | Default      | Description                         |
+|---------------|------------|----------------|----------|--------------|-------------------------------------|
+| **'Vanilla'** | batch_size | (int)          | [1, -]   | *dimensions* | Number of evaluations per iteration |
+
 ## Nelder-Mead (NM)
 
 | Variant       | Parameter | Allowed values | Range      | Default | Description                       |
@@ -127,17 +142,3 @@ Specific parameters for each of the available methods and their variants are lis
 |               | gamma     | (float)        | [0.0, -]   | 2.0     | Expansion factor                  |
 |               | rho       | (float)        | [0.0, -]   | 0.5     | Contraction factor                |
 |               | sigma     | (float)        | [0.0, -]   | 0.5     | Reduction factor                  |
-
-## Multi-Scale Grid Descent (MSGD)
-
-| Variant       | Parameter | Allowed values   | Range  | Default | Description                                                                                    |
-|---------------|-----------|------------------|--------|---------|------------------------------------------------------------------------------------------------|
-| **'Vanilla'** | divisions | (ndarray or int) | [1, -] | 10      | Number of grid divisions in each dimension                                                     |
-|               | base      | (int)            | [1, -] | 4       | Base of the exponential grid refining (how many times is grid refined in each scale increment) |
-|               | max_scale | (int)            | [1, -] | 15      | Maximum scale (maximum number of grid refinements)                                             |
-
-## Random Search (RS)
-
-| Variant       | Parameter  | Allowed values | Range    | Default      | Description                         |
-|---------------|------------|----------------|----------|--------------|-------------------------------------|
-| **'Vanilla'** | batch_size | (int)          | [1, -]   | *dimensions* | Number of evaluations per iteration |

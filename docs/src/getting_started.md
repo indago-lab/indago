@@ -146,20 +146,20 @@ This way, instead of the lower/upper bounds (note the `None, None`), we have pro
 As of now, Indago includes the following stochastic global optimization methods: 
 
 - Particle Swarm Optimization (PSO) [1]
-- Fireworks Algorithm (FWA) [2]
-- Squirrel Search Algorithm (SSA) [3]
-- Differential Evolution (DE) [4]
-- Electromagnetic Field Optimization (EFO) [5]
-- Artificial Bee Colony (ABC) [6]
-- Gray Wolf Optimizer (GWO) [7]
-- Heap-Based Optimizer (HBO) [8]
-- Controlled Random Search (CRS) [9]
+- Fireworks Algorithm (FWA) [7]
+- Squirrel Search Algorithm (SSA) [8]
+- Differential Evolution (DE) [9]
+- Electromagnetic Field Optimization (EFO) [10]
+- Artificial Bee Colony (ABC) [11]
+- Gray Wolf Optimizer (GWO) [12]
+- Heap-Based Optimizer (HBO) [13]
+- Controlled Random Search (CRS) [14]
+- Covariance Matrix Adaptation Evolution Strategy (CMAES) [15]
 - Random Search (RS)
 
 and gradient-free local search methods: 
 
 - Nelder-Mead method (NM) [10]
-- Multi-Scale Grid Descent (MSGD) [11]
 
 These methods are available through a unified API, which was designed to be as accessible as possible. Besides *NumPy*, Indago uses only *Matplotlib*, a couple of *SciPy* functions, and *rich* for fancy console printouts. Indago methods also include some of our original research improvements, so feel free to try those as well.
 
@@ -179,7 +179,7 @@ pso.evaluator = goalfun
 ```
 Now we can define optimizer inputs:
 ```python
-pso.variant = 'Vanilla'  # we will use Standard PSO, the other available options are 'Flagship', 'TVAC' [12] and 'Chaotic' [13]; default variant='Flagship'
+pso.variant = 'Vanilla'  # we will use Standard PSO, the other available options are 'Flagship', 'TVAC' [2] and 'Chaotic' [3]; default variant='Flagship'
 pso.dimensions = 20  # number of variables in the design vector (x) (optional, if not given will be infered from lb/ub)
 pso.lb = np.ones(pso.dimensions) * -1  # 1d np.array of lower bound values (if scalar value is given, it will automatically be transformed to 1d np.array of size dimensions); for (semi-) unbound problems, use (-)np.inf or np.nan, or omit entirely 
 pso.ub = np.ones(pso.dimensions) * 1  # 1d np.array of upper bound values; see above for other considerations
@@ -195,7 +195,7 @@ pso.params['cognitive_rate'] = 1.0  # PSO parameter also known as c1 (should ran
 pso.params['social_rate'] = 1.0  # PSO parameter also known as c2 (should range from 0.0 to 2.0); default social_rate=1.0
 ```
 
-If we want to use our novel adaptive inertia weight technique [14-16], which will often produce faster convergence and better accuracy, we invoke it by:
+If we want to use our novel adaptive inertia weight technique [4-6], which will often produce faster convergence and better accuracy, we invoke it by:
 ```python
 pso.params['inertia'] = 'anakatabatic'  # other options for dynamic inertia are 'LDIW' and 'HSIW'
 ```
@@ -203,7 +203,9 @@ and then we need to also specify the anakatabatic model:
 ```python
 pso.params['akb_model'] = 'Languid'  # other options explained below, default='TipsySpider'
 ```
-Apart from `'Languid'` [15, 16], we can use `'TipsySpider'`, `'FlyingStork'` or `'DoubleSummit'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [14]. According to our experience, your best bets are `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO.
+Apart from `'Languid'` [5, 6], we can use `'TipsySpider'`, `'FlyingStork'` or `'DoubleSummit'` models for Vanilla PSO, and `'RightwardPeaks'` or `'OrigamiSnake'` models for TVAC PSO [4]. According to our experience, your best bets are `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO.
+
+PSO *Flagship* variant automatically uses anakatabatic inertia with the `'TipsySpider'` model.
 
 We can enable reporting during the optimization process by providing the monitoring argument:
 ```python
@@ -222,7 +224,7 @@ If you're using the `indago.minimize` function instead, note that `params` used 
 
 ### Fireworks Algorithm
 
-If we want to use FWA [2], we just have to import it instead of PSO:
+If we want to use FWA [7], we just have to import it instead of PSO:
 ```python
 from indago import FWA
 fwa = FWA()
@@ -242,7 +244,7 @@ fwa.params['m2'] = 10  # default m2=dimensions/2
 
 ### Squirrel Search Algorithm
 
-We can try our luck also with SSA [3]. We initialize it like this:
+We can try our luck also with SSA [8]. We initialize it like this:
 ```python
 from indago import SSA
 ssa = SSA()
@@ -262,7 +264,7 @@ ssa.params['gd_lim'] = [0.5, 1.11]  # gliding distance limits; default gd_lim=[0
 
 ### Differential Evolution
 
-If we want to use DE [4], we initialize it in the same way as with the other methods:
+If we want to use DE [9], we initialize it in the same way as with the other methods:
 ```python
 from indago import DE
 de = DE()
@@ -283,7 +285,7 @@ de.params['p_mutation'] = 0.2  # default p_mutation=0.11
 
 ### Electromagnetic Field Optimization 
 
-To use EFO [5], we initialize it in the same way as shown above:
+To use EFO [10], we initialize it in the same way as shown above:
 ```python
 from indago import EFO
 efo = EFO()
@@ -304,7 +306,7 @@ Currently, parallelization in EFO is not allowed due to it being entirely ineffe
 
 ### Artificial Bee Colony 
 
-If we want to use ABC [6], we initialize it in the same way as with the other methods:
+If we want to use ABC [11], we initialize it in the same way as with the other methods:
 ```python
 from indago import ABC
 abc = ABC()
@@ -321,7 +323,7 @@ abc.params['trial_limit'] = 100  # default trial_limit=pop_size*dimensions/2
 
 ### Gray Wolf Optimizer
 
-We can initialize GWO [7] as:
+We can initialize GWO [12] as:
 ```python
 from indago import GWO
 gwo = GWO()
@@ -369,6 +371,32 @@ crs.params['pop_scale'] = 5  # default pop_scale=10
 ```
 Note that CRS is significantly slower than most other methods.
 
+### Covariance Matrix Adaptation Evolution Strategy
+
+CMAES can be used like this:
+```python
+from indago import CMAES
+cmaes = CMAES()
+```
+
+Three variants are implemented: *Vanilla* [15], *IPOP* [16], and *BIPOP* [17]. The default variant is *BIPOP*.
+
+You can use the following method parameters:
+```python
+cmaes.params['pop_size'] = 1.0  # default pop_size=4 + int(3 * log(max(n, 1))) (where n is the number of non-categorical variables), or 6 + int(3 * (np.log(n) + np.log(n_discrete))) (where n_discrete is the number of discrete variables and n_discrete > 0)
+cmaes.params['init_step'] = 0.4  # default init_step=0.25
+```
+
+### Random Search
+
+Beside the methods shown above, Indago also provides pure random sampling of the goal function. This is implemented as a method called Random Search, which is used like any other Indago method:
+```python
+from indago import RS
+rs = RS()
+rs.params['batch_size'] = 100  # number of evaluations per iteration; default batch_size=dimensions 
+```
+RS randomly produces and evaluates solution candidates and reports the best of them all. You can use this method for testing purposes or as a trivial optimization technique, although other methods should outperform it almost always.
+
 ### Nelder-Mead
 
 Nelder-Mead optimizer can be initialized like this:
@@ -388,33 +416,7 @@ nm.params['rho'] = 0.5
 nm.params['sigma'] = 0.5
 ```
 
-In the *GaoHan* variant, all of the above parameters beside `init_step` are automatically calculated as proposed in [10]. 
-
-### Multi-Scale Grid Descent
-
-Indago's MSGD method [13] is a grid-based variation of Pattern Search. Use it as any other method:
-```python
-from indago import MSGD
-msgd = MSGD()
-```
-MSGD uses three parameters: `divisions` regulating grid size in each dimension, 
-`base` (of the exponential grid refining) defines how many times grid is refined in each scale increment, 
-and `max_scale` limits the number of refinements and provides additional stopping criteria for MSGD:
-```python
-msgd.params['divisions'] = np.array([10, 10, 8, 10, 5])  # Allows for different number of division for each optimization variable/dimension.
-msgd.params['base'] = 5  # Grid cell is divided five times (for each dimension) in every scale increment.
-msgd.params['max_scale'] = 3  # Maximum three refinements
-```
-
-### Random Search
-
-Beside the methods shown above, Indago also provides pure random sampling of the goal function. This is implemented as a method called Random Search, which is used like any other Indago method:
-```python
-from indago import RS
-rs = RS()
-rs.params['batch_size'] = 100  # number of evaluations per iteration; default batch_size=dimensions 
-```
-RS randomly produces and evaluates solution candidates and reports the best of them all. You can use this method for testing purposes or as a trivial optimization technique, although other methods should outperform it almost always.
+In the *GaoHan* variant, all the above parameters beside `init_step` are automatically calculated as proposed in [18].
 
 ## Which method to choose?
 
@@ -428,7 +430,7 @@ optimizer.X0 = [(1,2,3), (2,3,4)]  # tuple or a list of tuples
 ```
 Note that for unbound optimization (i.e. `lb` and/or `ub` partially or fully undefined), `X0` is a mandatory parameter.
 
-Alternatively, `X0` can represent the number of random candidates generated at the start of optimization (`int`). Each method utilizes these candidates, fully or partially, for initial population, swarm or starting point. Initial candidates are chosen in order of their fitness. This is useful for methods like MSGD which does not utilize starting population but rather starts from a single point: specifying `msgd.X0 = 10` randomly generates 10 candidates and starts the search from the best one. 
+Alternatively, `X0` can represent the number of random candidates generated at the start of optimization (`int`). Each method utilizes these candidates, fully or partially, for initial population, swarm or starting point. Initial candidates are chosen in order of their fitness.
 
 The position of initial solution candidates is obtained randomly by default. Alternatively we can use Halton, Sobol, or LatinHypercube sequence, which will cover the domain more evenly. These can be enabled with `optimizer.sampler = 'halton'`, `'sobol'`, or `'lhs'`.
 
@@ -656,32 +658,36 @@ Optionally, you can provide a filename for saving the plot and a title for the p
 
 1. Eberhart, R., Kennedy, J. (1995). A new optimizer using particle swarm theory. MHS'95. Proceedings of the Sixth International Symposium on Micro Machine and Human Science, Nagoya, Japan, 39-43.
 
-2. Tan, Y., Zhu, Y. (2010). Fireworks algorithm for optimization. In International conference in swarm intelligence. Springer, Berlin, Heidelberg, 355-364.
+2. Ratnaweera, A., Halgamuge, S. K., & Watson, H. C. (2004). Self-organizing hierarchical particle swarm optimizer with time-varying acceleration coefficients. IEEE Transactions on evolutionary computation, 8(3), 240-255. 
 
-3. Jain, M., Singh, V., & Rani, A. (2019). A novel nature-inspired algorithm for optimization: Squirrel search algorithm. Swarm and evolutionary computation, 44, 148-175.
+3. Liu, B., Wang, L., Jin, Y.-H., Tang, F., & Huang D.-X. (2005). Improved particle swarm optimization combined with chaos. Chaos, Solitons & Fractals, 25(5), 1261-1271.
 
-4. Tanabe, R., & Fukunaga, A. S. (2014). Improving the search performance of SHADE using linear population size reduction. In Proceedings of the 2014 IEEE Congress on Evolutionary Computation (CEC), Beijing, China, 1658–1665.
+4. Družeta, S., & Ivić, S. (2020). Anakatabatic Inertia: Particle-wise Adaptive Inertia for PSO, arXiv:2008.00979 [cs.NE].
 
-5. Abedinpourshotorban, H., Shamsuddin, S. M., Beheshti, Z., & Jawawi, D. N. (2016). Electromagnetic field optimization: a physics-inspired metaheuristic optimization algorithm. Swarm and Evolutionary Computation, 26, 8-22.
+5. Družeta, S., & Ivić, S. (2017). Examination of benefits of personal fitness improvement dependent inertia for Particle Swarm Optimization. Soft Computing, 21(12), 3387-3400.
 
-6. Karaboga, D., & Akay, B. (2009). A comparative study of artificial bee colony algorithm. Applied mathematics and computation, 214(1), 108-132.
+6. Družeta, S., Ivić, S., Grbčić, L., & Lučin, I. (2019). Introducing languid particle dynamics to a selection of PSO variants. Egyptian Informatics Journal, 21(2), 119-129.
 
-7. Mirjalili, S., Mirjalili, S. M., Lewis, A. (2014). Grey Wolf Optimizer. Advances in Engineering Software, vol. 69, pp. 46-61
+7. Tan, Y., Zhu, Y. (2010). Fireworks algorithm for optimization. In International conference in swarm intelligence. Springer, Berlin, Heidelberg, 355-364.
 
-8. Askari, Q., Saeed, M., Younas, I. (2020). Heap-based optimizer inspired by corporate rank hierarchy for global optimization, Expert Systems with Applications, vol. 161, pp. 113702
+8. Jain, M., Singh, V., & Rani, A. (2019). A novel nature-inspired algorithm for optimization: Squirrel search algorithm. Swarm and evolutionary computation, 44, 148-175.
 
-9. Kaelo, P., & Ali, M. M. (2006). Some variants of the controlled random search algorithm for global optimization, J. Optim. Theory Appl. 130 (2), 253-264.
+9. Tanabe, R., & Fukunaga, A. S. (2014). Improving the search performance of SHADE using linear population size reduction. In Proceedings of the 2014 IEEE Congress on Evolutionary Computation (CEC), Beijing, China, 1658–1665.
 
-10. Gao, F., Han, L. (2012). Implementing the Nelder-Mead simplex algorithm with adaptive parameters. Computational Optimization and Applications. 51:1, pp. 259-277
+10. Abedinpourshotorban, H., Shamsuddin, S. M., Beheshti, Z., & Jawawi, D. N. (2016). Electromagnetic field optimization: a physics-inspired metaheuristic optimization algorithm. Swarm and Evolutionary Computation, 26, 8-22.
 
-11. Družeta, S., Ivić, S., Grbčić, L. (2026). IndagoBench25 Benchmark Definition. https://osf.io/7r6jz/
+11. Karaboga, D., & Akay, B. (2009). A comparative study of artificial bee colony algorithm. Applied mathematics and computation, 214(1), 108-132.
 
-12. Ratnaweera, A., Halgamuge, S. K., & Watson, H. C. (2004). Self-organizing hierarchical particle swarm optimizer with time-varying acceleration coefficients. IEEE Transactions on evolutionary computation, 8(3), 240-255. 
+12. Mirjalili, S., Mirjalili, S. M., Lewis, A. (2014). Grey Wolf Optimizer. Advances in Engineering Software, vol. 69, pp. 46-61
 
-13. Liu, B., Wang, L., Jin, Y.-H., Tang, F., & Huang D.-X. (2005). Improved particle swarm optimization combined with chaos. Chaos, Solitons & Fractals, 25(5), 1261-1271.
+13. Askari, Q., Saeed, M., Younas, I. (2020). Heap-based optimizer inspired by corporate rank hierarchy for global optimization, Expert Systems with Applications, vol. 161, pp. 113702
 
-14. Družeta, S., & Ivić, S. (2020). Anakatabatic Inertia: Particle-wise Adaptive Inertia for PSO, arXiv:2008.00979 [cs.NE].
+14. Kaelo, P., & Ali, M. M. (2006). Some variants of the controlled random search algorithm for global optimization, J. Optim. Theory Appl. 130 (2), 253-264.
 
-15. Družeta, S., & Ivić, S. (2017). Examination of benefits of personal fitness improvement dependent inertia for Particle Swarm Optimization. Soft Computing, 21(12), 3387-3400.
+15. Hansen, N. (2016). The CMA Evolution Strategy: A Tutorial, arXiv:1604.00772.
 
-16. Družeta, S., Ivić, S., Grbčić, L., & Lučin, I. (2019). Introducing languid particle dynamics to a selection of PSO variants. Egyptian Informatics Journal, 21(2), 119-129.
+16. Auger, A., Hansen, N. (2005). A Restart CMA Evolution Strategy With Increasing Population Size, Proceedings of the IEEE Congress on Evolutionary Computation (CEC 2005), pp. 1769-1776.
+
+17. Hansen, N. (2009). Benchmarking a BI-Population CMA-ES on the BBOB-2009 Function Testbed, Proceedings of the GECCO 2009 Workshop on Black-Box Optimization Benchmarking, pp. 2389-2396.
+
+18. Gao, F., Han, L. (2012). Implementing the Nelder-Mead simplex algorithm with adaptive parameters. Computational Optimization and Applications. 51:1, pp. 259-277
