@@ -159,7 +159,7 @@ As of now, Indago includes the following stochastic global optimization methods:
 
 and gradient-free local search methods: 
 
-- Nelder-Mead method (NM) [10]
+- Nelder-Mead method (NM) [18]
 
 These methods are available through a unified API, which was designed to be as accessible as possible. Besides *NumPy*, Indago uses only *Matplotlib*, a couple of *SciPy* functions, and *rich* for fancy console printouts. Indago methods also include some of our original research improvements, so feel free to try those as well.
 
@@ -244,7 +244,7 @@ fwa.params['m2'] = 10  # default m2=dimensions/2
 
 ### Squirrel Search Algorithm
 
-We can try our luck also with SSA [8]. We initialize it like this:
+We can try our luck also with SSA [8]. We initialize it exactly like with the previously explained methods:
 ```python
 from indago import SSA
 ssa = SSA()
@@ -264,12 +264,7 @@ ssa.params['gd_lim'] = [0.5, 1.11]  # gliding distance limits; default gd_lim=[0
 
 ### Differential Evolution
 
-If we want to use DE [9], we initialize it in the same way as with the other methods:
-```python
-from indago import DE
-de = DE()
-```
-There are three DE variants implemented, namely *SHADE*, *LSHADE* and *RankLSHADE*. Say we want to use *SHADE*:
+There are three DE [9] variants implemented, namely *SHADE*, *LSHADE* and *RankLSHADE*. Say we want to use *SHADE*:
 ```python
 de.variant = 'SHADE'  # other available options are 'LSHADE' and 'RankLSHADE', default variant='LSHADE'
 ```
@@ -285,16 +280,7 @@ de.params['p_mutation'] = 0.2  # default p_mutation=0.11
 
 ### Electromagnetic Field Optimization 
 
-To use EFO [10], we initialize it in the same way as shown above:
-```python
-from indago import EFO
-efo = EFO()
-```
-In EFO, the only available variant is *Vanilla* (which is set as default):
-```python
-efo.variant = 'Vanilla'
-```
-The following parameters are used:
+In EFO [10], the only available variant is *Vanilla* (which is set as default) and the following parameters are used:
 ```python
 efo.params['pop_size'] =  100  # default pop_size=max(50, dimensions)
 efo.params['R_rate'] = 0.25  # should range from 0.1 to 0.4; default R_rate=0.25
@@ -302,19 +288,16 @@ efo.params['Ps_rate'] = 0.25  # should range from 0.1 to 0.4; default Ps_rate=0.
 efo.params['P_field'] = 0.075  # should range from 0.05 to 0.1; default P_field=0.075
 efo.params['N_field'] = 0.45  # should range from 0.4 to 0.5; default N_field=0.45
 ```
+
 Currently, parallelization in EFO is not allowed due to it being entirely ineffective for this method. Also, note that EFO is significantly slower than other methods.
 
 ### Artificial Bee Colony 
 
-If we want to use ABC [11], we initialize it in the same way as with the other methods:
-```python
-from indago import ABC
-abc = ABC()
-```
-In ABC, there are two variants: *Vanilla* (set as default) and *FullyEmployed*.
+In ABC [11], there are two variants: *Vanilla* (set as default) and *FullyEmployed*.
 ```python
 abc.variant = 'Vanilla'  # the other option is 'FullyEmployed'
 ```
+
 The following parameters are used:
 ```python
 abc.params['pop_size'] = 50  # default pop_size=max(10, 2*dimensions)
@@ -323,15 +306,11 @@ abc.params['trial_limit'] = 100  # default trial_limit=pop_size*dimensions/2
 
 ### Gray Wolf Optimizer
 
-We can initialize GWO [12] as:
-```python
-from indago import GWO
-gwo = GWO()
-```
-GWO has two variants: *Vanilla* (set as default) and *HSA*.
+GWO [12] has two variants: *Vanilla* (set as default) and *HSA*.
 ```python
 gwo.variant = 'Vanilla'  # the other option is 'HSA'
 ```
+
 Only one parameter is used:
 ```python
 gwo.params['pop_size'] = 15  # default pop_size=max(10, dimensions)
@@ -339,16 +318,12 @@ gwo.params['pop_size'] = 15  # default pop_size=max(10, dimensions)
 
 ### Heap-Based Optimizer
 
-To use Heap-Based Optimizer [8], initialize it with:
-```python
-from indago import HBO
-hbo = HBO()
-```
-HBO has two variants: *Vanilla* (set as default) and *Dynamic*.
+HBO [8] has two variants: *Vanilla* (set as default) and *Dynamic*.
 ```python
 hbo.variant = 'Vanilla'  # the other option is 'Dynamic'
 ```
-Heap-Based Optimizer uses two parameters:
+
+HBO uses two parameters:
 ```python
 hbo.params['team_size'] = 5  # default team_size=max(dimensions**0.5, 3))
 hbo.params['levels'] = 5  # default levels=3
@@ -356,12 +331,7 @@ hbo.params['levels'] = 5  # default levels=3
 
 ### Controlled Random Search
 
-In order to use Controlled Random Search, you need to initialize it like this:
-```python
-from indago import CRS
-crs = CRS()
-```
-CRS has only one variant:
+CRS [14] has only one variant:
 ```python
 crs.variant = 'Vanilla'  # default variant='Vanilla'
 ```
@@ -369,19 +339,14 @@ and only one parameter:
 ```python
 crs.params['pop_scale'] = 5  # default pop_scale=10
 ```
-Note that CRS is significantly slower than most other methods.
+
+Note that CRS is significantly slower than most other methods. Also, parallelization in CRS is not allowed due to it being entirely ineffective.
 
 ### Covariance Matrix Adaptation Evolution Strategy
 
-CMAES can be used like this:
-```python
-from indago import CMAES
-cmaes = CMAES()
-```
+CMAES has three variants implemented: *Vanilla* [15], *IPOP* [16], and *BIPOP* [17]. The default variant is *BIPOP*.
 
-Three variants are implemented: *Vanilla* [15], *IPOP* [16], and *BIPOP* [17]. The default variant is *BIPOP*.
-
-You can use the following method parameters:
+In all variants you can use the following method parameters:
 ```python
 cmaes.params['pop_size'] = 1.0  # default pop_size=4 + int(3 * log(max(n, 1))) (where n is the number of non-categorical variables), or 6 + int(3 * (np.log(n) + np.log(n_discrete))) (where n_discrete is the number of discrete variables and n_discrete > 0)
 cmaes.params['init_step'] = 0.4  # default init_step=0.25
@@ -399,15 +364,7 @@ RS randomly produces and evaluates solution candidates and reports the best of t
 
 ### Nelder-Mead
 
-Nelder-Mead optimizer can be initialized like this:
-
-```python
-from indago import NM
-nm = NM()
-```
-
 There are two variants of Nelder-Mead method available. *Vanilla* variant (default) uses the following parameters:
-
 ```python
 nm.params['init_step'] = 0.4
 nm.params['alpha'] = 1.0
