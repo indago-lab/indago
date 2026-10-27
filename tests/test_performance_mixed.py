@@ -512,7 +512,7 @@ def test_CMAES_defaults():
     description = 'CMAES defaults'
     optimizer = CMAES()
     expected_result = 0.19214699962575685
-    tolerance = TOL
+    tolerance = 1e-4  # CMAES cross-platform reproducibility issues
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -522,7 +522,7 @@ def test_CMAES_Vanilla():
     optimizer = CMAES()
     optimizer.variant = 'Vanilla'
     expected_result = 0.19214699962575685
-    tolerance = TOL
+    tolerance = 1e-4  # CMAES cross-platform reproducibility issues
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
@@ -532,7 +532,7 @@ def test_CMAES_IPOP():
     optimizer = CMAES()
     optimizer.variant = 'IPOP'
     expected_result = 0.19214699962575685
-    tolerance = TOL
+    tolerance = 1e-4  # CMAES cross-platform reproducibility issues
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'

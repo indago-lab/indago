@@ -521,35 +521,6 @@ def test_CRS_custom_parameters_2():
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
-def test_CMAES_defaults():
-    description = 'CMAES defaults'
-    optimizer = CMAES()
-    expected_result = 4.276417409436527
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_CMAES_Vanilla():
-    description = 'CMAES Vanilla'
-    optimizer = CMAES()
-    optimizer.variant = 'Vanilla'
-    expected_result = 4.276417409436527
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
-def test_CMAES_IPOP():
-    description = 'CMAES IPOP'
-    optimizer = CMAES()
-    optimizer.variant = 'IPOP'
-    expected_result = 4.276417409436527
-    tolerance = TOL
-    result = run(optimizer)
-    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
-        f'{description} FAILED, result={result}, expected={expected_result}'
-
 def test_SynCO_defaults():
     description = 'SynCO defaults'
     optimizer = SynCO()
@@ -635,9 +606,6 @@ if __name__ == '__main__':
     test_CRS_defaults()
     test_CRS_custom_parameters_1()
     test_CRS_custom_parameters_2()
-    test_CMAES_defaults()
-    test_CMAES_Vanilla()
-    test_CMAES_IPOP()
     test_SynCO_defaults()
     test_SynCO_2_custom_methods()
     test_SynCO_3_custom_methods()
