@@ -399,10 +399,14 @@ class PSO(Optimizer):
         """
 
         if self._inject:
-            # PSO specific
             new = self._synco_inject(self._swarm)
+
+            # PSO specific stuff
             for p in new:
                 self._dF[self._swarm.index(p)] = np.min(self._dF)
+                for i, c in enumerate(self._swarm):
+                    if p is c:
+                        self._pbests[i] = c.copy()
             self._find_neighborhood_best()
 
         self._check_params()

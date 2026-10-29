@@ -524,7 +524,7 @@ def test_CRS_custom_parameters_2():
 def test_SynCO_defaults():
     description = 'SynCO defaults'
     optimizer = SynCO()
-    expected_result = 3.4127906107878063
+    expected_result = 3.4925979565612932
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -547,7 +547,7 @@ def test_SynCO_3_custom_methods():
     optimizer.methods = {'PSO': ('Vanilla', None),
                          'FWA': (None, None),
                          'ABC': (None, None)}
-    expected_result = 3.7441646167285225
+    expected_result = 3.7399803201987947
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
