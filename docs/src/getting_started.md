@@ -179,7 +179,7 @@ pso.evaluator = goalfun
 ```
 Now we can define optimizer inputs:
 ```python
-pso.variant = 'Vanilla'  # we will use Standard PSO, the other available options are 'Flagship', 'TVAC' [2] and 'Chaotic' [3]; default variant='Flagship'
+pso.variant = 'Vanilla'  # we will use Standard PSO, the other available options are 'Flagship', 'TVAC' [2], 'Chaotic' [3] and 'CL' (CLPSO) [19]; default variant='Flagship'
 pso.dimensions = 20  # number of variables in the design vector (x) (optional, if not given will be infered from lb/ub)
 pso.lb = np.ones(pso.dimensions) * -1  # 1d np.array of lower bound values (if scalar value is given, it will automatically be transformed to 1d np.array of size dimensions); for (semi-) unbound problems, use (-)np.inf or np.nan, or omit entirely 
 pso.ub = np.ones(pso.dimensions) * 1  # 1d np.array of upper bound values; see above for other considerations
@@ -648,3 +648,5 @@ Optionally, you can provide a filename for saving the plot and a title for the p
 17. Hansen, N. (2009). Benchmarking a BI-Population CMA-ES on the BBOB-2009 Function Testbed, Proceedings of the GECCO 2009 Workshop on Black-Box Optimization Benchmarking, pp. 2389-2396.
 
 18. Gao, F., Han, L. (2012). Implementing the Nelder-Mead simplex algorithm with adaptive parameters. Computational Optimization and Applications. 51:1, pp. 259-277
+
+19. Liang, J. J., Qin, A. K., Suganthan, P. N., & Baskar, S. (2006). Comprehensive learning particle swarm optimizer for global optimization of multimodal functions. IEEE Transactions on Evolutionary Computation, 10(3), 281-295.

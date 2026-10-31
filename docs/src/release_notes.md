@@ -13,6 +13,7 @@ Released on yyyy-mm-dd
 ### New features
 - **Variable types and mixed-variable support**
 - **New method: CMAES**
+- New PSO variant `'CL'` implementing Comprehensive Learning PSO (CLPSO)
 - New DE variant `'RankLSHADE'` supporting constraints
 - Changes in available anakatabatic models for Vanilla PSO: `'DoubleSummit'` added, `'MessyTie'` removed <i class="fa-solid fa-triangle-exclamation"></i>
 - New default anakatabatic models when using anakatabatic inertia in PSO: `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO <i class="fa-solid fa-triangle-exclamation"></i>
