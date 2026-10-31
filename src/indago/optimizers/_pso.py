@@ -218,9 +218,9 @@ class PSO(Optimizer):
                     self.params['swarm_size'] = max(10, self.dimensions)
                     defined_params += 'swarm_size'.split()
                 if 'inertia' not in self.params:
-                    self.params['inertia'] = 'CLDIW'
+                    self.params['inertia'] = 'LDIW'
                     defined_params += 'inertia'.split()
-                optional_params = 'refreshing_gap pc_min pc_max akb_model akb_fun_start akb_fun_stop'.split()
+                optional_params = 'refreshing_gap pc_min pc_max'.split()
                 if 'refreshing_gap' not in self.params:
                     self.params['refreshing_gap'] = 7
                     defined_params += 'refreshing_gap'.split()
@@ -552,10 +552,6 @@ class PSO(Optimizer):
                 w_start = self.params['akb_fun_start'](theta)
                 w_stop = self.params['akb_fun_stop'](theta)
                 w = w_start * (1 - self._progress_factor()) + w_stop * self._progress_factor()
-
-            elif self.params['inertia'] == 'CLDIW':
-                # Linearly decreasing inertia weight used in CLPSO (Liang et al., 2006)
-                w = 0.9 - (0.9 - 0.4) * self._progress_factor()
 
             w = w * np.ones(self.params['swarm_size']) # ensure w is a vector
             
