@@ -84,6 +84,7 @@ class NM(Optimizer):
             if 'sigma' not in self.params:
                 self.params['sigma'] = 0.5
                 defined_params += 'sigma'.split()
+
         elif self.variant == 'GaoHan':
             mandatory_params = 'init_step'.split()
             if 'init_step' not in self.params:
@@ -124,14 +125,15 @@ class NM(Optimizer):
         # Generate initial positions
         self._evaluate_initial_candidates()
         self._candidates[0] = self._initial_candidates[0].copy()
-        # TODO: if only one X0 is taken, then this should be checked and user should be informed if len(X0)>1
+        if len(self._initial_candidates) > 1:
+            self._log('Warning: Multiple initial candidates (X0) provided, but NM can use only one. Ignoring all but the first.')
 
         # Starting simplex
         for p in range(self.dimensions):
 
             dr = np.zeros([self.dimensions])
             dr[p] = self.params['init_step']
-            self._candidates[1 + p]._R = self._candidates[0]._R + dr
+            self._candidates[1 + p]._R = (self._candidates[0]._R + dr) % 1
 
         # Evaluate
         self._collective_evaluation(self._candidates[1:])

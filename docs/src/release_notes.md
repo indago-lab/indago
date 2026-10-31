@@ -28,6 +28,7 @@ Released on yyyy-mm-dd
 - Enum `Status` is renamed to `OptimizerStatus`
 - Documentation updated and improved
 ### Bug fixes
+- Fixed NM not working when initialized at the upper bounds
 - Many minor bug fixes
 
 ***

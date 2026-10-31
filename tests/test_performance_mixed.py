@@ -405,7 +405,7 @@ def test_GWO_HSA_defaults():
 def test_NM_defaults():
     description = 'NM defaults'
     optimizer = NM()
-    expected_result = 0.9932648872233105
+    expected_result = 0.3743060374600724
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -415,7 +415,7 @@ def test_NM_Vanilla_defaults():
     description = 'NelderMead Vanilla defaults'
     optimizer = NM()
     optimizer.variant = 'Vanilla'
-    expected_result = 0.27147719343542204
+    expected_result = 0.2485863778999829
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
