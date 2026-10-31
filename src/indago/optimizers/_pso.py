@@ -86,11 +86,14 @@ class PSO(Optimizer):
 
     Reference: Eberhart, R., Kennedy, J. (1995). A new optimizer using particle swarm theory. MHS'95.
     Proceedings of the Sixth International Symposium on Micro Machine and Human Science, Nagoya, Japan, 39-43.
-    
+    CL variant reference: Liang, J.J., Qin, A.K., Suganthan, P.N., Baskar, S. (2006). Comprehensive learning
+    particle swarm optimizer for global optimization of multimodal functions.
+    IEEE Transactions on Evolutionary Computation, 10(3), 281-295.
+
     Attributes
     ----------
     variant : str
-        Name of the PSO variant (``Flagship``, ``Vanilla``, ``TVAC``, or ``Chaotic``). Default: ``Flagship``.
+        Name of the PSO variant (``Flagship``, ``Vanilla``, ``TVAC``, ``Chaotic``, or ``CL``). Default: ``Flagship``.
     params : dict
         A dictionary of PSO parameters.
     _v_max : ndarray
@@ -105,6 +108,12 @@ class PSO(Optimizer):
         Indices of neighborhood best solutions.
     _topo : ndarray
         Topology of the swarm (connection matrix).
+    _Pc : ndarray
+        Learning probability of each particle (CL variant only).
+    _exemplar_idx : ndarray
+        Index of the exemplar particle followed by each dimension of each particle (CL variant only).
+    _refresh_count : ndarray
+        Number of iterations each particle has spent without fitness improvement (CL variant only).
         
     Returns
     -------
@@ -202,6 +211,25 @@ class PSO(Optimizer):
                     self.params['chaotic_elite'] = 0.2
                     defined_params += 'chaotic_elite'.split()
                 optional_params = 'akb_model akb_fun_start akb_fun_stop'.split()
+
+            case 'CL':
+                mandatory_params = 'swarm_size inertia'.split()
+                if 'swarm_size' not in self.params:
+                    self.params['swarm_size'] = max(10, self.dimensions)
+                    defined_params += 'swarm_size'.split()
+                if 'inertia' not in self.params:
+                    self.params['inertia'] = 'CLDIW'
+                    defined_params += 'inertia'.split()
+                optional_params = 'refreshing_gap pc_min pc_max akb_model akb_fun_start akb_fun_stop'.split()
+                if 'refreshing_gap' not in self.params:
+                    self.params['refreshing_gap'] = 7
+                    defined_params += 'refreshing_gap'.split()
+                if 'pc_min' not in self.params:
+                    self.params['pc_min'] = 0.05
+                    defined_params += 'pc_min'.split()
+                if 'pc_max' not in self.params:
+                    self.params['pc_max'] = 0.5
+                    defined_params += 'pc_max'.split()
 
             case _:
                 assert False, f'Unknown variant! {self.variant}'
@@ -348,7 +376,75 @@ class PSO(Optimizer):
         self._reinitialize_topology()
         self._find_neighborhood_best()
 
+        if self.variant == 'CL':
+
+            # Learning probability of each particle (Liang et al., 2006, eq. 10)
+            pc_min = self.params['pc_min']
+            pc_max = self.params['pc_max']
+            ps = self.params['swarm_size']
+            if ps > 1:
+                self._Pc = pc_min + (pc_max - pc_min) * (np.exp(10 * np.arange(ps) / (ps - 1)) - 1) / (np.exp(10) - 1)
+            else:
+                self._Pc = np.full(ps, pc_max)
+
+            # Assign exemplar particles for every dimension of every particle
+            self._exemplar_idx = np.zeros([self.params['swarm_size'], self.dimensions], dtype=int)
+            self._refresh_count = np.zeros(self.params['swarm_size'], dtype=int)
+            for p in range(self.params['swarm_size']):
+                self._assign_exemplars(p)
+
         self._finalize_iteration()
+
+    def _assign_exemplars(self, p):
+        """Method for assigning exemplar particles for all dimensions of a particle,
+        following the comprehensive learning strategy of the CL variant (Liang et al., 2006).
+        For each dimension, the dimension learns from the particle's own pbest with
+        probability 1 - Pc, otherwise it learns from another particle's pbest determined
+        by a tournament selection. If all dimensions learn from the particle's own pbest,
+        one dimension is forced to learn from another particle's pbest.
+
+        Parameters
+        ----------
+        p : int
+            Index of the particle whose exemplars are being assigned.
+
+        Returns
+        -------
+        None
+            Nothing
+        """
+
+        # Each dimension starts by learning from the particle's own pbest
+        self._exemplar_idx[p, :] = p
+
+        # Dimensions with random value below the particle's learning probability learn from another particle
+        for i_var in np.where(np.random.uniform(0, 1, self.dimensions) < self._Pc[p])[0]:
+            self._exemplar_idx[p, i_var] = self._tournament_exemplar(p)
+
+        # If all exemplars are the particle's own pbest, one dimension is forced to learn from another particle
+        if np.all(self._exemplar_idx[p, :] == p):
+            i_var = np.random.randint(self.dimensions)
+            self._exemplar_idx[p, i_var] = self._tournament_exemplar(p)
+
+    def _tournament_exemplar(self, p):
+        """Method for selecting an exemplar particle for a dimension of particle p
+        via a tournament selection of two randomly chosen particles' pbests.
+        The particle p itself is excluded from the tournament.
+
+        Parameters
+        ----------
+        p : int
+            Index of the particle which the exemplar is selected for.
+
+        Returns
+        -------
+        exemplar : int
+            Index of the selected exemplar particle.
+        """
+
+        others = np.delete(np.arange(self.params['swarm_size']), p)
+        contenders = others[np.random.randint(others.size, size=2)]
+        return contenders[np.argmin(self._pbests[contenders])]
         
     def _reinitialize_topology(self, k=3):
         """Method for reinitializing the PSO swarm topology.
@@ -456,7 +552,11 @@ class PSO(Optimizer):
                 w_start = self.params['akb_fun_start'](theta)
                 w_stop = self.params['akb_fun_stop'](theta)
                 w = w_start * (1 - self._progress_factor()) + w_stop * self._progress_factor()
-            
+
+            elif self.params['inertia'] == 'CLDIW':
+                # Linearly decreasing inertia weight used in CLPSO (Liang et al., 2006)
+                w = 0.9 - (0.9 - 0.4) * self._progress_factor()
+
             w = w * np.ones(self.params['swarm_size']) # ensure w is a vector
             
             if self.variant == 'TVAC':
@@ -466,33 +566,62 @@ class PSO(Optimizer):
             # Calculate new velocity and new position
             for p, particle in enumerate(self._swarm):
 
-                v_cog = self._pbests[p]._R - particle._R
-                v_soc = self._pbests[self._gbest_idx[p]]._R - particle._R
-                for i_var in (self._var_indices[VariableType.REAL_PERIODIC] +
-                              self._var_indices[VariableType.REAL_DISCRETE_PERIODIC] +
-                              self._var_indices[VariableType.INTEGER_PERIODIC]):
-                    if np.abs(v_cog[i_var]) > 0.5:
-                        v_cog[i_var] = v_cog[i_var] - np.sign(v_cog[i_var])
-                    if np.abs(v_soc[i_var]) > 0.5:
-                        v_soc[i_var] = v_soc[i_var] - np.sign(v_soc[i_var])
+                if self.variant == 'CL':
 
-                # # following two lines could replace the above code, but they work a bit worse
-                # v_cog = self._pbests[p]._distance_to(particle)
-                # v_soc = self._pbests[self._gbest_idx[p]]._distance_to(particle)
+                    # Comprehensive Learning strategy: each dimension of the particle
+                    # learns from the pbest of its exemplar particle (Liang et al., 2006)
+                    v_exp = np.array([self._pbests[self._exemplar_idx[p, i_var]]._R[i_var]
+                                      for i_var in range(self.dimensions)]) - particle._R
+                    for i_var in (self._var_indices[VariableType.REAL_PERIODIC] +
+                                  self._var_indices[VariableType.REAL_DISCRETE_PERIODIC] +
+                                  self._var_indices[VariableType.INTEGER_PERIODIC]):
+                        if np.abs(v_exp[i_var]) > 0.5:
+                            v_exp[i_var] = v_exp[i_var] - np.sign(v_exp[i_var])
 
-                if plot:
-                    ax.plot(particle._R[0], particle._R[1], 'bo', ms=3)
-                    ax.arrow(particle._R[0], particle._R[1], v_cog[0], v_cog[1], color='orange',
-                             width=0.001, linestyle=':',
-                             head_width=0.01, head_length=0.01, )
-                    ax.arrow(particle._R[0], particle._R[1], v_soc[0], v_soc[1], color='purple',
-                             width=0.001, linestyle=':',
-                             head_width=0.01, head_length=0.01, )
-                    ax.arrow(particle._R[0], particle._R[1], -particle.V[0], -particle.V[1], color='grey',
-                             width=0.001, linestyle=':',
-                             head_width=0.0, head_length=0.0, )
+                    if plot:
+                        ax.plot(particle._R[0], particle._R[1], 'bo', ms=3)
+                        ax.arrow(particle._R[0], particle._R[1], v_exp[0], v_exp[1], color='orange',
+                                 width=0.001, linestyle=':',
+                                 head_width=0.01, head_length=0.01, )
+                        ax.arrow(particle._R[0], particle._R[1], -particle.V[0], -particle.V[1], color='grey',
+                                 width=0.001, linestyle=':',
+                                 head_width=0.0, head_length=0.0, )
 
-                particle.V = w[p] * particle.V + c1 * R1[p, :] * v_cog + c2 * R2[p, :] * v_soc
+                    particle.V = w[p] * particle.V + R1[p, :] * v_exp
+
+                    # Clamp velocity magnitude to maximum velocity (Liang et al., 2006, Fig. 6)
+                    particle.V = np.clip(particle.V, -self._v_max, self._v_max)
+
+                else:
+
+                    v_cog = self._pbests[p]._R - particle._R
+                    v_soc = self._pbests[self._gbest_idx[p]]._R - particle._R
+                    for i_var in (self._var_indices[VariableType.REAL_PERIODIC] +
+                                  self._var_indices[VariableType.REAL_DISCRETE_PERIODIC] +
+                                  self._var_indices[VariableType.INTEGER_PERIODIC]):
+                        if np.abs(v_cog[i_var]) > 0.5:
+                            v_cog[i_var] = v_cog[i_var] - np.sign(v_cog[i_var])
+                        if np.abs(v_soc[i_var]) > 0.5:
+                            v_soc[i_var] = v_soc[i_var] - np.sign(v_soc[i_var])
+
+                    # # following two lines could replace the above code, but they work a bit worse
+                    # v_cog = self._pbests[p]._distance_to(particle)
+                    # v_soc = self._pbests[self._gbest_idx[p]]._distance_to(particle)
+
+                    if plot:
+                        ax.plot(particle._R[0], particle._R[1], 'bo', ms=3)
+                        ax.arrow(particle._R[0], particle._R[1], v_cog[0], v_cog[1], color='orange',
+                                 width=0.001, linestyle=':',
+                                 head_width=0.01, head_length=0.01, )
+                        ax.arrow(particle._R[0], particle._R[1], v_soc[0], v_soc[1], color='purple',
+                                 width=0.001, linestyle=':',
+                                 head_width=0.01, head_length=0.01, )
+                        ax.arrow(particle._R[0], particle._R[1], -particle.V[0], -particle.V[1], color='grey',
+                                 width=0.001, linestyle=':',
+                                 head_width=0.0, head_length=0.0, )
+
+                    particle.V = w[p] * particle.V + c1 * R1[p, :] * v_cog + c2 * R2[p, :] * v_soc
+
                 if plot:
                     ax.arrow(particle._R[0], particle._R[1], particle.V[0], particle.V[1], color='red',
                              width=0.001, linestyle=':',
@@ -531,8 +660,18 @@ class PSO(Optimizer):
             for p, particle in enumerate(self._swarm):
                 # Update personal best
                 if particle <= self._pbests[p]:
-                    self._pbests[p] = particle.copy()  
-                    
+                    self._pbests[p] = particle.copy()
+                    if self.variant == 'CL':
+                        # reset the counter of particles which improved their pbest
+                        self._refresh_count[p] = 0
+                elif self.variant == 'CL':
+                    # refresh exemplars of particles which have not improved
+                    # their own pbest for refreshing_gap generations (Liang et al., 2006)
+                    self._refresh_count[p] += 1
+                    if self._refresh_count[p] >= self.params['refreshing_gap']:
+                        self._assign_exemplars(p)
+                        self._refresh_count[p] = 0
+
             # Update swarm topology
             if np.max(self._dF) >= 0.0:
                 self._reinitialize_topology()
