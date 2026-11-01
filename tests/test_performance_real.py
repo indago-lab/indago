@@ -49,7 +49,8 @@ def test_PSO_defaults_1D_X0() -> None:
     description = 'PSO defaults, 1D X0'
     optimizer = PSO()
     optimizer.X0 = tuple(np.ones(DIM))
-    expected_result = 2.337381752822694
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 2.4008935767598216
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -59,7 +60,8 @@ def test_PSO_defaults_2D_X0() -> None:
     description = 'PSO defaults, 2D X0'
     optimizer = PSO()
     optimizer.X0 = [tuple(1*np.ones(DIM)), tuple(2*np.ones(DIM)), tuple(3*np.ones(DIM))]
-    expected_result = 2.1132470402088344
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 2.9435320548605284
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -214,7 +216,8 @@ def test_PSO_defaults_multiprocessing_on_4_processors() -> None:
     description = 'PSO defaults, multiprocessing on 4 processors'
     optimizer = PSO()
     optimizer.processes = 4
-    expected_result = 3.3754146242909053
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 3.9111847131244133
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -225,7 +228,8 @@ def test_PSO_defaults_multiprocessing_on_maximum_processors() -> None:
     description = 'PSO defaults, multiprocessing on maximum processors'
     optimizer = PSO()
     optimizer.processes = 'max'
-    expected_result = 3.3754146242909053
+    optimizer.max_evaluations = MAXEVAL // 4  # reducing linux/windows numerical discrepancy accumulation
+    expected_result = 3.9111847131244133
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

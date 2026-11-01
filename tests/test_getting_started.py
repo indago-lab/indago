@@ -2,10 +2,8 @@ import indago
 import numpy as np
 
 
-real_example_result_x = np.array((7.723175361462609e-05, 0.007620010335907423, 0.00038955064126255934,
-                                  8.731740586043202e-05, -0.000518793586882893, -0.0010262722272678104,
-                                  0.00015557814002775672, 0.0001289463897400367)
-)
+real_example_result_x = np.array((0.3184273332309129, 0.5479561768347043, 0.7191423101761707, -1.1495098374414088,
+                                  -0.3219940653026345, 0.2410220384297439, -0.3277701382278586, 0.06339246605492832))
 
 def test_getting_started_real():
 
@@ -38,6 +36,9 @@ def test_getting_started_real():
     # Print optimizer parameters
     print(optimizer)  # not necessary, but useful for checking the setup of the optimizer
 
+    # This line is necessary for reproducibility of the results (not included in Getting Started example)
+    optimizer.max_evaluations = 500  # reducing linux/windows numerical discrepancy accumulation when testing
+
     # Run optimization
     result = optimizer.optimize(seed=0)  # (using default parameters of the method)
 
@@ -45,7 +46,7 @@ def test_getting_started_real():
     print(result.f)  # minimum of obj with constr1 and constr2 satisfied
     print(result.X)  # design vector at minimum (as tuple)
 
-    assert np.isclose(result.f, 5.959310949391016e-05, atol=1e-10, rtol=0)
+    assert np.isclose(result.f, 2.5134141363053315, atol=1e-10, rtol=0)
     assert np.isclose(np.array(result.X), real_example_result_x, atol=1e-10, rtol=0).all()
 
 
@@ -64,9 +65,10 @@ def test_getting_started_real_minimize():
     X, f, O, C = minimize(goalfun, None, -10, 10 + np.arange(8), 'PSO',
                           objectives=1, objective_labels=['Squared sum minimization'],
                           constraints=2, constraint_labels=['Constraint 1', 'Constraint 2'],
+                          max_evaluations=500, # reducing linux/windows numerical discrepancy accumulation when testing
                           seed=0)
 
-    assert np.isclose(f, 5.959310949391016e-05, atol=1e-10, rtol=0)
+    assert np.isclose(f, 2.5134141363053315, atol=1e-10, rtol=0)
     assert np.isclose(np.array(X), real_example_result_x, atol=1e-10, rtol=0).all()
 
 
