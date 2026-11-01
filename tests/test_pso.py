@@ -78,3 +78,17 @@ def test_pso_mixed():
     # optimizer.monitoring = 'basic'
     optimizer.optimize()
 
+
+def test_pso_cl():
+    variables = {f'x{i + 1}': (indago.VariableType.REAL, -10, 10) for i in range(5)}
+
+    optimizer = indago.PSO()
+    optimizer.variant = 'CL'
+    optimizer.variables = variables
+    optimizer.evaluator = real_function
+    optimizer.max_evaluations = 5000
+
+    result = optimizer.optimize(seed=42)
+
+    assert optimizer.params['inertia'] == 'LDIW'
+    assert result.f < 1e-4
