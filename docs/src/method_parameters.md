@@ -22,6 +22,7 @@ Available methods and their variants are summarized in the following table.
 |                                                             | 'LSHADE' <i class="fa-regular fa-star"></i>   | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
 |                                                             | 'RankLSHADE'                                  | <i class="fa-regular fa-circle-check"></i> | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
 |                                                             | 'iLSHADE'                                     | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
+|                                                             | 'jSO'                                         | <i class="fa-solid fa-xmark"></i>          | User must provide at least one of the following stopping criteria: *max_iterations*, *max_evaluations*, *max_elapsed_time*.            |
 | **Electromagnetic Field Optimization (EFO)**                | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Significantly slower than other methods. Does not support parallel evaluation. Does not work efficiently with Periodic variable types. |
 | **Artificial Bee Colony (ABC)**                             | 'Vanilla' <i class="fa-regular fa-star"></i>  | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
 |                                                             | 'FullyEmployed'                               | <i class="fa-regular fa-circle-check"></i> | Showing poor performance on unbound problems.                                                                                          |
@@ -93,8 +94,12 @@ The `'CL'` variant implements Comprehensive Learning PSO (CLPSO), in which each 
 | **'iLSHADE'**| pop_init   | (int)          | [1, -]     | max (30, 12 * *dimensions*) | Initial population size                            |
 |              | p_mutation | (float)        | [0.0, 1.0] | 0.2                         | Maximum mutation probability (*p_max*)             |
 |              | p_min      | (float)        | [0.0, 1.0] | 0.1                         | Minimum mutation probability; must not exceed *p_mutation* |
+| **'jSO'**    | pop_init   | (int)          | [1, -]     | max (30, round(25 * ln(*dimensions*) * sqrt(*dimensions*))) | Initial population size |
+|              | hist_size  | (int)          | [1, -]     | 5                           | Size of historical memory                          |
+|              | p_mutation | (float)        | [0.0, 1.0] | 0.25                        | Maximum mutation probability (*p_max*)             |
+|              | p_min      | (float)        | [0.0, 1.0] | 0.125                       | Minimum mutation probability; must not exceed *p_mutation* |
 
-For iLSHADE, the mutation probability is linearly interpolated between *p_min* and *p_mutation* during the optimization, while the *f_archive* and *hist_size* defaults are the same as for other DE variants.
+For iLSHADE and jSO, the mutation probability linearly decreases from *p_mutation* to *p_min* during the optimization, while the *f_archive* default is the same as for other DE variants.
 
 ## Electromagnetic Field Optimization (EFO)
 

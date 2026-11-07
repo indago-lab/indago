@@ -264,22 +264,22 @@ ssa.params['gd_lim'] = [0.5, 1.11]  # gliding distance limits; default gd_lim=[0
 
 ### Differential Evolution
 
-There are four DE [9, 18] variants implemented, namely *SHADE*, *LSHADE*, *RankLSHADE* and *iLSHADE*. The *iLSHADE* variant implements the improved L-SHADE algorithm [18]. Say we want to use *SHADE*:
+There are five DE [9, 18, 20] variants implemented, namely *SHADE*, *LSHADE*, *RankLSHADE*, *iLSHADE* and *jSO*. The *iLSHADE* variant implements the improved L-SHADE algorithm [18], while *jSO* implements its improved variant [20]. Say we want to use *SHADE*:
 ```python
-de.variant = 'SHADE'  # other available options are 'LSHADE', 'RankLSHADE', and 'iLSHADE', default variant='LSHADE'
+de.variant = 'SHADE'  # other available options are 'LSHADE', 'RankLSHADE', 'iLSHADE', and 'jSO', default variant='LSHADE'
 ```
 When dealing with constraints, you must use the *RankLSHADE* variant.
 
 All DE variants use the following parameters:
 ```python
-de.params['pop_init'] = 200  # initial population size; default pop_init=max(30, 5*dimensions), or max(30, 12*dimensions) for iLSHADE
+de.params['pop_init'] = 200  # initial population size; default pop_init=max(30, 5*dimensions), max(30, 12*dimensions) for iLSHADE, or max(30, round(25*ln(dimensions)*sqrt(dimensions))) for jSO
 de.params['f_archive'] = 3  # external archive size factor; default f_archive=2.6
-de.params['hist_size'] = 4  # historical memory size; default hist_size=6
-de.params['p_mutation'] = 0.2  # default p_mutation=0.11, or 0.2 for iLSHADE
+de.params['hist_size'] = 4  # historical memory size; default hist_size=6, or 5 for jSO
+de.params['p_mutation'] = 0.2  # default p_mutation=0.11, 0.2 for iLSHADE, or 0.25 for jSO
 ```
-The *iLSHADE* variant additionally uses the following parameter:
+The *iLSHADE* and *jSO* variants additionally use the following parameter:
 ```python
-de.params['p_min'] = 0.1  # minimum mutation probability; default p_min=0.1
+de.params['p_min'] = 0.1  # minimum mutation probability; default p_min=0.1 for iLSHADE, or 0.125 for jSO
 ```
 
 ### Electromagnetic Field Optimization 
@@ -656,3 +656,5 @@ Optionally, you can provide a filename for saving the plot and a title for the p
 18. Gao, F., Han, L. (2012). Implementing the Nelder-Mead simplex algorithm with adaptive parameters. Computational Optimization and Applications. 51:1, pp. 259-277
 
 19. Liang, J. J., Qin, A. K., Suganthan, P. N., & Baskar, S. (2006). Comprehensive learning particle swarm optimizer for global optimization of multimodal functions. IEEE Transactions on Evolutionary Computation, 10(3), 281-295.
+
+20. Brest, J., Maučec, M. S., & Bošković, B. (2017). Single Objective Real-Parameter Optimization: Algorithm jSO. In Proceedings of the 2017 IEEE Congress on Evolutionary Computation (CEC), San Sebastián, Spain, 1311–1318.
