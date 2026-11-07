@@ -53,15 +53,18 @@ class Solution(Candidate):
 
 class DE(Optimizer):
     """Differential Evolution method class.
-    
-    Reference: R. Tanabe and A. S. Fukunaga. Improving the search performance of SHADE using 
-    linear population size reduction”, in Proceedings of the 2014 IEEE Congress on 
+
+    References: R. Tanabe and A. S. Fukunaga. Improving the search performance of SHADE using
+    linear population size reduction, in Proceedings of the 2014 IEEE Congress on
     Evolutionary Computation (CEC), pp. 1658–1665, Beijing, China, July 2014.
-    
+    J. Brest, M. S. Maučec, and B. Bošković. iL-SHADE: Improved L-SHADE algorithm for
+    single objective real-parameter optimization, in Proceedings of the 2016 IEEE Congress
+    on Evolutionary Computation (CEC), pp. 1188–1195, Vancouver, Canada, July 2016.
+
     Attributes
     ----------
     variant : str
-        Name of the DE variant (``SHADE``, ``LSHADE``, ``RankLSHADE``). Default: ``LSHADE``.
+        Name of the DE variant (``SHADE``, ``LSHADE``, ``RankLSHADE``, ``iLSHADE``). Default: ``LSHADE``.
     params : dict
         A dictionary of DE parameters.
     _Pop : list
@@ -110,10 +113,12 @@ class DE(Optimizer):
         if 'hist_size' in self.params:
             self.params['hist_size'] = int(self.params['hist_size'])
 
-        if self.variant in 'SHADE LSHADE RankLSHADE'.split():
+        if self.variant in 'SHADE LSHADE RankLSHADE iLSHADE'.split():
             mandatory_params = 'pop_init f_archive hist_size p_mutation'.split()
+            if self.variant == 'iLSHADE':
+                optional_params = ['p_min']
             if 'pop_init' not in self.params:
-                self.params['pop_init'] = max(30, self.dimensions * 5)
+                self.params['pop_init'] = max(30, self.dimensions * (12 if self.variant == 'iLSHADE' else 5))
                 defined_params += 'pop_init'.split()
             if 'f_archive' not in self.params:
                 self.params['f_archive'] = 2.6
@@ -122,8 +127,11 @@ class DE(Optimizer):
                 self.params['hist_size'] = 6
                 defined_params += 'hist_size'.split()
             if 'p_mutation' not in self.params:
-                self.params['p_mutation'] = 0.11
+                self.params['p_mutation'] = 0.2 if self.variant == 'iLSHADE' else 0.11
                 defined_params += 'p_mutation'.split()
+            if self.variant == 'iLSHADE' and 'p_min' not in self.params:
+                self.params['p_min'] = 0.1
+                defined_params += 'p_min'.split()
         else:
             assert False, f'Unknown variant! {self.variant}'
         
@@ -138,6 +146,9 @@ class DE(Optimizer):
         assert isinstance(self.params['hist_size'], int) \
             and self.params['hist_size'] > 0, \
             "hist_size should be positive integer"
+        if self.variant == 'iLSHADE':
+            assert 0 <= self.params['p_min'] <= self.params['p_mutation'] <= 1, \
+                "p_min and p_mutation should be in range [0, 1] and p_min <= p_mutation"
 
         Optimizer._check_params(self, mandatory_params, optional_params, defined_params)
         
@@ -152,7 +163,7 @@ class DE(Optimizer):
             
         """
 
-        if self.variant in 'LSHADE RankLSHADE'.split():
+        if self.variant in 'LSHADE RankLSHADE iLSHADE'.split():
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
                 'Error: optimizer.max_iteration, optimizer.max_evaluations, or self.max_elapsed_time should be provided for this method/variant'
 
@@ -168,7 +179,7 @@ class DE(Optimizer):
         self._A = []
         
         # Prepare historical memory
-        self._M_CR = np.full(self.params['hist_size'], 0.5)
+        self._M_CR = np.full(self.params['hist_size'], 0.8 if self.variant == 'iLSHADE' else 0.5)
         self._M_F = np.full(self.params['hist_size'], 0.5)
 
         # Generate initial positions
@@ -215,14 +226,24 @@ class DE(Optimizer):
             S_F = np.empty([0])
             S_df = np.empty([0])
             
+            if self.variant == 'iLSHADE':
+                progress = min(max(self._progress_factor(), 0.0), 1.0)
+                p_mutation = self.params['p_min'] + \
+                    (self.params['p_mutation'] - self.params['p_min']) * progress
+            else:
+                p_mutation = self.params['p_mutation']
+
             # find pbest
-            top = max(round(len(self._Pop) * self.params['p_mutation']), 1)
+            top = max(round(len(self._Pop) * p_mutation), 1)
             pbest = np.random.choice(sorted(self._Pop)[0:top])
             
             for p, t in zip(self._Pop, self._Trials):
                 
                 # Update CR, F
                 r = np.random.randint(self.params['hist_size'])
+                if self.variant == 'iLSHADE' and r == self.params['hist_size'] - 1:
+                    self._M_F[r] = 0.9
+                    self._M_CR[r] = 0.9
                 if np.isnan(self._M_CR[r]):
                     p.CR = 0
                 else:
@@ -231,6 +252,18 @@ class DE(Optimizer):
                 p.F = -1
                 while p.F <= 0:
                     p.F = min(cauchy.rvs(self._M_F[r], 0.1), 1)
+
+                if self.variant == 'iLSHADE':
+                    if progress < 0.25:
+                        p.CR = max(p.CR, 0.5)
+                    elif progress < 0.5:
+                        p.CR = max(p.CR, 0.25)
+                    if progress < 0.25:
+                        p.F = min(p.F, 0.7)
+                    elif progress < 0.5:
+                        p.F = min(p.F, 0.8)
+                    elif progress < 0.75:
+                        p.F = min(p.F, 0.9)
                 
                 # Compute mutant vector
                 r1 = r2 = p
@@ -310,14 +343,20 @@ class DE(Optimizer):
                 if np.isnan(self._M_CR[self._k]) or np.max(S_CR) < 1e-100:
                     self._M_CR[self._k] = np.nan
                 else:
-                    self._M_CR[self._k] = np.sum(w * S_CR**2) / np.sum(w * S_CR)
-                self._M_F[self._k] = np.sum(w * S_F**2) / np.sum(w * S_F)
+                    mean_CR = np.sum(w * S_CR**2) / np.sum(w * S_CR)
+                    if self.variant == 'iLSHADE':
+                        mean_CR = (mean_CR + self._M_CR[self._k]) / 2
+                    self._M_CR[self._k] = mean_CR
+                mean_F = np.sum(w * S_F**2) / np.sum(w * S_F)
+                if self.variant == 'iLSHADE':
+                    mean_F = (mean_F + self._M_F[self._k]) / 2
+                self._M_F[self._k] = mean_F
                 self._k += 1
                 if self._k >= self.params['hist_size']:
                     self._k = 0
                     
             # Linear Population Size Reduction (LPSR)
-            if self.variant in 'LSHADE RankLSHADE'.split():
+            if self.variant in 'LSHADE RankLSHADE iLSHADE'.split():
                 N_init = self.params['pop_init']
                 N_new = round((4 - N_init) * self._progress_factor() + N_init)
                 if N_new < len(self._Pop):

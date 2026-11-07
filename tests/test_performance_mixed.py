@@ -343,6 +343,30 @@ def test_DE_LSHADE_custom_parameters():
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
         f'{description} FAILED, result={result}, expected={expected_result}'
 
+def test_DE_iLSHADE_defaults():
+    description = 'DE iLSHADE defaults'
+    optimizer = DE()
+    optimizer.variant = 'iLSHADE'
+    expected_result = 0.2485865536215501
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
+def test_DE_iLSHADE_custom_parameters():
+    description = 'DE iLSHADE custom parameters'
+    optimizer = DE()
+    optimizer.variant = 'iLSHADE'
+    optimizer.params['pop_init'] = 20
+    optimizer.params['f_archive'] = 2
+    optimizer.params['p_min'] = 0.05
+    optimizer.params['p_mutation'] = 0.3
+    expected_result = 0.24859031203718845
+    tolerance = TOL
+    result = run(optimizer)
+    assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
+        f'{description} FAILED, result={result}, expected={expected_result}'
+
 def test_EFO_defaults():
     description = 'EFO defaults'
     optimizer = EFO()
@@ -602,6 +626,8 @@ if __name__ == '__main__':
     test_DE_RankLSHADE_defaults()
     test_DE_SHADE_defaults()
     test_DE_LSHADE_custom_parameters()
+    test_DE_iLSHADE_defaults()
+    test_DE_iLSHADE_custom_parameters()
     test_EFO_defaults()
     test_ABC_defaults()
     test_ABC_FullyEmployed_defaults()
