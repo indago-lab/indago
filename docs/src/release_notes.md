@@ -6,9 +6,17 @@ Most important changes in Indago releases are listed here. Breaking changes are 
 
 ***
 
-## Indago x.x.x
+## Indago 0.7.1
 
-Released on yyyy-mm-dd
+Released on 2029-11-09
+
+- Fixing publishing issues
+
+***
+
+## Indago 0.7.0
+
+Released on 2029-11-09
 
 ### New features
 - **Variable types and mixed-variable support**
