@@ -39,4 +39,4 @@ jobs:
         with:
           token: ${{ secrets.READTHEDOCS_TOKEN }}
           project-slug: 'indago'
-          html-dir: 'docs/build/html'
+          html: 'docs/build/html'
