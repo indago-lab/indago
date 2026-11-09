@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Indago 0.0.0 documentation!
+Welcome to Indago 0.6.99 documentation!
 ======================================
 .. toctree::
    :maxdepth: 2
