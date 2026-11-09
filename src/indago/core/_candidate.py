@@ -248,12 +248,12 @@ class Candidate:
 
         return np.asarray(self._X, dtype=np.float64)
 
-    def _get_X_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]:
+    def _get_X_as_grouped(self) -> tuple[NDArray[np.float64], NDArray[np.int32], NDArray[str]]:
         """Utility function of getting a design vector X as a tuple of numpy.ndarrays grouped by type.
 
         Returns
         -------
-        X: tuple[NDArray[np.float64], NDArray[np.int32], NDArray[np.str_]]
+        X: tuple[NDArray[np.float64], NDArray[np.int32], NDArray[str]]
             A tuple of grouped design variables.
         """
 
