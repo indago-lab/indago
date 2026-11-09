@@ -5,13 +5,16 @@ build:
   tools:
     python: "3.12"
   jobs:
-    # Read the Docs nema nativno instaliran 'uv', pa ga instaliramo prije builda
+    # 1. Instalacija uv-a u sustav
     post_create_environment:
       - pip install uv
-    # Koristimo uv za instalaciju vašeg paketa i dev grupe (gdje su Sphinx i tema)
+
+    # 2. Sinkronizacija zavisnosti u uv virtualno okruženje
     post_install:
       - uv sync --all-extras --group docs
 
-# Putanja do conf.py datoteke unutar vašeg projekta
-sphinx:
-  configuration: docs/src/conf.py
+    # 3. Prisiljavanje Read the Docs-a da pokrene Sphinx preko 'uv run'
+    # Ovo osigurava da Sphinx vidi myst_parser, temu i vaš modul
+    build:
+      html:
+        - uv run sphinx-build -b html docs/src/ $READTHEDOCS_OUTPUT/html

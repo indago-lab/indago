@@ -296,9 +296,11 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "pytest" },
+]
+docs = [
     { name = "furo" },
     { name = "myst-parser" },
-    { name = "pytest" },
     { name = "sphinx" },
     { name = "sphinx-rtd-theme" },
 ]
@@ -312,10 +314,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [
+dev = [{ name = "pytest", specifier = ">9.0.2" }]
+docs = [
     { name = "furo" },
     { name = "myst-parser", specifier = ">=5.0.0" },
-    { name = "pytest", specifier = ">9.0.2" },
     { name = "sphinx", specifier = ">=9.1.0" },
     { name = "sphinx-rtd-theme", specifier = ">=3.1.0" },
 ]
