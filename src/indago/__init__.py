@@ -19,7 +19,7 @@ Usage: import indago
 """
 
 
-__version__ = '0.7.0'
+__version__ = '0.6.99'
 
 from indago.core._candidate import Candidate, VariableType, VariableDictType, XFormat, X_Content_Type
 from indago.core._optimizer import Optimizer, OptimizerStatus
