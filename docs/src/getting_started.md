@@ -264,7 +264,7 @@ ssa.params['gd_lim'] = [0.5, 1.11]  # gliding distance limits; default gd_lim=[0
 
 ### Differential Evolution
 
-There are five DE [9, 18, 20] variants implemented, namely *SHADE*, *LSHADE*, *RankLSHADE*, *iLSHADE* and *jSO*. The *iLSHADE* variant implements the improved L-SHADE algorithm [18], while *jSO* implements its improved variant [20]. Say we want to use *SHADE*:
+There are five DE [9, 18, 20] variants implemented, namely *SHADE*, *LSHADE*, *RankLSHADE*, *iLSHADE* and *jSO*. The *iLSHADE* variant implements the improved LSHADE algorithm [18], while *jSO* implements its improved variant [20]. Say we want to use *SHADE*:
 ```python
 de.variant = 'SHADE'  # other available options are 'LSHADE', 'RankLSHADE', 'iLSHADE', and 'jSO', default variant='LSHADE'
 ```

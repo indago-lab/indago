@@ -237,7 +237,7 @@ class DE(Optimizer):
             S_df = np.empty([0])
             
             if self.variant in ['iLSHADE', 'jSO']:
-                progress = min(max(self._progress_factor(), 0.0), 1.0)
+                progress = self._progress_factor()
                 p_mutation = self.params['p_mutation'] - \
                     (self.params['p_mutation'] - self.params['p_min']) * progress
             else:
