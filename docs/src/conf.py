@@ -7,19 +7,22 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath('../../indago'))
-import indago
-# import sphinx_fontawesome
+from importlib.metadata import version as get_version
+
+# Dohvaćanje verzije iz metapodataka instaliranog indago paketa
+try:
+    release = get_version("indago")
+except Exception:
+    release = "0.0.0"  # Fallback ako paket još nije instaliran u okruženju
+
+version = ".".join(release.split(".")[:2])
 
 
 project = 'Indago'
 copyright = 'Department of fluid mechanics and computational engineering, Faculty of Engineering, University of Rijeka (2023-)'
 author = 'Department of fluid mechanics and computational engineering, Faculty of Engineering, University of Rijeka'
-version = indago.__version__
-release = version
+# version = indago.__version__
+# release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
