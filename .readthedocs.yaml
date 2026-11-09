@@ -1,42 +1,17 @@
-name: Publish to Read the Docs
+version: 2
 
-on:
-  push:
-    branches:
-      - release
-    tags:
-      - '*'
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"
+  jobs:
+    # Read the Docs nema nativno instaliran 'uv', pa ga instaliramo prije builda
+    post_create_environment:
+      - pip install uv
+    # Koristimo uv za instalaciju vašeg paketa i dev grupe (gdje su Sphinx i tema)
+    post_install:
+      - uv sync --all-extras --group docs
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # 1. Postavljanje uv-a i specifične verzije Pythona
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
-          python-version: '3.12'
-
-      # 2. Sinkronizacija zavisnosti (npr. ako imate 'docs' grupu u pyproject.toml)
-      # Ako nemate definiranu grupu, uv će instalirati vaš modul i osnovne zavisnosti
-      - name: Install dependencies
-        run: |
-          uv sync --all-extras --group docs
-
-      # 3. Izgradnja dokumentacije unutar uv okruženja
-      # Korištenjem 'uv run' osiguravate da Sphinx vidi vaš lokalni Python modul
-      - name: Build HTML documentation
-        run: |
-          uv run sphinx-build -b html docs/src docs/build/html
-
-      # 4. Slanje na Read the Docs
-      - name: Upload to Read the Docs
-        uses: readthedocs/upload-action@main
-        with:
-          token: ${{ secrets.READTHEDOCS_TOKEN }}
-          project-slug: 'indago'
-          html: 'docs/build/html'
+# Putanja do conf.py datoteke unutar vašeg projekta
+sphinx:
+  configuration: docs/src/conf.py
