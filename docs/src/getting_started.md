@@ -2,7 +2,7 @@
 
 Indago is a Python 3 module for numerical optimization.
 
-Indago contains several modern optimization methods adapted for real fitness function optimization over a mixed-type parameter domain. It was developed at the Department for Fluid Mechanics and Computational Engineering of the University of Rijeka, Faculty of Engineering, by Stefan Ivić, Siniša Družeta, and Luka Grbčić. 
+Indago contains several modern optimization methods adapted for real fitness function optimization over a mixed-type parameter domain. It was developed at the Department for Fluid Mechanics and Computational Engineering of the University of Rijeka, Faculty of Engineering, by Stefan Ivić, Siniša Družeta, and Luka Grbčić. Research group home page is [indago-lab.gitgub.io](https://indago-lab.github.io/).
 
 Indago is developed for in-house research and teaching purposes, and comes with no guarantees and with insufficient documentation. However, we have been developing and using it regulary for years, and it seems to be working fine. Hopefully you will find it useful as well.
 
