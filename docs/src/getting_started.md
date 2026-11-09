@@ -148,7 +148,7 @@ As of now, Indago includes the following stochastic global optimization methods:
 - Particle Swarm Optimization (PSO) [1]
 - Fireworks Algorithm (FWA) [7]
 - Squirrel Search Algorithm (SSA) [8]
-- Differential Evolution (DE) [9]
+- Differential Evolution (DE) [9, 18]
 - Electromagnetic Field Optimization (EFO) [10]
 - Artificial Bee Colony (ABC) [11]
 - Gray Wolf Optimizer (GWO) [12]
@@ -264,18 +264,22 @@ ssa.params['gd_lim'] = [0.5, 1.11]  # gliding distance limits; default gd_lim=[0
 
 ### Differential Evolution
 
-There are three DE [9] variants implemented, namely *SHADE*, *LSHADE* and *RankLSHADE*. Say we want to use *SHADE*:
+There are five DE [9, 18, 20] variants implemented, namely *SHADE*, *LSHADE*, *RankLSHADE*, *iLSHADE* and *jSO*. The *iLSHADE* variant implements the improved L-SHADE algorithm [18], while *jSO* implements its improved variant [20]. Say we want to use *SHADE*:
 ```python
-de.variant = 'SHADE'  # other available options are 'LSHADE' and 'RankLSHADE', default variant='LSHADE'
+de.variant = 'SHADE'  # other available options are 'LSHADE', 'RankLSHADE', 'iLSHADE', and 'jSO', default variant='LSHADE'
 ```
 When dealing with constraints, you must use the *RankLSHADE* variant.
 
 All DE variants use the following parameters:
 ```python
-de.params['pop_init'] = 200  # initial population size; default pop_init=max(30, 5*dimensions)
+de.params['pop_init'] = 200  # initial population size; default pop_init=max(30, 5*dimensions), max(30, 12*dimensions) for iLSHADE, or max(30, round(25*ln(dimensions)*sqrt(dimensions))) for jSO
 de.params['f_archive'] = 3  # external archive size factor; default f_archive=2.6
-de.params['hist_size'] = 4  # historical memory size; default hist_size=6
-de.params['p_mutation'] = 0.2  # default p_mutation=0.11
+de.params['hist_size'] = 4  # historical memory size; default hist_size=6, or 5 for jSO
+de.params['p_mutation'] = 0.2  # default p_mutation=0.11, 0.2 for iLSHADE, or 0.25 for jSO
+```
+The *iLSHADE* and *jSO* variants additionally use the following parameter:
+```python
+de.params['p_min'] = 0.1  # minimum mutation probability; default p_min=0.1 for iLSHADE, or 0.125 for jSO
 ```
 
 ### Electromagnetic Field Optimization 
@@ -647,6 +651,10 @@ Optionally, you can provide a filename for saving the plot and a title for the p
 
 17. Hansen, N. (2009). Benchmarking a BI-Population CMA-ES on the BBOB-2009 Function Testbed, Proceedings of the GECCO 2009 Workshop on Black-Box Optimization Benchmarking, pp. 2389-2396.
 
+18. Brest, J., Maučec, M. S., & Bošković, B. (2016). iL-SHADE: Improved L-SHADE algorithm for single objective real-parameter optimization. In Proceedings of the 2016 IEEE Congress on Evolutionary Computation (CEC), Vancouver, Canada, 1188–1195.
+
 18. Gao, F., Han, L. (2012). Implementing the Nelder-Mead simplex algorithm with adaptive parameters. Computational Optimization and Applications. 51:1, pp. 259-277
 
 19. Liang, J. J., Qin, A. K., Suganthan, P. N., & Baskar, S. (2006). Comprehensive learning particle swarm optimizer for global optimization of multimodal functions. IEEE Transactions on Evolutionary Computation, 10(3), 281-295.
+
+20. Brest, J., Maučec, M. S., & Bošković, B. (2017). Single Objective Real-Parameter Optimization: Algorithm jSO. In Proceedings of the 2017 IEEE Congress on Evolutionary Computation (CEC), San Sebastián, Spain, 1311–1318.
