@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../../src'))
 import indago
 # import sphinx_fontawesome
-print(f'{indago.__version__=}')
+# print(f'{indago.__version__=}')
 # input('?')
 
 project = 'Indago'
