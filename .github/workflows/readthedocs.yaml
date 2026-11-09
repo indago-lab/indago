@@ -35,7 +35,7 @@ jobs:
 
       # 4. Slanje na Read the Docs
       - name: Upload to Read the Docs
-        uses: readthedocs/upload-action@v1
+        uses: readthedocs/upload-action@v1.0.1
         with:
           token: ${{ secrets.READTHEDOCS_TOKEN }}
           project-slug: 'indago'
