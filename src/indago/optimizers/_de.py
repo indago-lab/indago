@@ -118,7 +118,7 @@ class DE(Optimizer):
 
         if self.variant in 'SHADE LSHADE RankLSHADE iLSHADE jSO'.split():
             mandatory_params = 'pop_init f_archive hist_size p_mutation'.split()
-            if self.variant in ['iLSHADE', 'jSO']:
+            if self.variant in 'iLSHADE jSO'.split():
                 optional_params = ['p_min']
             if 'pop_init' not in self.params:
                 if self.variant == 'iLSHADE':
@@ -139,7 +139,7 @@ class DE(Optimizer):
                 self.params['p_mutation'] = 0.25 if self.variant == 'jSO' else \
                     (0.2 if self.variant == 'iLSHADE' else 0.11)
                 defined_params += 'p_mutation'.split()
-            if self.variant in ['iLSHADE', 'jSO'] and 'p_min' not in self.params:
+            if self.variant in 'iLSHADE jSO'.split() and 'p_min' not in self.params:
                 self.params['p_min'] = 0.125 if self.variant == 'jSO' else 0.1
                 defined_params += 'p_min'.split()
         else:
@@ -156,7 +156,7 @@ class DE(Optimizer):
         assert isinstance(self.params['hist_size'], int) \
             and self.params['hist_size'] > 0, \
             "hist_size should be positive integer"
-        if self.variant in ['iLSHADE', 'jSO']:
+        if self.variant in 'iLSHADE jSO'.split():
             assert 0 <= self.params['p_min'] <= self.params['p_mutation'] <= 1, \
                 "p_min and p_mutation should be in range [0, 1] and p_min <= p_mutation"
 
@@ -173,7 +173,7 @@ class DE(Optimizer):
             
         """
 
-        if self.variant in 'LSHADE RankLSHADE iLSHADE'.split():
+        if self.variant in 'LSHADE RankLSHADE iLSHADE jSO'.split():
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
                 'Error: optimizer.max_iteration, optimizer.max_evaluations, or self.max_elapsed_time should be provided for this method/variant'
 
@@ -189,7 +189,7 @@ class DE(Optimizer):
         self._A = []
         
         # Prepare historical memory
-        self._M_CR = np.full(self.params['hist_size'], 0.8 if self.variant in ['iLSHADE', 'jSO'] else 0.5)
+        self._M_CR = np.full(self.params['hist_size'], 0.8 if self.variant in 'iLSHADE jSO'.split() else 0.5)
         self._M_F = np.full(self.params['hist_size'], 0.3 if self.variant == 'jSO' else 0.5)
 
         # Generate initial positions
@@ -236,7 +236,7 @@ class DE(Optimizer):
             S_F = np.empty([0])
             S_df = np.empty([0])
             
-            if self.variant in ['iLSHADE', 'jSO']:
+            if self.variant in 'iLSHADE jSO'.split():
                 progress = self._progress_factor()
                 p_mutation = self.params['p_mutation'] - \
                     (self.params['p_mutation'] - self.params['p_min']) * progress
@@ -252,7 +252,7 @@ class DE(Optimizer):
                 
                 # Update CR, F
                 r = np.random.randint(self.params['hist_size'])
-                if self.variant in ['iLSHADE', 'jSO'] and r == self.params['hist_size'] - 1:
+                if self.variant in 'iLSHADE jSO'.split() and r == self.params['hist_size'] - 1:
                     self._M_F[r] = 0.9
                     self._M_CR[r] = 0.9
                 if np.isnan(self._M_CR[r]):
@@ -372,15 +372,15 @@ class DE(Optimizer):
                     self._M_CR[self._k] = np.nan
                 else:
                     mean_CR = np.sum(w * S_CR**2) / np.sum(w * S_CR)
-                    if self.variant in ['iLSHADE', 'jSO']:
+                    if self.variant in 'iLSHADE jSO'.split():
                         mean_CR = (mean_CR + self._M_CR[self._k]) / 2
                     self._M_CR[self._k] = mean_CR
                 mean_F = np.sum(w * S_F**2) / np.sum(w * S_F)
-                if self.variant in ['iLSHADE', 'jSO']:
+                if self.variant in 'iLSHADE jSO'.split():
                     mean_F = (mean_F + self._M_F[self._k]) / 2
                 self._M_F[self._k] = mean_F
                 self._k += 1
-                k_max = self.params['hist_size'] - 1 if self.variant in ['iLSHADE', 'jSO'] \
+                k_max = self.params['hist_size'] - 1 if self.variant in 'iLSHADE jSO'.split() \
                     else self.params['hist_size']
                 if self._k >= k_max:
                     self._k = 0

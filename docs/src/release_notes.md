@@ -15,11 +15,11 @@ Released on yyyy-mm-dd
 - **New method: CMAES**
 - New PSO variant `'CL'` implementing Comprehensive Learning PSO (CLPSO)
 - New DE variant `'RankLSHADE'` supporting constraints
-- New DE variant `'iLSHADE'` implementing the improved L-SHADE algorithm
+- New DE variant `'iLSHADE'` implementing the improved LSHADE algorithm
 - New DE variant `'jSO'` implementing the jSO algorithm
 - Changes in available anakatabatic models for Vanilla PSO: `'DoubleSummit'` added, `'MessyTie'` removed <i class="fa-solid fa-triangle-exclamation"></i>
 - New default anakatabatic models when using anakatabatic inertia in PSO: `'TipsySpider'` for Vanilla PSO and `'OrigamiSnake'` for TVAC PSO <i class="fa-solid fa-triangle-exclamation"></i>
-- Introducing new default PSO variant (`'Flagship'`), representing "best in show" of all PSO (sub-)variants. Using this variant you get Vanilla PSO with anakatabatic inertia and `'TipsySpider'` anakatabatic model, which has shown to be the best implemented version of PSO in our rather extensive testing <i class="fa-solid fa-triangle-exclamation"></i>
+- Introducing new default PSO variant (`'Flagship'`), representing "best in show" of all PSO (sub-)variants. Using this variant you get Vanilla PSO with anakatabatic inertia and `'TipsySpider'` anakatabatic model, which has shown to be the overall best implemented version of PSO in our rather extensive testing <i class="fa-solid fa-triangle-exclamation"></i>
 - Utility functions `inspect`, `inspect_optimizers` and `minimize_exhaustive` have been removed <i class="fa-solid fa-triangle-exclamation"></i>
 ### Improvements
 - **Significant code refactoring, making Indago ready for future extensions**
