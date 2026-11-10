@@ -6,6 +6,17 @@ Most important changes in Indago releases are listed here. Breaking changes are 
 
 ***
 
+## Indago 0.7.2
+
+Released on ????-??-??
+
+### Improvements
+- ???
+### Bug fixes
+- Fixed missing README text on PyPI project page
+
+***
+
 ## Indago 0.7.1
 
 Released on 2026-11-09
