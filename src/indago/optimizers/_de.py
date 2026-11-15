@@ -82,6 +82,8 @@ class DE(Optimizer):
         M_F values.
     _k : int
         Memory index.
+    _g_max : int
+        Predicted total number of generations (used by iLSHADE and jSO only).
         
     Returns
     -------
@@ -157,6 +159,8 @@ class DE(Optimizer):
             and self.params['hist_size'] > 0, \
             "hist_size should be positive integer"
         if self.variant in 'iLSHADE jSO'.split():
+            assert self.params['hist_size'] >= 2, \
+                "hist_size should be at least 2 for iLSHADE and jSO"
             assert 0 <= self.params['p_min'] <= self.params['p_mutation'] <= 1, \
                 "p_min and p_mutation should be in range [0, 1] and p_min <= p_mutation"
 
@@ -175,7 +179,7 @@ class DE(Optimizer):
 
         if self.variant in 'LSHADE RankLSHADE iLSHADE jSO'.split():
             assert self.max_iterations or self.max_evaluations or self.max_elapsed_time, \
-                'Error: optimizer.max_iteration, optimizer.max_evaluations, or self.max_elapsed_time should be provided for this method/variant'
+                'Error: optimizer.max_iterations, optimizer.max_evaluations, or optimizer.max_elapsed_time should be provided for this method/variant'
 
         self._evaluate_initial_candidates()
 
@@ -187,6 +191,10 @@ class DE(Optimizer):
         
         # Initalize Archive
         self._A = []
+
+        # Predicted total number of generations (used by iLSHADE and jSO only)
+        self._g_max = None
+        self._g_max_limits = None
         
         # Prepare historical memory
         self._M_CR = np.full(self.params['hist_size'], 0.8 if self.variant in 'iLSHADE jSO'.split() else 0.5)
@@ -212,7 +220,66 @@ class DE(Optimizer):
             self._err_msg = 'ALL CANDIDATES FAILED TO EVALUATE'
         
         self._finalize_iteration()
-        
+
+    def _trim_archive(self):
+        """Private method for keeping the external archive within its capacity,
+        which follows the current population size. Randomly selected archive
+        members are removed (by index) until the archive fits.
+
+        Returns
+        -------
+        None
+            Nothing
+
+        """
+
+        capacity = round(len(self._Pop) * self.params['f_archive'])
+        while len(self._A) > capacity:
+            self._A.pop(np.random.randint(len(self._A)))
+
+    def _stage_progress(self):
+        """Private method for calculating the generation-based progress
+        (g / G_MAX), used only by the iLSHADE and jSO variants for staging
+        their CR and F limits. These two algorithms define the stages by
+        generations, which (due to the population size reduction) are not
+        proportional to evaluations. When an evaluation budget is given, the
+        total number of generations (G_MAX) is hence predicted by replaying
+        the population size reduction schedule over the remaining evaluations.
+
+        Returns
+        -------
+        stage_progress : float
+            A number between zero and one, representing the share of
+            generations performed.
+
+        """
+
+        if not self.max_evaluations:
+            # No evaluation budget: the progress factor is already based on
+            # iterations (i.e. generations) and/or elapsed time
+            return min(max(self._progress_factor(), 0.0), 1.0)
+
+        limits = (self.max_evaluations, self.max_iterations)
+        if self._g_max_limits != limits:  # first call, or the limits changed before resuming
+            N_init = self.params['pop_init']
+            g, evals, N = self.it - 1, self.eval, len(self._Pop)
+            while True:
+                g += 1
+                evals += N
+                progress = evals / self.max_evaluations
+                if self.max_iterations:
+                    progress = max(progress, g / self.max_iterations)
+                if progress >= 1:
+                    break
+                N = min(N, round((4 - N_init) * progress + N_init))
+            self._g_max = max(g, 1)
+            self._g_max_limits = limits
+
+        progress = self.it / self._g_max
+        if self.max_elapsed_time:
+            progress = max(progress, self.elapsed_time / self.max_elapsed_time)
+        return min(max(progress, 0.0), 1.0)
+
     def _run(self):
         """Main loop of DE method.
 
@@ -237,16 +304,18 @@ class DE(Optimizer):
             S_df = np.empty([0])
             
             if self.variant in 'iLSHADE jSO'.split():
+                # evaluation-based progress (for p and jSO's Fw)
                 progress = self._progress_factor()
+                # generation-based progress (for CR and F stages)
+                stage = self._stage_progress()
                 p_mutation = self.params['p_mutation'] - \
                     (self.params['p_mutation'] - self.params['p_min']) * progress
             else:
                 p_mutation = self.params['p_mutation']
 
-            # find pbest
+            # find pbest pool
             top = max(round(len(self._Pop) * p_mutation), 1)
             pbest_pool = sorted(self._Pop)[0:top]
-            pbest = np.random.choice(pbest_pool)
             
             for p, t in zip(self._Pop, self._Trials):
                 
@@ -265,22 +334,22 @@ class DE(Optimizer):
                     p.F = min(cauchy.rvs(self._M_F[r], 0.1), 1)
 
                 if self.variant == 'iLSHADE':
-                    if progress < 0.25:
+                    if stage < 0.25:
                         p.CR = max(p.CR, 0.5)
-                    elif progress < 0.5:
+                    elif stage < 0.5:
                         p.CR = max(p.CR, 0.25)
-                    if progress < 0.25:
+                    if stage < 0.25:
                         p.F = min(p.F, 0.7)
-                    elif progress < 0.5:
+                    elif stage < 0.5:
                         p.F = min(p.F, 0.8)
-                    elif progress < 0.75:
+                    elif stage < 0.75:
                         p.F = min(p.F, 0.9)
                 elif self.variant == 'jSO':
-                    if progress < 0.25:
+                    if stage < 0.25:
                         p.CR = max(p.CR, 0.7)
-                    elif progress < 0.5:
+                    elif stage < 0.5:
                         p.CR = max(p.CR, 0.6)
-                    if progress < 0.6:
+                    if stage < 0.6:
                         p.F = min(p.F, 0.7)
                 
                 # Compute mutant vector
@@ -288,8 +357,8 @@ class DE(Optimizer):
                 while r1 is r2 or r1 is p or r2 is p:
                     r1 = np.random.choice(self._Pop)
                     r2 = np.random.choice(self._Pop + self._A)
+                pbest = np.random.choice(pbest_pool)  # drawn independently for each target
                 if self.variant == 'jSO':
-                    pbest = np.random.choice(pbest_pool)
                     if progress < 0.2:
                         Fw = 0.7 * p.F
                     elif progress < 0.4:
@@ -299,7 +368,10 @@ class DE(Optimizer):
                 else:
                     Fw = p.F
                 p.V = p._R + Fw * (pbest._R - p._R) + p.F * (r1._R - r2._R)
-                p.V = np.clip(p.V, (0 + p._R)/2, (p._R + 1)/2)
+                # Repair only the out-of-bounds coordinates, by placing them halfway
+                # between the parent and the violated bound
+                p.V = np.where(p.V < 0, (0 + p._R)/2,
+                               np.where(p.V > 1, (p._R + 1)/2, p.V))
                 
                 # Compute trial vector
                 t.CR = p.CR
@@ -323,18 +395,21 @@ class DE(Optimizer):
             # standard fitness-based algorithm
             if self.variant != 'RankLSHADE':
                 for p, t in zip(self._Pop, self._Trials):
-                    if t < p:
+                    improved = t < p
 
-                        # Update external archive
-                        self._A.append(p)
-                        if len(self._A) > round(len(self._Pop) * self.params['f_archive']):
-                            self._A.remove(np.random.choice(self._A))
+                    if improved:
+
+                        # Update external archive (with a snapshot of the replaced parent)
+                        self._A.append(p.copy())
+                        self._trim_archive()
 
                         S_CR = np.append(S_CR, t.CR) 
                         S_F = np.append(S_F, t.F)
                         S_df = np.append(S_df, p.f - t.f)
 
-                        # Update population
+                    # Update population
+                    # (equal-fitness trials also survive, but are not archived nor recorded as successful)
+                    if improved or t.f == p.f:
                         p._R = np.copy(t._R)
                         p.f = t.f
                         p.O, p.C = np.copy(t.O), np.copy(t.C)  # formally copying, natively not supporting constraints
@@ -350,9 +425,8 @@ class DE(Optimizer):
 
                         # Update external archive
                         if p.is_feasible():
-                            self._A.append(p)
-                            if len(self._A) > round(len(self._Pop) * self.params['f_archive']):
-                                self._A.remove(np.random.choice(self._A))
+                            self._A.append(p.copy())
+                            self._trim_archive()
 
                         S_CR = np.append(S_CR, t.CR) 
                         S_F = np.append(S_F, t.F)
@@ -392,6 +466,7 @@ class DE(Optimizer):
                 if N_new < len(self._Pop):
                     self._Pop = sorted(self._Pop)[:N_new]
                     self._Trials = self._Trials[:N_new]
+                    self._trim_archive()  # archive capacity follows the population size
                 
             if self._finalize_iteration():
                 break
