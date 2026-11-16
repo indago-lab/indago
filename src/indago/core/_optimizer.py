@@ -258,7 +258,7 @@ class Optimizer(Engine):
             prog.append(self.eval / self.max_evaluations)
         if self.max_elapsed_time:
             prog.append(self.elapsed_time / self.max_elapsed_time)
-        return max(prog)
+        return min(max(prog), 1)
 
     def _evaluator_safe(self, X, s=None):
         """Private method for wrapping evaluation function in try-except.
