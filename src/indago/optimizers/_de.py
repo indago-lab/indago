@@ -257,7 +257,7 @@ class DE(Optimizer):
         if not self.max_evaluations:
             # No evaluation budget: the progress factor is already based on
             # iterations (i.e. generations) and/or elapsed time
-            return min(max(self._progress_factor(), 0.0), 1.0)
+            return self._progress_factor()
 
         limits = (self.max_evaluations, self.max_iterations)
         if self._g_max_limits != limits:  # first call, or the limits changed before resuming
@@ -278,6 +278,7 @@ class DE(Optimizer):
         progress = self.it / self._g_max
         if self.max_elapsed_time:
             progress = max(progress, self.elapsed_time / self.max_elapsed_time)
+
         return min(max(progress, 0.0), 1.0)
 
     def _run(self):
