@@ -504,13 +504,7 @@ class Candidate:
 
         """
 
-        all_real = True
-        for var_type in list(a._variables.values()) + list(b._variables.values()):
-            if var_type[0] is not VariableType.REAL:
-                all_real = False
-                break
-
-        if all_real:
+        if a._all_real() and b._all_real():
             return (a.X == b.X).all() and (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
         else:
             return a.X == b.X and a.O == b.O and a.C == b.C and a.f == b.f
@@ -686,14 +680,10 @@ class Candidate:
             Computed relative distance vector.
         """
 
-        all_real = True
-        for var_type in self._variables.values():
-            if var_type[0] is not VariableType.REAL:
-                all_real = False
-                break
-        if all_real:
+        if self._all_real() and other._all_real():
             return self._R - other._R
 
+        # else
         delta_R = []
         for i, (var_type, *var_options) in enumerate(self._variables.values()):
 
@@ -733,3 +723,21 @@ class Candidate:
         """
 
         return np.all(self.C <= 0)
+
+    def _all_real(self) -> bool:
+        """
+        Determines whether the design vector of a Candidate consists of real continuous values only.
+
+        Returns
+        -------
+        all_real : bool
+            ``True`` if Candidate design vector is all real continuous, ``False`` otherwise.
+        """
+
+        all_real = True
+        for var_type in self._variables.values():
+            if var_type[0] is not VariableType.REAL:
+                all_real = False
+                break
+
+        return all_real
