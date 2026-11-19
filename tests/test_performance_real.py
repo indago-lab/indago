@@ -322,7 +322,7 @@ def test_SSA_custom_additional_parameters():
 def test_DE_defaults():
     description = 'DE defaults'
     optimizer = DE()
-    expected_result = 2.4053635948242538  # before moving to _R: 2.3996066775068625
+    expected_result = 2.6841626798029807
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -332,7 +332,7 @@ def test_DE_RankLSHADE_defaults():
     description = 'DE RankLSHADE defaults'
     optimizer = DE()
     optimizer.variant = 'RankLSHADE'
-    expected_result = 2.1682477443921826
+    expected_result = 3.086470244083372
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -342,7 +342,7 @@ def test_DE_SHADE_defaults():
     description = 'DE SHADE defaults'
     optimizer = DE()
     optimizer.variant = 'SHADE'
-    expected_result = 3.44022075320384  # before moving to _R: 3.3448851150990944
+    expected_result = 4.173048630824239
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -354,7 +354,7 @@ def test_DE_LSHADE_custom_parameters():
     optimizer.variant = 'LSHADE'
     optimizer.params['pop_init'] = 20
     optimizer.params['f_archive'] = 2
-    expected_result = 2.0116745779210747  # before moving to _R: 1.4083783202220084
+    expected_result = 2.384317815068114
     tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -364,7 +364,7 @@ def test_DE_iLSHADE_defaults():
     description = 'DE iLSHADE defaults'
     optimizer = DE()
     optimizer.variant = 'iLSHADE'
-    expected_result = 3.3125148703343594
+    expected_result = 3.4789310457317972
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -378,7 +378,7 @@ def test_DE_iLSHADE_custom_parameters():
     optimizer.params['f_archive'] = 2
     optimizer.params['p_min'] = 0.05
     optimizer.params['p_mutation'] = 0.3
-    expected_result = 1.56932818461869
+    expected_result = 1.7320086915243018
     tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -388,7 +388,7 @@ def test_DE_jSO_defaults():
     description = 'DE jSO defaults'
     optimizer = DE()
     optimizer.variant = 'jSO'
-    expected_result = 3.62436805477409
+    expected_result = 3.839446148714184
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -402,7 +402,7 @@ def test_DE_jSO_custom_parameters():
     optimizer.params['f_archive'] = 2
     optimizer.params['p_min'] = 0.05
     optimizer.params['p_mutation'] = 0.3
-    expected_result = 2.219112712937929
+    expected_result = 2.078530557592791
     tolerance = 1e-9
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \
@@ -587,7 +587,7 @@ def test_SynCO_2_custom_methods():
     optimizer = SynCO()
     optimizer.methods = {'DE': ('LSHADE', {'pop_init': 30}),
                          'GWO': ('Vanilla', {'pop_size': 20})}
-    expected_result = 3.6913445422119726
+    expected_result = 4.34049675945559
     tolerance = TOL
     result = run(optimizer)
     assert np.isclose(expected_result, result, atol=tolerance, rtol=0), \

@@ -11,7 +11,7 @@ Most important changes in Indago releases are listed here. Breaking changes are 
 Released on ????-??-??
 
 ### Improvements
-- ???
+- Fixed some issues in DE methods implementation (should produce better performance)
 ### Bug fixes
 - Fixed missing README text on PyPI project page
 

@@ -410,7 +410,7 @@ class DE(Optimizer):
 
                     # Update population
                     # (equal-fitness trials also survive, but are not archived nor recorded as successful)
-                    if improved or t.f == p.f:
+                    if improved or t == p:
                         p._R = np.copy(t._R)
                         p.f = t.f
                         p.O, p.C = np.copy(t.O), np.copy(t.C)  # formally copying, natively not supporting constraints
