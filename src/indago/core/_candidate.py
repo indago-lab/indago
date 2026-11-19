@@ -505,9 +505,9 @@ class Candidate:
         """
 
         if a._all_real() and b._all_real():
-            return (a.X == b.X).all() and (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
+            return (a.O == b.O).all() and (a.C == b.C).all() and a.f == b.f
         else:
-            return a.X == b.X and a.O == b.O and a.C == b.C and a.f == b.f
+            return a.O == b.O and a.C == b.C and a.f == b.f
 
     def __ne__(self, other: Candidate) -> bool:
         """Inequality operator.
